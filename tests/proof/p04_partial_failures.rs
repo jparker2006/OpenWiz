@@ -447,10 +447,41 @@ fn help_documents_the_commands_the_order_and_the_exit_codes() {
             );
         }
         assert!(
-            !out.contains("  4  "),
+            !out.lines().any(|l| l.starts_with("  4  ")),
             "{flag}: no exit code 4, the version is never a gate:\n{out}"
         );
         assert!(fake.invocations().is_empty(), "help reads nothing");
+    }
+}
+
+/// OpenWiz 0.0.2 is read-only: there is no `send`. The real `openwiz`
+/// program treats it as an unknown command, reads and writes nothing, and
+/// its help never mentions it.
+#[test]
+fn send_is_an_unknown_command_and_help_never_mentions_it() {
+    let fake = Fake::new("p04_no_send", "normal");
+    for args in [&["send", "thr_syn_0001", "hello"][..], &["send"][..]] {
+        let (code, out, err) = fake.program_cli(args);
+        assert_eq!(code, 2, "openwiz {args:?}: {out}{err}");
+        assert!(out.is_empty(), "openwiz {args:?}: stdout: {out}");
+        assert_eq!(
+            err, "openwiz: unknown command send (see openwiz --help)\n",
+            "openwiz {args:?}"
+        );
+    }
+    assert!(
+        fake.invocations().is_empty(),
+        "an unknown command runs no room-cli: {:?}",
+        fake.invocations()
+    );
+    for flag in ["--help", "-h"] {
+        let (code, out, err) = fake.program_cli(&[flag]);
+        assert_eq!(code, 0, "{err}");
+        assert!(
+            !out.to_lowercase().contains("send"),
+            "{flag}: help mentions send:\n{out}"
+        );
+        assert!(out.contains("read-only"), "{flag}:\n{out}");
     }
 }
 

@@ -1,6 +1,6 @@
 {
   "scenario": "version-failed",
-  "description": "room-cli --version exits 1 with a stderr line that must never be echoed. Every other read is normal.",
+  "description": "room-cli --version exits 1 with a stderr line that must never be echoed. The line passes the stderr sanitizer's general grammar (Error: HTTP <code>: <letters and spaces>), so only the version read's own rule withholds it. Every other read is normal.",
   "extends": "normal",
   "synthetic_assumptions": [
     "A failing --version is unobserved; the stderr line is a synthetic marker standing for private text."
@@ -11,7 +11,7 @@
         "--version"
       ],
       "exit": 1,
-      "stderr": "Synthetic private version marker"
+      "stderr": "Error: HTTP 500: Synthetic private version marker"
     }
   ]
 }

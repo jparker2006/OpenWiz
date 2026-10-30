@@ -6,16 +6,24 @@
 //! `schema drift: <read> <field>`. A row without a readable id is unreadable.
 //! Output that is not JSON, or not the expected top-level shape, fails that
 //! read. Nothing is invented.
+//!
+//! Text `room-cli` prints is shown only where it is session data. A version
+//! other than `N.N.N`, a mismatched id and an unrecognised value that is not
+//! label-like are withheld; output that is not JSON is described by the
+//! parser's category and position only; the stderr of a failed read is
+//! sanitized in `process`.
 
 use std::path::PathBuf;
 use std::time::Instant;
 
 use openwiz_core::envelope::{Gap, GapKind};
 use openwiz_core::model::{Fact, ProjectId, SessionId, Timestamp};
+use openwiz_core::ops::{VERSION_NOT_RECOGNISED, is_version_text};
 use openwiz_core::source::{
     MachineRecord, OutputRecord, Placement, ProjectRecord, Read, Rows, SessionDetailRecord,
     SessionRecord, SessionScope, SessionSource, SourceError,
 };
+use serde_json::error::Category;
 use serde_json::{Map, Value};
 
 use crate::allowlist::{Invocation, ThreadId};
@@ -47,7 +55,7 @@ impl CloudRoomSource {
     fn json(&self, invocation: &Invocation, deadline: Instant) -> Result<Value, SourceError> {
         let out = process::run(&self.program, invocation, deadline)?;
         serde_json::from_slice(&out).map_err(|e| SourceError::Malformed {
-            detail: format!("not JSON ({e})"),
+            detail: not_json(&e),
         })
     }
 
@@ -109,7 +117,7 @@ impl CloudRoomSource {
         self.object(&invocation(thread_id), deadline)
             .map_err(|e| match e {
                 SourceError::CommandFailed { ref detail, .. }
-                    if detail.contains("HTTP 404: Thread not found") =>
+                    if detail.starts_with(process::NOT_FOUND_LINE) =>
                 {
                     SourceError::NotFound {
                         subject: id.0.clone(),
@@ -146,6 +154,11 @@ impl SessionSource for CloudRoomSource {
         if version.is_empty() {
             return Err(SourceError::Malformed {
                 detail: "printed no version".to_owned(),
+            });
+        }
+        if !is_version_text(&version) {
+            return Err(SourceError::Malformed {
+                detail: VERSION_NOT_RECOGNISED.to_owned(),
             });
         }
         Ok(version)
@@ -238,7 +251,10 @@ impl SessionSource for CloudRoomSource {
         match fields.string("id") {
             Fact::Known(reported) if reported != id.0 => {
                 return Err(SourceError::Malformed {
-                    detail: format!("it describes {reported}, not {}", id.0),
+                    detail: format!(
+                        "it describes a different session (id withheld), not {}",
+                        id.0
+                    ),
                 });
             }
             _ => {}
@@ -287,6 +303,32 @@ impl SessionSource for CloudRoomSource {
             problems: fields.problems,
         })
     }
+}
+
+/// Why output is not JSON, from the parser's category and position only,
+/// never from the output itself.
+fn not_json(error: &serde_json::Error) -> String {
+    let what = match error.classify() {
+        Category::Io => "a read error",
+        Category::Syntax => "a syntax error",
+        Category::Data => "unexpected data",
+        Category::Eof => "an early end",
+    };
+    format!(
+        "not JSON ({what} at line {} column {})",
+        error.line(),
+        error.column()
+    )
+}
+
+/// A value shown in an unknown's reason: 1 to 32 lowercase ASCII letters,
+/// `-` or `_`, starting with a letter, like the labels 0.43.1 has.
+fn is_label(value: &str) -> bool {
+    let b = value.as_bytes();
+    (1..=32).contains(&b.len())
+        && b[0].is_ascii_lowercase()
+        && b.iter()
+            .all(|&c| c.is_ascii_lowercase() || c == b'-' || c == b'_')
 }
 
 fn shape(expected: &str, got: &Value) -> SourceError {
@@ -391,7 +433,11 @@ impl<'a> Fields<'a> {
                 self.read
             ),
         });
-        format!("schema: {field} is {value}, which is not recognised")
+        if is_label(value) {
+            format!("schema: {field} is {value}, which is not recognised")
+        } else {
+            format!("schema: {field} has a value that is not recognised (value withheld)")
+        }
     }
 
     fn string(&mut self, key: &str) -> Fact<String> {

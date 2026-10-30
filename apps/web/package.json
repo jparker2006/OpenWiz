@@ -1,0 +1,31 @@
+{
+  "name": "openwiz-web",
+  "version": "0.0.2",
+  "private": true,
+  "type": "module",
+  "description": "OpenWiz 0.0.2: the read-only web viewer over openwiz-server's API. A static export, same-origin under /.",
+  "engines": {
+    "node": "24.22.1"
+  },
+  "scripts": {
+    "build": "NEXT_TELEMETRY_DISABLED=1 next build --webpack",
+    "typecheck": "tsc --noEmit",
+    "check": "node scripts/check.mjs",
+    "test": "npm run test:unit && npm run test:browser",
+    "test:unit": "node --test --test-reporter=spec \"test/unit/**/*.test.ts\"",
+    "test:browser": "node --test --test-concurrency=1 --test-force-exit --test-reporter=spec \"test/browser/**/*.test.mjs\""
+  },
+  "dependencies": {
+    "next": "16.4.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "axe-core": "4.14.0",
+    "playwright-core": "1.64.1",
+    "typescript": "6.0.3"
+  }
+}

@@ -24,7 +24,8 @@ use crate::allowlist::Invocation;
 /// about 1.2 MB for several hundred sessions. Provisional.
 pub const MAX_STDOUT_BYTES: usize = 32 * 1024 * 1024;
 
-/// The most stderr kept from a read; only its first line is used.
+/// The most stderr kept from a read; only its first line is used, through
+/// [`diagnostic`].
 const MAX_STDERR_BYTES: usize = 64 * 1024;
 
 /// How long the output of a child that has exited may still be collected
@@ -97,17 +98,79 @@ pub fn run(
     if status.success() {
         return Ok(out);
     }
-    let text = String::from_utf8_lossy(&err);
-    let detail = text
-        .lines()
-        .map(str::trim)
-        .find(|l| !l.is_empty())
-        .unwrap_or("no error output")
-        .to_owned();
     Err(SourceError::CommandFailed {
         exit_code: status.code(),
-        detail,
+        detail: diagnostic(&err),
     })
+}
+
+/// The longest reason phrase kept after `Error: HTTP <code>: `.
+const MAX_REASON_CHARS: usize = 60;
+
+/// The not-found line observed in capture C. A first line that is exactly
+/// this line is kept; one that only contains its `HTTP 404: Thread not
+/// found` is reported as this line and ` (detail withheld)`. So `thread
+/// show` and `thread output` (for `show` and `ls -l`) still find not-found by
+/// prefix, as before, and nothing else of the line is shown.
+pub const NOT_FOUND_LINE: &str = "Error: HTTP 404: Thread not found";
+
+/// The line shown for a failed read: `room-cli`'s first non-empty stderr
+/// line, only if it is in the safe grammar, `Error: HTTP <code>` and
+/// optionally `: ` and a reason phrase of ASCII letters and single spaces.
+/// Otherwise only its status is kept, as `Error: HTTP <code> (detail
+/// withheld)`, or nothing of it. No digit beyond the status, punctuation,
+/// control or non-ASCII character from `room-cli` is shown, so no path,
+/// address, `KEY=value` or terminal control; a word of letters still can
+/// be. Provisional.
+fn diagnostic(stderr: &[u8]) -> String {
+    let text = String::from_utf8_lossy(stderr);
+    let Some(line) = text.lines().map(str::trim).find(|l| !l.is_empty()) else {
+        return "no error output".to_owned();
+    };
+    if line != NOT_FOUND_LINE && line.contains("HTTP 404: Thread not found") {
+        return format!("{NOT_FOUND_LINE} (detail withheld)");
+    }
+    if is_safe(line) {
+        return line.to_owned();
+    }
+    match http_status(line) {
+        Some(code) => format!("Error: HTTP {code} (detail withheld)"),
+        None => "room-cli error (detail withheld)".to_owned(),
+    }
+}
+
+fn is_safe(line: &str) -> bool {
+    let Some((code, reason)) = line
+        .strip_prefix("Error: HTTP ")
+        .and_then(|rest| rest.split_at_checked(3))
+    else {
+        return false;
+    };
+    is_status(code)
+        && (reason.is_empty()
+            || reason.strip_prefix(": ").is_some_and(|phrase| {
+                phrase.chars().count() <= MAX_REASON_CHARS
+                    && phrase
+                        .split(' ')
+                        .all(|w| !w.is_empty() && w.bytes().all(|b| b.is_ascii_alphabetic()))
+            }))
+}
+
+/// The first `HTTP <code>` in `line` that is a word of its own.
+fn http_status(line: &str) -> Option<&str> {
+    let bytes = line.as_bytes();
+    line.match_indices("HTTP ").find_map(|(i, _)| {
+        let code = line.get(i + 5..i + 8)?;
+        let starts_word = i == 0 || !bytes[i - 1].is_ascii_alphanumeric();
+        let ends_word = !bytes.get(i + 8).is_some_and(u8::is_ascii_digit);
+        (starts_word && ends_word && is_status(code)).then_some(code)
+    })
+}
+
+/// Three ASCII digits from 100 to 599.
+fn is_status(code: &str) -> bool {
+    let b = code.as_bytes();
+    b.len() == 3 && (b'1'..=b'5').contains(&b[0]) && b[1..].iter().all(u8::is_ascii_digit)
 }
 
 /// Reads a pipe to its end, or to `limit + 1` bytes, on its own thread.

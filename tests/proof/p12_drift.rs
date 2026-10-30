@@ -70,9 +70,9 @@ fn an_unrecognised_version_is_unknown_and_never_stops() {
     assert!(!out.contains("Synthetic not a version"), "{out}");
 }
 
-/// A failed version read is
-/// unknown with a controlled reason. The source's own error text is never
-/// echoed in text, JSON or stderr, and the run goes on.
+/// A failed version read is unknown with a controlled reason. The source's
+/// own error text is never echoed in text, JSON or stderr, even a line that
+/// passes the stderr sanitizer's general grammar, and the run goes on.
 #[test]
 fn a_failed_version_read_never_echoes_its_error_text() {
     const MARKER: &str = "Synthetic private version marker";
@@ -81,7 +81,7 @@ fn a_failed_version_read_never_echoes_its_error_text() {
     let reason = unknown_reason(&env.source.version).to_owned();
     assert!(!reason.contains(MARKER), "{reason}");
     assert!(
-        reason.contains("exited 1"),
+        reason.contains("exited 1 (detail withheld)"),
         "the safe fact is kept: {reason}"
     );
     assert!(
@@ -108,6 +108,10 @@ fn a_failed_version_read_never_echoes_its_error_text() {
         assert!(
             !out.contains(MARKER) && !err.contains(MARKER),
             "openwiz {args:?}: {out}{err}"
+        );
+        assert!(
+            out.contains("exited 1 (detail withheld)"),
+            "openwiz {args:?}: {out}"
         );
     }
 }

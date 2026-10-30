@@ -1,0 +1,18 @@
+{
+  "scenario": "diagnostics-version",
+  "description": "room-cli --version exits 1 with planted, unsafe-looking diagnostic text on stderr; every other read is normal. The source-diagnostics proof (tests/proof/p04b_source_diagnostics.rs) also replaces this stderr with each of its planted variants.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "The whole stderr is synthetic and adversarial: an absolute path, a home-relative path, a KEY=value pair with digits, a second line and terminal escape sequences. room-cli 0.43.1 was only observed to print 'Error: HTTP 404: Thread not found'.",
+    "Variants this fixture scan forbids in committed files (home paths, Windows paths, token prefixes, emails, URLs with credentials, and Error: lines other than the two recorded ones) are built by the proof at run time, in its own target directory."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "--version"
+      ],
+      "exit": 1,
+      "stderr": "Synthetic failure reading /synthetic/owner/.syn-room/state.json and ~/synthetic/notes with SYNTHETIC_TOKEN=synthetic-value-12345\n\u001b[31mSynthetic second line\u001b[0m"
+    }
+  ]
+}

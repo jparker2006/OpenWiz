@@ -16,7 +16,7 @@ checksum = "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98"
 
 [[package]]
 name = "openwiz-adapter-cloudroom"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "openwiz-core",
  "serde",
@@ -25,7 +25,7 @@ dependencies = [
 
 [[package]]
 name = "openwiz-cli"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "openwiz-adapter-cloudroom",
  "openwiz-core",
@@ -35,18 +35,29 @@ dependencies = [
 
 [[package]]
 name = "openwiz-core"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "serde",
 ]
 
 [[package]]
+name = "openwiz-server"
+version = "0.0.2"
+dependencies = [
+ "openwiz-adapter-cloudroom",
+ "openwiz-core",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "openwiz-tests"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "openwiz-adapter-cloudroom",
  "openwiz-cli",
  "openwiz-core",
+ "openwiz-server",
  "serde_json",
 ]
 

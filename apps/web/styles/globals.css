@@ -1,0 +1,609 @@
+/* OpenWiz web · visual style v1. Styling only.
+ * Dark first. Colour has one job each and never carries status alone:
+ * gold = you're needed, wiz purple = live / now / focus, Lakers purple =
+ * brand only, greys for everything else. No red or green.
+ * Spacing: 4 · 8 · 12 · 16 · 24 · 32 · 48 only (the marker chip's 4 × 6 is
+ * the one exception), checked by `npm run check`. Hairlines are backgrounds.
+ */
+
+@font-face {
+  font-family: Geist;
+  src: url('/fonts/Geist-var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: GeistMono;
+  src: url('/fonts/GeistMono-var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  --canvas: #0e0f11;
+  --s1: #151719;
+  --s2: #1c1e21;
+  --s3: #24272b;
+  --line: #2c3036;
+  --line-2: #3a3f46;
+  --ink: #e8eaed;
+  --ink-2: #a3a9b2;
+  --ink-3: #7f8691;
+  --gold: #fdb927;
+  --wiz: #a78bfa;
+  --brand: #552583;
+  --on-light: #141414;
+  --sans: Geist, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --mono: GeistMono, ui-monospace, Menlo, monospace;
+  --hair: repeating-linear-gradient(90deg, var(--line-2) 0 1px, transparent 1px 3px);
+  --top-h: 48px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --sheet-w: 400px;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--canvas);
+  /* Refreshes keep rows in place themselves (KeepPlace); the browser's own anchoring would double it. */
+  overflow-anchor: none;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--canvas);
+  color: var(--ink);
+  font: 400 14px/20px var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+/* Lakers-purple viewport frame (brand only). */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  border: 2px solid var(--brand);
+}
+a {
+  color: inherit;
+}
+code,
+pre {
+  font-family: var(--mono);
+}
+bdi {
+  unicode-bidi: isolate;
+}
+:focus-visible {
+  outline: 2px solid var(--wiz);
+  outline-offset: 2px;
+}
+
+/* ── chrome ─────────────────────────────────────────── */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: var(--top-h);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  background: var(--canvas);
+  background-image: var(--hair);
+  background-size: 100% 1px;
+  background-position: bottom;
+  background-repeat: no-repeat;
+}
+/* A placeholder until the approved wizard artwork is supplied. Never draw the wizard. */
+.logo-slot {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border: 1.5px dashed var(--line-2);
+  border-radius: 4px;
+  font: 600 7px/8px var(--mono);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.wordmark {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.wordmark b {
+  font: 500 20px/24px system-ui;
+  font-variation-settings: 'wdth' 40;
+  letter-spacing: -0.01em;
+}
+.wordmark span {
+  font: 11px/16px var(--mono);
+  color: var(--ink-3);
+}
+
+/* Connection: a word and a shape each. live ● · stale ○ · disconnected ◌ (broken) ·
+ * signed out □ · busy ◇ · error ■ · reading ▬ */
+.conn {
+  margin: 0 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  border: 1px solid var(--line-2);
+  border-radius: 99px;
+  font: 11px/20px var(--mono);
+  color: var(--ink-2);
+}
+.shape {
+  display: inline-block;
+  flex: none;
+  width: 8px;
+  height: 8px;
+}
+[data-connection='live'] .shape,
+[data-notice] .shape {
+  border-radius: 50%;
+  background: var(--wiz);
+}
+[data-connection='stale'] .shape {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--ink-2);
+}
+[data-connection='disconnected'] .shape,
+[data-notice='disconnected'] .shape {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: none;
+  border: 2px solid var(--ink-2);
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+[data-connection='signed-out'] .shape,
+[data-notice='signed-out'] .shape {
+  width: 10px;
+  height: 10px;
+  border-radius: 0;
+  background: none;
+  border: 2px solid var(--gold);
+}
+[data-connection='busy'] .shape,
+[data-notice='busy'] .shape {
+  width: 8px;
+  height: 8px;
+  border-radius: 0;
+  background: none;
+  border: 2px solid var(--ink-2);
+  transform: rotate(45deg);
+}
+[data-connection='error'] .shape,
+[data-notice='error'] .shape {
+  width: 10px;
+  height: 10px;
+  border-radius: 0;
+  background: var(--gold);
+}
+[data-connection='reading'] .shape {
+  width: 12px;
+  height: 4px;
+  border-radius: 0;
+  background: var(--ink-3);
+}
+[data-connection='live'] {
+  color: var(--ink);
+}
+[data-connection='error'],
+[data-connection='signed-out'] {
+  color: var(--ink);
+  border-color: var(--gold);
+}
+
+/* ── type ───────────────────────────────────────────── */
+.disp {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-variation-settings: 'wdth' 30;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+.disp.m {
+  font-size: 42px;
+  line-height: 40px;
+}
+.disp.s {
+  font-size: 28px;
+  line-height: 32px;
+}
+.body {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+}
+.meta {
+  display: block;
+  margin: 4px 0 0;
+  font: 11px/16px var(--mono);
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.kicker {
+  margin: 24px 0 0;
+  font: 600 10px/12px var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.sec {
+  margin: 16px 0 4px;
+  font: 600 10px/12px var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+code {
+  font-size: 12px;
+  color: var(--ink);
+}
+
+/* ── markers: five tiers by shape; the word is always shown ── */
+.mk {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 4px 6px;
+  border-radius: 3px;
+  vertical-align: middle;
+  font: 600 12px/12px var(--mono);
+  white-space: nowrap;
+}
+.mk .word {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mk.t1 {
+  background: var(--gold);
+  color: var(--on-light);
+  font-weight: 700;
+}
+.mk.t2 {
+  color: var(--ink);
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.mk.t3 {
+  color: var(--wiz);
+  font-weight: 700;
+}
+.mk.t4 {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+.mk.t5 {
+  color: var(--ink-2);
+  font-style: italic;
+  outline: 1.5px dashed var(--ink-2);
+  outline-offset: -1.5px;
+}
+.mod {
+  font: 11px/16px var(--mono);
+  color: var(--ink-2);
+  text-decoration: underline dotted var(--ink-3);
+  text-underline-offset: 4px;
+}
+.tag {
+  display: inline-block;
+  padding: 0 4px;
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  font: 11px/16px var(--mono);
+  color: var(--ink-2);
+}
+.tag.dashed {
+  border-style: dashed;
+  font-style: italic;
+}
+
+/* ── page ───────────────────────────────────────────── */
+main {
+  padding: 16px 16px 48px;
+  max-width: 880px;
+}
+.page-head {
+  margin: 0 0 8px;
+}
+.inv {
+  margin: 8px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font: 11px/16px var(--mono);
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.cov {
+  min-height: 44px;
+  margin: 0;
+  padding: 0 8px;
+  border: 1px dashed var(--line-2);
+  border-radius: 4px;
+  background: none;
+  color: var(--ink);
+  font: italic 11px/16px var(--mono);
+  cursor: pointer;
+}
+.gaps {
+  margin: 8px 0 0;
+  padding: 0 0 0 16px;
+  font: 11px/16px var(--mono);
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.gaps li {
+  margin: 4px 0 0;
+}
+
+/* What went wrong. */
+.notice {
+  margin: 16px 0 0;
+  padding: 12px;
+  border: 1px dashed var(--line-2);
+  border-radius: 4px;
+  background: var(--s1);
+}
+.notice p {
+  margin: 0;
+}
+.notice-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.notice-body {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.notice .btn {
+  margin: 12px 0 0;
+}
+
+/* Thin full-width rows on dotted hairlines (no square cards). */
+.group {
+  margin: 0;
+}
+.rows {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+.row {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 12px 0;
+  border: 0;
+  background: none;
+  background-image: var(--hair);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.row:hover,
+.row.on {
+  background-color: var(--s1);
+}
+.row-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.title {
+  flex: 1;
+  min-width: 0;
+  font: 600 15px/20px var(--sans);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.title.unknown {
+  font-style: italic;
+  color: var(--ink-2);
+}
+.age {
+  flex: none;
+  font: 11px/16px var(--mono);
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 4px 0 0;
+  min-width: 0;
+}
+.reason {
+  min-width: 0;
+  font: italic 11px/16px var(--mono);
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.empty {
+  margin: 24px 0 0;
+  padding: 16px 0;
+  background-image: var(--hair);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+}
+.paging {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 24px 0 0;
+}
+.paging .meta {
+  margin: 0;
+}
+.page-change {
+  display: block;
+  margin: 16px 0 0;
+  padding: 4px 8px;
+  color: var(--ink);
+}
+
+/* Buttons: 44 px touch targets. */
+.btn {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  background: var(--s2);
+  color: var(--ink);
+  font: 600 14px/20px var(--sans);
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover {
+  background: var(--s3);
+}
+.btn:disabled {
+  color: var(--ink-3);
+  background: var(--s1);
+  cursor: default;
+}
+
+/* ── the detail: a bottom sheet on phones, a side panel on desktop ── */
+.sheet {
+  position: fixed;
+  inset: auto 0 0 0;
+  width: 100%;
+  max-width: none;
+  max-height: 84vh;
+  margin: 0;
+  padding: 8px 16px 24px;
+  padding-bottom: calc(24px + var(--safe-b));
+  overflow: auto;
+  border: 0;
+  border-radius: 12px 12px 0 0;
+  background: var(--s2);
+  color: var(--ink);
+  box-shadow: 0 -1px 0 var(--line-2);
+}
+.sheet::backdrop {
+  background: rgba(5, 5, 6, 0.6);
+}
+.sheet-grab {
+  width: 32px;
+  height: 4px;
+  margin: 0 auto 8px;
+  border-radius: 4px;
+  background: var(--line-2);
+}
+.sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+.sheet-cmd {
+  margin: 0;
+  font: 11px/16px var(--mono);
+  color: var(--ink-2);
+}
+.sheet-x {
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--ink-2);
+  font: 16px/16px var(--mono);
+  cursor: pointer;
+}
+.kv {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px 12px;
+  margin: 12px 0;
+  font: 12px/16px var(--mono);
+}
+.kv dt {
+  color: var(--ink-2);
+}
+.kv dd {
+  margin: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.out {
+  margin: 0;
+  padding: 12px;
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  unicode-bidi: plaintext;
+  background: var(--s1);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font: 12px/16px var(--mono);
+  color: var(--ink);
+}
+
+@media (min-width: 900px) {
+  .top {
+    padding: 0 24px;
+  }
+  main {
+    padding: 24px 32px 48px;
+    max-width: 960px;
+  }
+  .app.panel-open main {
+    margin-right: var(--sheet-w);
+  }
+  .sheet {
+    inset: var(--top-h) 0 0 auto;
+    width: var(--sheet-w);
+    max-height: none;
+    height: auto;
+    padding: 16px 24px 24px;
+    border-radius: 0;
+    box-shadow: -1px 0 0 var(--line-2);
+    z-index: 30;
+  }
+  .sheet-grab {
+    display: none;
+  }
+}
+@media (min-width: 1400px) {
+  :root {
+    --sheet-w: 440px;
+  }
+}

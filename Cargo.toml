@@ -4,11 +4,12 @@ members = [
     "crates/core",
     "crates/adapters/cloudroom",
     "crates/cli",
+    "crates/server",
     "tests",
 ]
 
 [workspace.package]
-version = "0.0.1"
+version = "0.0.2"
 edition = "2024"
 rust-version = "1.99.1"
 publish = false

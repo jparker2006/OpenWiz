@@ -176,6 +176,9 @@ const ARGV_WORDS: &[&str] = &[
 const ERROR_LINES: &[&str] = &[
     "Error: HTTP 404: Thread not found",
     "Error: HTTP 500: Synthetic server error",
+    // A line in the stderr sanitizer's safe grammar that a failed version
+    // read must still never echo.
+    "Error: HTTP 500: Synthetic private version marker",
 ];
 
 fn files(dir: &Path, out: &mut Vec<PathBuf>) {

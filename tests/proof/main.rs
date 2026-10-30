@@ -17,6 +17,7 @@ mod p01_coverage;
 mod p02_freshness;
 mod p03_unknowns;
 mod p04_partial_failures;
+mod p04b_source_diagnostics;
 mod p05_paging_and_budget;
 mod p06_verified_grouping;
 mod p07_bounded_output;

@@ -27,6 +27,12 @@ path = "proof/main.rs"
 name = "checks"
 path = "checks/main.rs"
 
+# OpenWiz 0.0.2: the web API's proof tests (A3 to A8) and its
+# contract check, over the same fixtures and fake room-cli.
+[[test]]
+name = "web-api"
+path = "web-api/main.rs"
+
 [dependencies]
 serde_json.workspace = true
 
@@ -34,6 +40,9 @@ serde_json.workspace = true
 openwiz-core = { path = "../crates/core" }
 openwiz-adapter-cloudroom = { path = "../crates/adapters/cloudroom" }
 openwiz-cli = { path = "../crates/cli" }
+# The web API tests start openwiz-server in-process. A dev-dependency only,
+# so no normal dependency points at the server.
+openwiz-server = { path = "../crates/server" }
 
 [lints]
 workspace = true

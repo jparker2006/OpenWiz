@@ -106,8 +106,57 @@ struct VersionRead {
     gap: Option<Gap>,
 }
 
+/// A recognised version: `N.N.N` (1 to 4 digits each), as `room-cli` 0.43.1
+/// printed, or `v<N>` (1 to 6 digits), as `room-cli` v127 prints. The only
+/// version text ever shown: the adapter's stderr sanitizer uses it too.
+pub fn is_version_text(text: &str) -> bool {
+    let digits = |s: &str, max: usize| {
+        !s.is_empty() && s.len() <= max && s.bytes().all(|b| b.is_ascii_digit())
+    };
+    if let Some(n) = text.strip_prefix('v') {
+        return digits(n, 6);
+    }
+    let parts: Vec<&str> = text.split('.').collect();
+    parts.len() == 3 && parts.iter().all(|p| digits(p, 4))
+}
+
+/// The version a run reports, and whether it is `tested`. Never a gate.
+/// `read` names the version read, such as `room-cli --version`. A recognised
+/// version is known; anything else is unknown with OpenWiz's reason, and its
+/// text is never echoed.
+pub fn version_fact(
+    read: &str,
+    tested: &str,
+    result: Result<String, SourceError>,
+) -> (Fact<String>, bool) {
+    match result {
+        Ok(text) if is_version_text(&text) => {
+            let is_tested = text == tested;
+            (Fact::Known(text), is_tested)
+        }
+        Ok(_) => (
+            Fact::Unknown(format!(
+                "{read} printed text that is not a recognised version (withheld)"
+            )),
+            false,
+        ),
+        Err(e) => (
+            Fact::Unknown(format!("{read} {}", version_failure(&e))),
+            false,
+        ),
+    }
+}
+
+/// What a source reports, as its `Malformed` detail, for a version text
+/// outside [`is_version_text`]: the only malformed detail a version read's
+/// failure may show.
+pub const VERSION_NOT_RECOGNISED: &str =
+    "printed a version that is not N.N.N or v<N> (detail withheld)";
+
 /// A failed version read, described by safe facts only: the exit code or the
 /// timeout, never the source's own text, which could hold private detail.
+/// Even a line the stderr sanitizer would show is withheld: the version
+/// read's failure reaches every envelope.
 fn version_failure(error: &SourceError) -> String {
     match error {
         SourceError::CommandFailed {
@@ -118,25 +167,16 @@ fn version_failure(error: &SourceError) -> String {
             exit_code: None, ..
         } => "ended without an exit code (detail withheld)".to_owned(),
         SourceError::TimedOut { after_ms } => format!("timed out after {after_ms} ms"),
+        // The one malformed detail that is shown: OpenWiz's own fixed words
+        // for a version outside the grammar. Allowlisted, so any other detail
+        // is withheld.
+        SourceError::Malformed { detail } if detail == VERSION_NOT_RECOGNISED => detail.clone(),
         SourceError::Malformed { .. } => "returned malformed output (detail withheld)".to_owned(),
         SourceError::Unavailable { .. } => "could not be run (detail withheld)".to_owned(),
         SourceError::NotFound { .. } | SourceError::InvalidId { .. } => {
             "failed (detail withheld)".to_owned()
         }
     }
-}
-
-/// A recognised version: `N.N.N` (1 to 4 digits each), as `room-cli` 0.43.1
-/// printed, or `v<N>` (1 to 6 digits), as `room-cli` v127 prints.
-fn is_version_text(text: &str) -> bool {
-    let digits = |s: &str, max: usize| {
-        !s.is_empty() && s.len() <= max && s.bytes().all(|b| b.is_ascii_digit())
-    };
-    if let Some(n) = text.strip_prefix('v') {
-        return digits(n, 6);
-    }
-    let parts: Vec<&str> = text.split('.').collect();
-    parts.len() == 3 && parts.iter().all(|p| digits(p, 4))
 }
 
 /// A result and what its display needs beyond the envelope.
@@ -393,25 +433,19 @@ impl<'a> Run<'a> {
     /// whatever it is. Only a recognised version text is shown; anything else
     /// is unknown with a reason and a gap, and is never echoed.
     fn read_version(&self) -> VersionRead {
-        let tested = self.source.tested_version();
-        let why = match self.source.version(self.deadline) {
-            Ok(text) if is_version_text(&text) => {
-                return VersionRead {
-                    tested: text == tested,
-                    version: Fact::Known(text),
-                    gap: None,
-                };
-            }
-            Ok(_) => format!(
-                "{} printed text that is not a recognised version (withheld)",
-                self.name(Read::Version)
-            ),
-            Err(e) => format!("{} {}", self.name(Read::Version), version_failure(&e)),
+        let (version, tested) = version_fact(
+            self.name(Read::Version),
+            self.source.tested_version(),
+            self.source.version(self.deadline),
+        );
+        let gap = match &version {
+            Fact::Unknown(why) => Some(gap(GapKind::UntestedVersion, None, why.clone())),
+            Fact::Known(_) => None,
         };
         VersionRead {
-            version: Fact::Unknown(why.clone()),
-            tested: false,
-            gap: Some(gap(GapKind::UntestedVersion, None, why)),
+            version,
+            tested,
+            gap,
         }
     }
 

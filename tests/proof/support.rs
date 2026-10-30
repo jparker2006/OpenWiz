@@ -133,6 +133,30 @@ impl Fake {
         )
     }
 
+    /// Runs the real `openwiz` program with this fake first on `PATH` and
+    /// this fake's directory as its `HOME`: (exit code, stdout, stderr).
+    pub fn program_cli(&self, args: &[&str]) -> (i32, String, String) {
+        let path = format!(
+            "{}:{}",
+            self.dir.display(),
+            std::env::var("PATH").unwrap_or_default()
+        );
+        let output = std::process::Command::new(openwiz_binary())
+            .args(args)
+            .env("PATH", path)
+            .env("HOME", &self.dir)
+            .env_remove("XDG_STATE_HOME")
+            .current_dir(&self.dir)
+            .stdin(std::process::Stdio::null())
+            .output()
+            .expect("run openwiz");
+        (
+            output.status.code().expect("openwiz exited"),
+            String::from_utf8(output.stdout).expect("stdout is UTF-8"),
+            String::from_utf8(output.stderr).expect("stderr is UTF-8"),
+        )
+    }
+
     /// Runs `openwiz <args>` against this fake: (exit code, stdout, stderr).
     pub fn cli(&self, args: &[&str]) -> (i32, String, String) {
         cli_with(&self.source(), args)
@@ -704,4 +728,34 @@ pub fn capped(original: &str) -> String {
         .collect();
     kept.push(CUT_MARKER);
     kept
+}
+
+/// Builds the `openwiz` program into the test's target directory, once, and
+/// returns its path.
+pub fn openwiz_binary() -> PathBuf {
+    static BUILT: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+    BUILT
+        .get_or_init(|| {
+            let target = Path::new(env!("CARGO_TARGET_TMPDIR"))
+                .parent()
+                .expect("the target directory")
+                .to_path_buf();
+            let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".to_owned());
+            let build = std::process::Command::new(cargo)
+                .args(["build", "--locked", "-p", "openwiz-cli"])
+                .args(["--bin", "openwiz", "--target-dir"])
+                .arg(&target)
+                .current_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join(".."))
+                .output()
+                .expect("run cargo build");
+            assert!(
+                build.status.success(),
+                "cargo build failed:\n{}",
+                String::from_utf8_lossy(&build.stderr)
+            );
+            let program = target.join("debug").join("openwiz");
+            assert!(program.is_file(), "no {program:?}");
+            program
+        })
+        .clone()
 }
