@@ -56,7 +56,7 @@ Its release notes will state the CloudRoom CLI version it was tested against and
 - **The server is a second thin client of the core,** like the CLI: each route calls the same operation with the same options and returns the CLI's `--json`. It adds no field, operation or rule ([contract](../contracts/web-api.v1.md)).
 - **Loopback only, and remote access through Cloudflare.** The server listens on `127.0.0.1`; a Cloudflare Tunnel and an Access login in front of one hostname let in only the owner ([setup](web-access.md)). The server does not check Access's token itself.
 - **The page is a static Next.js export,** served by the server on the same origin as the API, so the page needs no other server and no CORS.
-- **Read-only.** No write, start or message route. A message-sending command was built in the private beta but is not part of 0.0.2.
+- **Read-only.** No write, start or message route.
 
 ## Open
 

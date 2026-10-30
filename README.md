@@ -38,8 +38,9 @@ cargo test --workspace                       # after building the page: A8 serve
 
 ### Limits of 0.0.2
 
-- **Checked live once, on one Mac,** with a server built just before an unused part was removed from the shared code ([details](docs/evidence/0.0.2-live-check.md#the-environment)). Requests without a login got only the login page. That a second person is refused is known from Access's configuration only.
-- **Chromium only.** The page's tests, including the keyboard and screen-reader checks, ran in Chromium. Safari, iOS and real screen readers are untested.
+- **Checked live on one Mac.** The full check ran an earlier build of the release line; the server was then rebuilt from the release line's head and rechecked for loopback only and no data without a login ([details](docs/evidence/0.0.2-live-check.md#the-release-lines-build-rechecked)). Requests without a login got only the login page. That a second person is refused is known from Access's configuration only.
+- **On a phone:** the owner opened the page on their own phone and saw their threads. That is an observation; no Safari or VoiceOver test is recorded.
+- **Chromium only.** The page's automated tests, including the keyboard and screen-reader checks, ran in Chromium. No Safari or real screen-reader test is recorded.
 - **Your Mac must be awake,** with the server and the tunnel running. Nothing starts them for you.
 - **Cloudflare sees your data.** HTTPS ends at Cloudflare's edge, so thread titles and output pass through Cloudflare.
 - **Not proven:** the [list](docs/evidence/0.0.2-live-check.md#not-proven), including whether the page's own reads were part of the live check that saw no thread woken.

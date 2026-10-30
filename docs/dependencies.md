@@ -68,5 +68,5 @@ The licences are as each package declares them in the lockfile. The repository i
 | macOS | Built natively and live-checked once (Apple Silicon). *Updated for 0.0.2:* the server too, behind Cloudflare Tunnel and Access ([evidence](evidence/0.0.2-live-check.md)) |
 | Linux | Fixture tests pass, the web page's included |
 | Windows | Untested |
-| Browsers | *New in 0.0.2.* Chromium only, in the tests. Safari, iOS and others are untested |
+| Browsers | *New in 0.0.2.* Chromium, in the automated tests. The owner has opened the page on their own phone (an observation, no browser details recorded). No Safari test is recorded; other browsers are untested |
 | PACP | None: 0.0.2 implements no PACP version |

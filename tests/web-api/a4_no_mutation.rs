@@ -387,7 +387,7 @@ fn the_server_calls_only_the_cores_list_and_show() {
             "std::fs",
             "File::open",
             "read_dir",
-            // Messaging, a possible later write: the server has no part in it.
+            // No write path of any kind.
             "messaging",
             "openwiz_store",
             "Messenger",
