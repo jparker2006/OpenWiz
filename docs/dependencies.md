@@ -26,4 +26,13 @@ The licences are as each crate declares them in its package metadata. This repos
 | --- | --- | --- |
 | Rust (`rustc`, `cargo`) | 1.99.1, the `rust-version` in `Cargo.toml` | Required to build. Older versions are not supported |
 | `rustfmt`, `clippy` | as shipped with Rust 1.99.1 | Needed only for the formatting and lint checks |
-| `room-cli` | v127 tested; any version runs | Needed at run time. See the [changelog](../CHANGELOG.md) for what was tested |
+| `room-cli` | v127 tested; any version runs | Needed at run time. Other versions run and are shown as untested. See [what was tested](evidence/0.0.1-live-check.md) |
+
+## Systems and protocols
+
+| What | Status |
+| --- | --- |
+| macOS | Built natively and live-checked once (Apple Silicon) |
+| Linux | Fixture tests pass |
+| Windows | Untested |
+| PACP | None: 0.0.1 implements no PACP version |

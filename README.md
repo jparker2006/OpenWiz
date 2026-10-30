@@ -6,9 +6,9 @@
 
 ## What 0.0.1 does
 
-**Status: Released.** What was tested, and what is not proven, is in the [changelog](CHANGELOG.md). The only live evidence is [one check on one Mac](docs/evidence/0.0.1-live-check.md), with `room-cli` v127; everything below that it did not cover is fixture-tested only.
+**Status: Released.** What it adds is in the [changelog](CHANGELOG.md); what was tested, and what is not proven, is in [docs/evidence/0.0.1-live-check.md](docs/evidence/0.0.1-live-check.md). The only live evidence is [one check on one Mac](docs/evidence/0.0.1-live-check.md), with `room-cli` v127; everything below that it did not cover is fixture-tested only.
 
-`openwiz` is a read-only inventory of your CloudRoom sessions. It reads them through `room-cli` (checked live with v127: [evidence](docs/evidence/0.0.1-live-check.md)), the CloudRoom command-line tool, which must already be installed and signed in on your machine.
+`openwiz` is a read-only inventory of your CloudRoom sessions, which CloudRoom calls threads. It reads them through `room-cli` (checked live with v127: [evidence](docs/evidence/0.0.1-live-check.md)), the CloudRoom command-line tool, which must already be installed and signed in on your machine.
 
 | Command | What it prints |
 | --- | --- |
@@ -128,14 +128,14 @@ Managed hosting and selling compute are possible paid offerings for later. Neith
 | [contracts/inventory.v1.schema.json](contracts/inventory.v1.schema.json) | The JSON Schema of `openwiz ls --json` and `show --json` |
 | `tests/` | Proof tests, checks, a fake `room-cli` and synthetic fixtures ([tests/fixtures/README.md](tests/fixtures/README.md)) |
 | [docs/dependencies.md](docs/dependencies.md) | Every locked crate with its version, licence and checksum, and the tools needed |
-| [docs/evidence/0.0.1-live-check.md](docs/evidence/0.0.1-live-check.md) | The 0.0.1 live check: method, rules, environment, results as counts, and limits |
+| [docs/evidence/0.0.1-live-check.md](docs/evidence/0.0.1-live-check.md) | What 0.0.1 was tested with and what is not proven, and its live check: method, rules, environment, results as counts, and limits |
 | [docs/overview.md](docs/overview.md) | The problem, the layers, interfaces, built-in plans, approval policy, terms and principles |
 | [docs/interface.md](docs/interface.md) | The proposed command set, decision types and screens shared by the CLI, agent commands and OpenWiz Web |
 | [docs/workflow.md](docs/workflow.md) | How the controller and the factory loop work: ownership, ticket states, rework, pause and resume, approval, dependent unlock, a worked example, and proof-driven development |
 | [docs/architecture.md](docs/architecture.md) | Mermaid diagrams: today's manual workflow, the first pilot, the broader architecture, the release flow, and the repository layout with its dependency direction |
 | [docs/pacp/v0.1.md](docs/pacp/v0.1.md) | **PACP v0.1** (Personal Agent Connection Protocol): a draft protocol proposal with synthetic examples and proposed conformance checks. Nothing implements it |
 | [docs/decisions.md](docs/decisions.md) | Decisions made so far, and the ones still open |
-| [CHANGELOG.md](CHANGELOG.md) | What changed in each version, and for 0.0.1 what was tested |
+| [CHANGELOG.md](CHANGELOG.md) | What each version adds, in a short list |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to give feedback and contribute |
 | [RELEASING.md](RELEASING.md) | Version lines, what a release means here, and how one is reviewed |
 | [LICENSE](LICENSE) | Apache License 2.0 |
@@ -144,7 +144,7 @@ Managed hosting and selling compute are possible paid offerings for later. Neith
 
 | Label | Meaning |
 | --- | --- |
-| **Released** | In a published OpenWiz version, with what was tested and what is unproven stated in the [changelog](CHANGELOG.md). *(New in 0.0.1.)* |
+| **Released** | In a published OpenWiz version, with what was tested and what is unproven stated in its evidence page under [docs/evidence/](docs/evidence/0.0.1-live-check.md). *(New in 0.0.1.)* |
 | **Current** | What a person does by hand today. No OpenWiz software is involved. |
 | **Unverified** | An integration that might be possible but has not been tested or proven. |
 | **Proposed** | Design only. Nothing has been built. |
@@ -159,7 +159,7 @@ Managed hosting and selling compute are possible paid offerings for later. Neith
 | OpenWiz Web (Next.js client: live graph and control surface) | Proposed |
 | Monorepo layout: Rust workspace (core, CLI, adapters), `apps/web`, shared contracts, tests and docs | Proposed. 0.0.1 has the Rust workspace's first crates, one contract and tests; no `apps/web` |
 | Desktop packaging | Undecided |
-| `openwiz ls`, `ls -l`, `show`, `--json`: a read-only Rust inventory of real CloudRoom sessions, through `room-cli` ([changelog](CHANGELOG.md), [decisions](docs/decisions.md#001-a-read-only-inventory)) | Released (0.0.1). Fixture-tested; [one live check on one Mac](docs/evidence/0.0.1-live-check.md), with its limits |
+| `openwiz ls`, `ls -l`, `show`, `--json`: a read-only Rust inventory of real CloudRoom sessions, through `room-cli` ([changelog](CHANGELOG.md), [decisions](docs/decisions.md#001-a-read-only-inventory)) | Released (0.0.1). Fixture-tested; [one live check on one Mac](docs/evidence/0.0.1-live-check.md), with its limits; [not proven](docs/evidence/0.0.1-live-check.md#not-proven) |
 | Memory captured automatically in the user's private repository | Proposed. Detailed behaviour is left to a separate design session. |
 | Built-in plans: Grill or Wayfinder → plan → user approval → launch | Proposed |
 | Controller on a user-owned PC for the pilot | Proposed |

@@ -32,7 +32,7 @@ Anything the captures did not observe is a **synthetic assumption**. Each scenar
 11. **Both flags at once.** `thread list --json --include-hidden --include-archived` is assumed to return the union of the two lists. It was not observed.
 12. **A project disappearing between runs.** The `project-removed` scenario drops `prj_syn_0001` from the project list while its sessions still name it. P6 reads one source with `normal`, then `project-removed`, then `normal` again, to catch grouping kept from an earlier run. Unobserved.
 
-**Not covered by any fixture:** read-side effects. Nothing here shows that a read cannot wake a session or mark it read. 0.0.1's live check looked for such effects; see the changelog for what it covered.
+**Not covered by any fixture:** read-side effects. Nothing here shows that a read cannot wake a session or mark it read. 0.0.1's live check looked for such effects; see docs/evidence/0.0.1-live-check.md for what it covered.
 
 ## Layout
 

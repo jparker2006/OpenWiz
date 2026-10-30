@@ -36,7 +36,7 @@ The first version with software will be 0.0.1. Its planned first job is a read-o
 - what was tested, and on what evidence;
 - its explicit dependencies.
 
-*Updated for 0.0.1:* 0.0.1 states how to install it in the [README](README.md#install), and what was tested, on what evidence, and its dependencies in the [changelog](CHANGELOG.md) and [docs/dependencies.md](docs/dependencies.md). Evidence that holds private data, such as a live check of the maintainer's own sessions, is published as its method, rules and counts, without the private data: [docs/evidence/0.0.1-live-check.md](docs/evidence/0.0.1-live-check.md).
+*Updated for 0.0.1:* 0.0.1 states how to install it in the [README](README.md#install), and what was tested, on what evidence, and what is not proven in [docs/evidence/0.0.1-live-check.md](docs/evidence/0.0.1-live-check.md), linked from the [changelog](CHANGELOG.md), and its dependencies in [docs/dependencies.md](docs/dependencies.md). Evidence that holds private data, such as a live check of the maintainer's own sessions, is published as its method, rules and counts, without the private data: [docs/evidence/0.0.1-live-check.md](docs/evidence/0.0.1-live-check.md).
 
 ## How a release is reviewed
 
@@ -59,10 +59,12 @@ The release does not happen if any step fails. Tags and GitHub Releases are crea
 
 ## Changelog
 
-`CHANGELOG.md` lists every version and every revision of a version, newest first. Each entry has:
-- the version and date;
-- its outcomes, no more than five;
-- for software, what was tested and what remains unproved.
+`CHANGELOG.md` lists every version and every revision of a version, newest first. *Updated for 0.0.1:* each entry has:
+- the version and its date;
+- a short headline, saying what the version is for;
+- a short numbered list of user-facing changes: one plain sentence each, what a user can now do or see, usually five to seven items.
+
+**A change is not an outcome.** The outcomes (at most five, above) are what a version sets out to prove; the changelog lists what a user gets. Every item belongs to one of the version's outcomes, and no item may claim more than that outcome's evidence shows. For software, what was tested and what remains unproven is in `docs/evidence/`, linked from the entry, not in the changelog itself. Entries before 0.0.1 use the older form, with outcomes listed directly.
 
 Entries are written for the public when the change is published. They never copy private notes.
 

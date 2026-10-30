@@ -38,7 +38,7 @@ These are design decisions. None of them is a built feature or a verified integr
 
 ## 0.0.1: a read-only inventory
 
-*Updated for 0.0.1:* **Status: Released** in 0.0.1. What it does is in the [README](../README.md#what-001-does); what was tested, and what is not proven, is in the [changelog](../CHANGELOG.md) and the [live check](evidence/0.0.1-live-check.md). It differs from the plan below in three ways: sessions are grouped by project only (not by version, spec or ticket), unplaced sessions appear under `/factories/_ungrouped/`, and whether a read can wake a session or mark it read is not yet proven.
+*Updated for 0.0.1:* **Status: Released** in 0.0.1. What it does is in the [README](../README.md#what-001-does); what it adds is in the [changelog](../CHANGELOG.md); what was tested, and what is not proven, is in [evidence/0.0.1-live-check.md](evidence/0.0.1-live-check.md). It differs from the plan below in three ways: sessions are grouped by project only (not by version, spec or ticket), unplaced sessions appear under `/factories/_ungrouped/`, and whether a read can wake a session or mark it read is not yet proven.
 
 The plan, as written before it was built: the first runnable version has one job: a **read-only inventory, written in Rust, of the user's real CloudRoom sessions**.
 
