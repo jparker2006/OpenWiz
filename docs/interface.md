@@ -2,6 +2,8 @@
 
 **Status: Proposed.** This is decided design for the first runnable versions. **Nothing here is built**: no command, button or screen exists. Examples use invented names.
 
+*Updated for 0.0.1:* 0.0.1 has a first, read-only form of `ls`, `ls -l` and `show`, as the program `openwiz` (see the [README](../README.md#what-001-does)). It is narrower than this design: no paths, `cd`, revisions, `next` or `blockers`; sessions are grouped by project only, unplaced ones under `/factories/_ungrouped/`; `ls -l` shows the reported model and effort and the purpose, with no loop step or `Next:`; and `show` gives the final output, not recent messages or evidence. Its text has no status glyphs yet. Nothing else on this page exists.
+
 ## One interface, three surfaces
 
 The CLI, the commands and buttons inside a personal agent, and OpenWiz Web all use **one set of operations** on one controller.

@@ -153,7 +153,7 @@ Rules:
 
 In the diagrams this is the **Define proof** step, which comes before Build.
 
-Example claims for the planned 0.0.1 inventory (not started):
+Example claims for the planned 0.0.1 inventory, as written before it was built. *Updated for 0.0.1:* what 0.0.1 actually tested, and what it did not prove, is in the [changelog](../CHANGELOG.md); the third claim's live comparison was not made.
 
 | Claim | Required evidence |
 | --- | --- |

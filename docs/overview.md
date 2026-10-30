@@ -44,7 +44,7 @@ Managed hosting and selling compute are possible paid offerings for later. Neith
 - **Rust core.** The controller, the CLI and all backend logic would be written in Rust. The web client and any agent adapter call the same Rust backend operations.
 - **Desktop packaging** is undecided.
 
-The proposed command set, decision types and screens are in [interface.md](interface.md). All of these are proposed. None exists yet.
+The proposed command set, decision types and screens are in [interface.md](interface.md). All of these are proposed. None exists yet. *Updated for 0.0.1:* apart from a first, read-only `ls`, `ls -l` and `show` in the `openwiz` command.
 
 ## The out-of-the-box factory: built-in plans
 

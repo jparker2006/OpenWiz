@@ -8,7 +8,7 @@ These are design decisions. None of them is a built feature or a verified integr
 | --- | --- |
 | License: Apache License 2.0 | See [LICENSE](../LICENSE) |
 | The product is named **OpenWiz** | Renamed from OpenFleet. The protocol keeps the name PACP |
-| OpenWiz is CLI-first and agent-first, and a polished UI is an equal goal | Commands and buttons in the personal agent, plus the web client; none exists yet |
+| OpenWiz is CLI-first and agent-first, and a polished UI is an equal goal | Commands and buttons in the personal agent, plus the web client; none exists yet. *Updated for 0.0.1:* 0.0.1 has a first, read-only CLI command, `openwiz` |
 | **The controller is the one Rust core that owns authoritative state, permissions, routing and coordination** | Each project orchestrator runs its factory workflow under the controller. It holds no authoritative state and is not a second authority |
 | Clients keep presentation state only; adapters keep integration bookkeeping only | Authoritative product state and every policy decision live in the core |
 | **Proof-driven development** | Each claim and its required evidence are defined before building, then verified and independently reviewed. Tests alone do not prove live behaviour; nothing is called formally proven without an actual formal proof. See [workflow.md](workflow.md#proof-driven-development) |
@@ -36,11 +36,11 @@ These are design decisions. None of them is a built feature or a verified integr
 | User control is bounded by provider permissions, platform restrictions and applicable safety requirements | |
 | 0.0.0 stays proposal-only, with no installable implementation | |
 
-## Planned next: 0.0.1 (not started)
+## 0.0.1: a read-only inventory
 
-**Status: Planned.** Nothing is built or started.
+*Updated for 0.0.1:* **Status: Released** in 0.0.1. What it does is in the [README](../README.md#what-001-does); what was tested, and what is not proven, is in the [changelog](../CHANGELOG.md) and the [live check](evidence/0.0.1-live-check.md). It differs from the plan below in three ways: sessions are grouped by project only (not by version, spec or ticket), unplaced sessions appear under `/factories/_ungrouped/`, and whether a read can wake a session or mark it read is not yet proven.
 
-The first runnable version has one job: a **read-only inventory, written in Rust, of the user's real CloudRoom sessions**.
+The plan, as written before it was built: the first runnable version has one job: a **read-only inventory, written in Rust, of the user's real CloudRoom sessions**.
 
 - Each session shows its observed status word, its model where reported, and how fresh the data is.
 - A session is grouped under a project, version, spec or ticket **only when that mapping is verified**. Anything else stays visible as unplaced, with its reason. Nothing is guessed.
@@ -68,5 +68,5 @@ Its release notes will state the CloudRoom CLI version it was tested against and
 | 15 | **Merges without a click**: whether a prior authorization may ever let a merge happen without the user, and who performs it | Unresolved | Policy gates; [workflow.md](workflow.md#human-approval) |
 | 16 | **Project orchestrator, implementation details**: where it runs, how it receives work from the controller, and how it reports back. The ownership boundary itself is decided | Unresolved | [workflow.md](workflow.md#who-owns-what) |
 | 17 | **Pre-approved dependents**: whether one launch approval may cover a dependent ticket in advance | Unresolved | [workflow.md](workflow.md#dependent-unlock) |
-| 13 | **The CLI's program name**, and friendlier names for `launch` and `resume` | Open | Command examples |
+| 13 | **The CLI's program name**, and friendlier names for `launch` and `resume` | Open. *Updated for 0.0.1:* 0.0.1 uses `openwiz` | Command examples |
 | 11 | **Business multiplayer** | Future scope | Not before the single-user design is proven |

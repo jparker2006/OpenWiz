@@ -6,7 +6,7 @@ Each line has its own numbers. A number on one line never implies anything about
 
 | Line | Current | Where it is recorded |
 | --- | --- | --- |
-| **OpenWiz** (the product) | `0.0.0`: design preview, documents only | `CHANGELOG.md`; once there is code, also the Rust workspace version, which the CLI prints along with the commit |
+| **OpenWiz** (the product) | `0.0.1`: the first version with software, a read-only inventory command. *Updated for 0.0.1* | `CHANGELOG.md`, and the Rust workspace version in `Cargo.toml`. *Updated for 0.0.1:* the CLI does not print its own version or commit yet |
 | **PACP** (the protocol) | `v0.1` (draft) | [PACP versioning](docs/pacp/v0.1.md#13-versioning) and its version history |
 | **Adapters** (one per personal agent) | none exist | each adapter's own notes, when one exists |
 
@@ -31,10 +31,12 @@ If a dependency is not listed with evidence, it is not claimed. A higher version
 - keeps the version at 0.0.0;
 - never adds software or a capability claim.
 
-The first version with software will be 0.0.1. Its planned first job is a read-only inventory of real CloudRoom sessions (see [decisions](docs/decisions.md#planned-next-001-not-started)). Before it is tagged, it must state:
+The first version with software will be 0.0.1. Its planned first job is a read-only inventory of real CloudRoom sessions (see [decisions](docs/decisions.md#001-a-read-only-inventory)). Before it is tagged, it must state:
 - how to install it;
 - what was tested, and on what evidence;
 - its explicit dependencies.
+
+*Updated for 0.0.1:* 0.0.1 states how to install it in the [README](README.md#install), and what was tested, on what evidence, and its dependencies in the [changelog](CHANGELOG.md) and [docs/dependencies.md](docs/dependencies.md). Evidence that holds private data, such as a live check of the maintainer's own sessions, is published as its method, rules and counts, without the private data: [docs/evidence/0.0.1-live-check.md](docs/evidence/0.0.1-live-check.md).
 
 ## How a release is reviewed
 

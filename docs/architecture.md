@@ -215,6 +215,8 @@ flowchart TD
 
 **Status: Proposed. Nothing exists yet:** no workspace, crate, app or test. The names below are illustrative.
 
+*Updated for 0.0.1:* `Cargo.toml`, `crates/core`, `crates/adapters/cloudroom`, `crates/cli`, `contracts/inventory.v1.schema.json` and `tests/` now exist, for the read-only inventory only. `apps/web`, every other adapter, and the rest of the core do not.
+
 OpenWiz is planned as **one monorepo**. The private beta uses this same layout. It is the same product, not a second implementation.
 
 ![OpenWiz planned monorepo modules and their dependency direction, as described in this section.](assets/openwiz-modules.png)
@@ -280,15 +282,15 @@ flowchart TB
 - **One set of operations.** The CLI, agent commands and the web all reach the same core operations, so a change behaves the same wherever it starts.
 - **Wiring happens in a binary.** The binary that runs the controller connects the chosen adapters to the core.
 - **The controller is `crates/core` plus the binary that runs it.** It is the one Rust core that owns authoritative state, permissions, routing and coordination. Project orchestrators run each factory's workflow under it, through its operations.
-- **Still open:** how the web reaches the backend (the transport and its served interface) and the name of the CLI program.
+- **Still open:** how the web reaches the backend (the transport and its served interface) and the name of the CLI program. *Updated for 0.0.1:* 0.0.1's program is `openwiz`.
 
 ### External services: access versus adapters
 
-Access that a service offers today is not an OpenWiz integration. **No OpenWiz adapter exists.** Each one must be built and verified under [proof-driven development](workflow.md#proof-driven-development) before anything is claimed.
+Access that a service offers today is not an OpenWiz integration. **No OpenWiz adapter exists.** *Updated for 0.0.1:* one exists now, the read-only CloudRoom reader in `crates/adapters/cloudroom`; no other. Each one must be built and verified under [proof-driven development](workflow.md#proof-driven-development) before anything is claimed.
 
 | Service | Access available today, outside OpenWiz | OpenWiz adapter |
 | --- | --- | --- |
-| CloudRoom | CloudRoom's own app and CLI. Its documented [automations](https://www.cloudroom.dev/docs/automations) and [subagents](https://www.cloudroom.dev/docs/subagents) | Proposed, not implemented. The control route from a controller is unverified |
+| CloudRoom | CloudRoom's own app and CLI. Its documented [automations](https://www.cloudroom.dev/docs/automations) and [subagents](https://www.cloudroom.dev/docs/subagents) | Proposed, not implemented. The control route from a controller is unverified. *Updated for 0.0.1:* reading sessions through `room-cli` is released in 0.0.1 (read only); controlling CloudRoom is not implemented |
 | GitHub | Git, and GitHub's documented [REST API](https://docs.github.com/en/rest) and [GraphQL API](https://docs.github.com/en/graphql) | Proposed, not implemented |
 | Memory repository | A private repository on GitHub, through the same access | Proposed, not implemented. Its behaviour is left to the memory design session |
 | Personal agents (dot, Grok Bot; Muse and Duet later) | Only through an interface the vendor supports and the user may use. None is verified for this purpose | Proposed, not implemented. Each requires a supported interface |
