@@ -66,7 +66,7 @@ test('a failure keeps the last good snapshot, and the next success clears it (V6
   h.viewer.stop();
 });
 
-test('stale is measured on the device\'s clocks since the response arrived, not by the snapshot time (Q1)', () => {
+test('stale is measured on the device\'s clocks since the response arrived, not by the snapshot time', () => {
   const snap = { receivedAt: 1_000, receivedWall: 1_000_000 };
   assert.equal(isStale(snap, { mono: 31_000, wall: 1_030_000 }, 30_000), false);
   assert.equal(isStale(snap, { mono: 31_001, wall: 1_030_001 }, 30_000), true);

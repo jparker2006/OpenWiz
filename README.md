@@ -10,7 +10,7 @@
 
 `openwiz-server` runs on your Mac, next to your signed-in `room-cli`, and serves two things on `127.0.0.1` only:
 
-- **A small read-only HTTP API:** `GET /api/v1/inventory` (the same as `openwiz ls` or `ls -l`), `GET /api/v1/sessions/<id>` (the same as `openwiz show`) and `GET /api/v1/health`. Each answer is exactly what `openwiz … --json` prints. The routes, statuses, headers and bounds are in [contracts/web-api.v1.md](contracts/web-api.v1.md).
+- **A small read-only HTTP API:** `GET /api/v1/inventory` (the same as `openwiz ls` or `ls -l`), `GET /api/v1/sessions/<id>` (the same as `openwiz show`) and `GET /api/v1/health`. The inventory and session routes answer exactly what `openwiz … --json` prints; health is the server's own metadata (its name and version, and the live-tested `room-cli` version), with no CLI equivalent and no read. The routes, statuses, headers and bounds are in [contracts/web-api.v1.md](contracts/web-api.v1.md).
 - **The web page** (`apps/web`, with `--web-root`): your threads grouped by project, each with its status as a word and a symbol, its age, and a details sheet on tap (a side panel on a wide screen). It refreshes itself while open and says when the data is stale, partial or disconnected, or when you are signed out. It is a static Next.js export, served from the same origin as the API.
 
 To reach it from your phone, put it behind a Cloudflare Tunnel and an Access login for your own email: [docs/web-access.md](docs/web-access.md) walks through it, with placeholders for your own values. The server never listens on your network, and you open no port.

@@ -1,6 +1,6 @@
 # OpenWiz web API, version 1
 
-The HTTP API of `openwiz-server` (`crates/server`), for OpenWiz 0.0.2. It is a thin client of the core, like the `openwiz` CLI: each route calls the same core operation with the same options, and each success body is the `openwiz.inventory.v1` envelope that `openwiz … --json` prints. The envelope's schema is [`contracts/inventory.v1.schema.json`](inventory.v1.schema.json), reused unchanged. Nothing here adds a field, an operation or a rule.
+The HTTP API of `openwiz-server` (`crates/server`), for OpenWiz 0.0.2. It is a thin client of the core, like the `openwiz` CLI: the inventory and session routes call the same core operation with the same options, and each of their success bodies is the `openwiz.inventory.v1` envelope that `openwiz … --json` prints. `/api/v1/health` is the server's own metadata (its name and version, and the source's name and live-tested version); it has no CLI equivalent and reads nothing. The envelope's schema is [`contracts/inventory.v1.schema.json`](inventory.v1.schema.json), reused unchanged. Nothing here adds a field, an operation or a rule.
 
 **Status:** implemented and proven on fixtures (`tests/web-api`), the web page (A8) included. What was checked live, and what was not, is in [`docs/evidence/0.0.2-live-check.md`](../docs/evidence/0.0.2-live-check.md); the access path (Cloudflare Tunnel and Access) is set up as in [`docs/web-access.md`](../docs/web-access.md).
 

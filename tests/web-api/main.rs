@@ -14,8 +14,8 @@
 //!   matches the export, contained, `GET` and `HEAD` only, page headers
 //!   (W1 to W11 in `a8_web_page.rs`).
 //!
-//! A1, A2 and A9 are not fixture tests: they need the real access path or
-//! the real `room-cli` (see `docs/evidence/0.0.2-live-check.md`).
+//! A1 and A2, and a performance baseline, are not fixture tests: they need
+//! the real access path or the real `room-cli` (see `docs/evidence/0.0.2-live-check.md`).
 //! Fixture tests never prove live behaviour.
 
 #[path = "../proof/support.rs"]

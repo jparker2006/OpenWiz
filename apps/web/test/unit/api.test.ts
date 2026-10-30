@@ -107,7 +107,7 @@ test('busy: 503 with Retry-After, with or without a body', async () => {
   assert.deepEqual(await outcome({ status: 503, headers: {} }), { kind: 'busy', status: 503, retryAfterMs: null, error: null });
 });
 
-test('a 503 with a page of its own is the network\'s, not the server being busy (Q3)', async () => {
+test('a 503 with a page of its own is the network\'s, not the server being busy', async () => {
   assert.deepEqual(await outcome({ status: 503, headers: { 'Content-Type': 'text/html' }, body: '<html>Synthetic: service unavailable</html>' }), {
     kind: 'disconnected',
     cause: 'gateway',
