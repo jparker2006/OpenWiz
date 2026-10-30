@@ -2,7 +2,7 @@
 
 All OpenWiz versions and revisions, newest first. Versioning is explained in [RELEASING.md](RELEASING.md). PACP has its own version history in [docs/pacp/v0.1.md](docs/pacp/v0.1.md#version-history).
 
-## 0.0.1 · PUBLICATION-DATE
+## 0.0.1 · 2026-10-30
 
 **See your CloudRoom threads from the terminal**
 
