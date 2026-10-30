@@ -75,6 +75,8 @@ Running `openwiz ls` or `show` reads your real sessions through your signed-in `
 
 ## The larger design (proposal only)
 
+The 0.0.0 design documents are kept as they were, except where 0.0.1 needed to say something new; each such sentence is marked *Updated for 0.0.1*.
+
 OpenWiz proposes a **coordination layer above the personal agents a person already uses**. A user could start with one personal agent and add more later. The agents would share memory kept in the user's own private repository. Cloud coding factories would sit downstream and do bounded software work when asked.
 
 It is not one personal agent that happens to launch coding agents. The aim is for personal agents to work from the same memory and hand work to each other and to coding factories, without the user copying context between them or managing terminals by hand.
