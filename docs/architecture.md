@@ -215,7 +215,7 @@ flowchart TD
 
 **Status: Proposed. Nothing exists yet:** no workspace, crate, app or test. The names below are illustrative.
 
-*Updated for 0.0.1:* `Cargo.toml`, `crates/core`, `crates/adapters/cloudroom`, `crates/cli`, `contracts/inventory.v1.schema.json` and `tests/` now exist, for the read-only inventory only. `apps/web`, every other adapter, and the rest of the core do not.
+*Updated for 0.0.1:* `Cargo.toml`, `crates/core`, `crates/adapters/cloudroom`, `crates/cli`, `contracts/inventory.v1.schema.json` and `tests/` now exist, for the read-only inventory only. `apps/web`, every other adapter, and the rest of the core do not. *Updated for 0.0.2:* `crates/server`, a first, read-only `apps/web` and `contracts/web-api.v1.md` exist too. The server depends on the core and the CloudRoom adapter, as the CLI does, and nothing depends on the server; the page talks to the server only over HTTP.
 
 OpenWiz is planned as **one monorepo**. The private beta uses this same layout. It is the same product, not a second implementation.
 
@@ -282,7 +282,7 @@ flowchart TB
 - **One set of operations.** The CLI, agent commands and the web all reach the same core operations, so a change behaves the same wherever it starts.
 - **Wiring happens in a binary.** The binary that runs the controller connects the chosen adapters to the core.
 - **The controller is `crates/core` plus the binary that runs it.** It is the one Rust core that owns authoritative state, permissions, routing and coordination. Project orchestrators run each factory's workflow under it, through its operations.
-- **Still open:** how the web reaches the backend (the transport and its served interface) and the name of the CLI program. *Updated for 0.0.1:* 0.0.1's program is `openwiz`.
+- **Still open:** how the web reaches the backend (the transport and its served interface) and the name of the CLI program. *Updated for 0.0.1:* 0.0.1's program is `openwiz`. *Updated for 0.0.2:* 0.0.2's read-only page reaches `openwiz-server` with JSON over HTTP ([contract](../contracts/web-api.v1.md)); the controller's own interface is still open.
 
 ### External services: access versus adapters
 

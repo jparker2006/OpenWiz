@@ -8,7 +8,7 @@ These are design decisions. None of them is a built feature or a verified integr
 | --- | --- |
 | License: Apache License 2.0 | See [LICENSE](../LICENSE) |
 | The product is named **OpenWiz** | Renamed from OpenFleet. The protocol keeps the name PACP |
-| OpenWiz is CLI-first and agent-first, and a polished UI is an equal goal | Commands and buttons in the personal agent, plus the web client; none exists yet. *Updated for 0.0.1:* 0.0.1 has a first, read-only CLI command, `openwiz` |
+| OpenWiz is CLI-first and agent-first, and a polished UI is an equal goal | Commands and buttons in the personal agent, plus the web client; none exists yet. *Updated for 0.0.1:* 0.0.1 has a first, read-only CLI command, `openwiz`. *Updated for 0.0.2:* 0.0.2 has a first, read-only web page |
 | **The controller is the one Rust core that owns authoritative state, permissions, routing and coordination** | Each project orchestrator runs its factory workflow under the controller. It holds no authoritative state and is not a second authority |
 | Clients keep presentation state only; adapters keep integration bookkeeping only | Authoritative product state and every policy decision live in the core |
 | **Proof-driven development** | Each claim and its required evidence are defined before building, then verified and independently reviewed. Tests alone do not prove live behaviour; nothing is called formally proven without an actual formal proof. See [workflow.md](workflow.md#proof-driven-development) |
@@ -49,6 +49,15 @@ The plan, as written before it was built: the first runnable version has one job
 
 Its release notes will state the CloudRoom CLI version it was tested against and what was tested, as [RELEASING.md](../RELEASING.md) requires.
 
+## 0.0.2: the inventory on your phone
+
+*Updated for 0.0.2:* **Status: Released** in 0.0.2. What it adds is in the [changelog](../CHANGELOG.md); what was tested, and what is not proven, is in [evidence/0.0.2-live-check.md](evidence/0.0.2-live-check.md). Decided for it:
+
+- **The server is a second thin client of the core,** like the CLI: each route calls the same operation with the same options and returns the CLI's `--json`. It adds no field, operation or rule ([contract](../contracts/web-api.v1.md)).
+- **Loopback only, and remote access through Cloudflare.** The server listens on `127.0.0.1`; a Cloudflare Tunnel and an Access login in front of one hostname let in only the owner ([setup](web-access.md)). The server does not check Access's token itself.
+- **The page is a static Next.js export,** served by the server on the same origin as the API, so the page needs no other server and no CORS.
+- **Read-only.** No write, start or message route. A message-sending command was built in the private beta but is not part of 0.0.2.
+
 ## Open
 
 | # | Decision | Status | What depends on it |
@@ -64,7 +73,7 @@ Its release notes will state the CloudRoom CLI version it was tested against and
 | 9 | **Where PACP lives**: in this repository or its own | Open | Governance; independent versioning |
 | 10 | **Names**: whether "OpenWiz" and "PACP" are free to use | Not checked | Publishing beyond a preview |
 | 12 | **Desktop packaging** | Undecided; planned later, inside the same monorepo | How OpenWiz is installed on a desktop |
-| 14 | **How the web reaches the backend** (transport and served interface) | Open | `apps/web`; contract schemas |
+| 14 | **How the web reaches the backend** (transport and served interface) | Open. *Updated for 0.0.2:* for 0.0.2's read-only page, JSON over HTTP from `openwiz-server` on `127.0.0.1`, which also serves the page itself ([contract](../contracts/web-api.v1.md)); the controller's interface is still open | `apps/web`; contract schemas |
 | 15 | **Merges without a click**: whether a prior authorization may ever let a merge happen without the user, and who performs it | Unresolved | Policy gates; [workflow.md](workflow.md#human-approval) |
 | 16 | **Project orchestrator, implementation details**: where it runs, how it receives work from the controller, and how it reports back. The ownership boundary itself is decided | Unresolved | [workflow.md](workflow.md#who-owns-what) |
 | 17 | **Pre-approved dependents**: whether one launch approval may cover a dependent ticket in advance | Unresolved | [workflow.md](workflow.md#dependent-unlock) |

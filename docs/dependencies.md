@@ -1,6 +1,6 @@
-# Dependencies of OpenWiz 0.0.1
+# Dependencies of OpenWiz 0.0.2
 
-**Status: Current** for the code in this repository. Every third-party crate in `Cargo.lock` is listed here with its exact version, licence and checksum. `cargo test -p openwiz-tests --test checks` fails if a locked crate is missing from this table or its version or checksum differs.
+**Status: Current** for the code in this repository. *Updated for 0.0.2:* the server adds no crate, and the web page's npm packages are [below](#the-web-pages-packages). Every third-party crate in `Cargo.lock` is listed here with its exact version, licence and checksum. `cargo test -p openwiz-tests --test checks` fails if a locked crate is missing from this table or its version or checksum differs.
 
 OpenWiz depends directly on two crates, `serde` and `serde_json`. Any other direct dependency needs the maintainer's approval. The other crates come in through those two. Proc-macro crates run only while building, and are not part of the program.
 
@@ -20,6 +20,36 @@ OpenWiz depends directly on two crates, `serde` and `serde_json`. Any other dire
 
 The licences are as each crate declares them in its package metadata. This repository does not include any crate's source; `cargo` downloads them from crates.io and checks each against the checksum above.
 
+## The web page's packages
+
+*New in 0.0.2.* `apps/web/package-lock.json` pins every package with its exact version and an integrity hash, and `npm ci` checks each one. Install with `npm ci --ignore-scripts`: no package needs an install script. Any new package needs the maintainer's approval.
+
+**Direct dependencies.** The built page holds only their browser code, with that of the packages they bring in:
+
+| Package | Version | Licence | Why |
+| --- | --- | --- | --- |
+| `next` | `16.4.3` | MIT | The framework: a static export (`output: 'export'`, Pages Router), built with its bundled webpack |
+| `react` | `19.3.1` | MIT | The page's components |
+| `react-dom` | `19.3.1` | MIT | Renders them in the browser |
+
+**Build and test tools**, never in the built page:
+
+| Package | Version | Licence | Why |
+| --- | --- | --- | --- |
+| `typescript` | `6.0.3` | Apache-2.0 | Type checking (`npm run typecheck`) and the static checks (`npm run check`) |
+| `@types/node` | `24.19.2` | MIT | Types for Node.js |
+| `@types/react`, `@types/react-dom` | `19.3.0` | MIT | Types for React |
+| `playwright-core` | `1.64.1` | Apache-2.0 | Drives Chromium in the browser tests. Downloads no browser |
+| `axe-core` | `4.14.0` | MPL-2.0 | Accessibility checks in the browser tests |
+
+**Through those** (from the lockfile): `@next/env` 16.4.3 (MIT), `@swc/helpers` 0.5.23 (Apache-2.0), `baseline-browser-mapping` 2.11.33 (Apache-2.0), `caniuse-lite` 1.0.30001819 (CC-BY-4.0), `client-only` 0.0.1 (MIT), `csstype` 3.2.3 (MIT), `nanoid` 3.3.20 (MIT), `picocolors` 1.1.1 (ISC), `postcss` 8.5.23 (MIT), `scheduler` 0.28.0 (MIT), `source-map-js` 1.2.2 (BSD-3-Clause), `styled-jsx` 5.1.6 (MIT), `tslib` 2.8.1 (0BSD) and `undici-types` 7.24.6 (MIT).
+
+**Optional, one per platform**, installed only where they match: Next's compiler (`@next/swc-*` 16.4.3, MIT), and the image library `sharp` 0.35.5 (Apache-2.0) with its `@img/sharp-*` builds (Apache-2.0; the `libvips` builds are LGPL-3.0-or-later), `@img/colour` 1.1.0 (MIT), `detect-libc` 2.1.2 (Apache-2.0), `semver` 7.8.5 (ISC) and `@emnapi/runtime` 1.11.3 (MIT). The page uses no image optimisation, so `sharp` does nothing in its build.
+
+The licences are as each package declares them in the lockfile. The repository includes no package's code.
+
+**Fonts.** Geist and Geist Mono (variable, `woff2`), bundled in `apps/web/public/fonts/` and served by the page itself, never from another site. They are licensed under the SIL Open Font License 1.1, whose text is next to them in `OFL.txt`.
+
 ## Tools
 
 | Tool | Version | Status |
@@ -27,12 +57,16 @@ The licences are as each crate declares them in its package metadata. This repos
 | Rust (`rustc`, `cargo`) | 1.99.1, the `rust-version` in `Cargo.toml` | Required to build. Older versions are not supported |
 | `rustfmt`, `clippy` | as shipped with Rust 1.99.1 | Needed only for the formatting and lint checks |
 | `room-cli` | v127 tested; any version runs | Needed at run time. Other versions run and are shown as untested. See [what was tested](evidence/0.0.1-live-check.md) |
+| Node.js, npm | 24.22.1 (the `engines` in `apps/web/package.json`), with npm 11.19.1 | *New in 0.0.2.* Needed only to build and test the web page; the server does not run Node.js |
+| Chromium | 156 | *New in 0.0.2.* Needed only for the page's browser tests (`/usr/bin/chromium`, or `OPENWIZ_CHROMIUM`) |
+| `cloudflared` | any current version | *New in 0.0.2.* Needed only to reach the page from outside your Mac ([setup](web-access.md)). Cloudflare Zero Trust, with Access, is needed for the same |
 
 ## Systems and protocols
 
 | What | Status |
 | --- | --- |
-| macOS | Built natively and live-checked once (Apple Silicon) |
-| Linux | Fixture tests pass |
+| macOS | Built natively and live-checked once (Apple Silicon). *Updated for 0.0.2:* the server too, behind Cloudflare Tunnel and Access ([evidence](evidence/0.0.2-live-check.md)) |
+| Linux | Fixture tests pass, the web page's included |
 | Windows | Untested |
-| PACP | None: 0.0.1 implements no PACP version |
+| Browsers | *New in 0.0.2.* Chromium only, in the tests. Safari, iOS and others are untested |
+| PACP | None: 0.0.2 implements no PACP version |

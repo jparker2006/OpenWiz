@@ -6,7 +6,7 @@ Each line has its own numbers. A number on one line never implies anything about
 
 | Line | Current | Where it is recorded |
 | --- | --- | --- |
-| **OpenWiz** (the product) | `0.0.1`: the first version with software, a read-only inventory command. *Updated for 0.0.1* | `CHANGELOG.md`, and the Rust workspace version in `Cargo.toml`. *Updated for 0.0.1:* the CLI does not print its own version or commit yet |
+| **OpenWiz** (the product) | `0.0.2`: the read-only inventory, as a command (0.0.1) and as a private web page (0.0.2). *Updated for 0.0.2* | `CHANGELOG.md`, and the Rust workspace version in `Cargo.toml`. *Updated for 0.0.1:* the CLI does not print its own version or commit yet. *Updated for 0.0.2:* the server reports its version on `/api/v1/health`, and `apps/web/package.json` carries the same version |
 | **PACP** (the protocol) | `v0.1` (draft) | [PACP versioning](docs/pacp/v0.1.md#13-versioning) and its version history |
 | **Adapters** (one per personal agent) | none exist | each adapter's own notes, when one exists |
 
@@ -36,7 +36,7 @@ The first version with software will be 0.0.1. Its planned first job is a read-o
 - what was tested, and on what evidence;
 - its explicit dependencies.
 
-*Updated for 0.0.1:* 0.0.1 states how to install it in the [README](README.md#install), and what was tested, on what evidence, and what is not proven in [docs/evidence/0.0.1-live-check.md](docs/evidence/0.0.1-live-check.md), linked from the [changelog](CHANGELOG.md), and its dependencies in [docs/dependencies.md](docs/dependencies.md). Evidence that holds private data, such as a live check of the maintainer's own sessions, is published as its method, rules and counts, without the private data: [docs/evidence/0.0.1-live-check.md](docs/evidence/0.0.1-live-check.md).
+*Updated for 0.0.1:* 0.0.1 states how to install it in the [README](README.md#install), and what was tested, on what evidence, and what is not proven in [docs/evidence/0.0.1-live-check.md](docs/evidence/0.0.1-live-check.md), linked from the [changelog](CHANGELOG.md), and its dependencies in [docs/dependencies.md](docs/dependencies.md). Evidence that holds private data, such as a live check of the maintainer's own sessions, is published as its method, rules and counts, without the private data: [docs/evidence/0.0.1-live-check.md](docs/evidence/0.0.1-live-check.md). *Updated for 0.0.2:* 0.0.2 does the same in [docs/evidence/0.0.2-live-check.md](docs/evidence/0.0.2-live-check.md), and its access setup is published with placeholders only ([docs/web-access.md](docs/web-access.md)).
 
 ## How a release is reviewed
 

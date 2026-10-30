@@ -40,7 +40,7 @@ Anything the captures did not observe is a **synthetic assumption**. Each scenar
 | --- | --- |
 | `room-cli-0.43.1/<scenario>/scenario.json` | What the fake `room-cli` answers for each allowlisted argument list. A scenario may `extends` another |
 | `room-cli-0.43.1/normal/` | The normal case: 6 default sessions, plus one hidden and one archived, 5 projects (two share a name), 1 machine |
-| `room-cli-0.43.1/<variant>/` | Command error and timeout (of `thread list`, `project list`, `thread show` or `thread output`), not JSON, truncated, wrong types, missing fields, unknown extra fields, versions 0.44.0 and 0.43.1 (both untested), and a project removed between runs (`project-removed`). The nonexistent id `thr_syn_9999` is in `normal` |
+| `room-cli-0.43.1/<variant>/` | Command error and timeout (of `thread list`, `project list`, `thread show` or `thread output`), not JSON, truncated, wrong types, missing fields, unknown extra fields, versions 0.44.0 and 0.43.1 (both untested), and a project removed between runs (`project-removed`). The nonexistent id `thr_syn_9999` is in `normal`. *Updated for 0.0.2:* `diagnostics-*`, one per read, fail with planted, unsafe-looking stderr for the stderr sanitizer's proofs (P4b, A7) |
 | `envelopes/` | Example `openwiz.inventory.v1` envelopes, checked against `contracts/inventory.v1.schema.json` |
 
 ## The synthetic world

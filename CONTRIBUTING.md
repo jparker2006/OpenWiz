@@ -1,6 +1,6 @@
 # Contributing
 
-OpenWiz is a **design preview**. *Updated for 0.0.1:* 0.0.1 adds one small, read-only command, `openwiz`; everything else is still a proposal, with no code. The most useful contribution right now is critical feedback.
+OpenWiz is a **design preview**. *Updated for 0.0.1:* 0.0.1 adds one small, read-only command, `openwiz`; everything else is still a proposal, with no code. *Updated for 0.0.2:* 0.0.2 adds a read-only server and web page for the same inventory. The most useful contribution right now is critical feedback.
 
 ## What helps
 
@@ -26,6 +26,19 @@ cargo test --workspace
 ```
 
 The tests use a fake `room-cli` and synthetic fixtures only; `cargo test -p openwiz-tests --test checks fixture_scan` refuses anything that looks real. A new third-party crate needs the maintainer's approval and a row in [docs/dependencies.md](docs/dependencies.md). The tests never call your real `room-cli`.
+
+*Updated for 0.0.2:* the web API's tests (A8) need the page built first, and a change to `apps/web` must also pass, with Node.js 24.22.1 and a Chromium for the browser tests (`/usr/bin/chromium`, or set `OPENWIZ_CHROMIUM`):
+
+```sh
+cd apps/web
+npm ci --ignore-scripts
+npm run build
+npm run typecheck
+npm run check
+npm test
+```
+
+A new npm package needs the maintainer's approval too.
 
 ## Rules for anything you post
 

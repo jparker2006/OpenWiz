@@ -2,6 +2,19 @@
 
 All OpenWiz versions and revisions, newest first. Versioning is explained in [RELEASING.md](RELEASING.md). PACP has its own version history in [docs/pacp/v0.1.md](docs/pacp/v0.1.md#version-history).
 
+## 0.0.2 · PUBLICATION-DATE
+
+**Your threads on your phone, privately**
+
+1. `openwiz-server` serves your threads as a private web page on your own Mac, listening on localhost only.
+2. The page shows your threads grouped by project, with status, age and a details sheet on tap; it refreshes itself while open.
+3. It says plainly when data is stale, partial or disconnected, or when you're signed out, and never shows stale data as fresh.
+4. Reach it from anywhere through a Cloudflare Tunnel and an Access login that lets in only the emails you allow; in a live check, requests without a login got only the login page ([setup guide](docs/web-access.md)).
+5. Read-only, like 0.0.1: it never starts, messages or changes a thread, and it makes the same reads as `openwiz`, which in a live check woke no idle thread and marked none read.
+6. Status is a word and a symbol, not just a colour, and the page passes automated keyboard and screen-reader checks in Chromium.
+
+What was tested, and what is not proven: [docs/evidence/0.0.2-live-check.md](docs/evidence/0.0.2-live-check.md). Dependencies: [docs/dependencies.md](docs/dependencies.md).
+
 ## 0.0.1 · 2026-10-30
 
 **See your CloudRoom threads from the terminal**
