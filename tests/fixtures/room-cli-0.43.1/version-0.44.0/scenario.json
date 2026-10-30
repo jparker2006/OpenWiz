@@ -1,0 +1,16 @@
+{
+  "scenario": "version-0.44.0",
+  "description": "room-cli reports 0.44.0, a version OpenWiz is not tested against. Every other read is normal.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "0.44.0 is a synthetic version number."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "--version"
+      ],
+      "stdout_file": "version.txt"
+    }
+  ]
+}

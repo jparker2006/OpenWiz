@@ -1,0 +1,39 @@
+[package]
+name = "openwiz-tests"
+description = "Cross-crate proof tests, synthetic fixtures and the fake room-cli. Never shipped"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+autobins = false
+autotests = false
+autoexamples = false
+autobenches = false
+
+# The fake room-cli the tests run in place of the real one.
+[[bin]]
+name = "fake-room-cli"
+path = "fake-room-cli/main.rs"
+test = false
+
+# The 0.0.1 proof cases P1 to P12.
+[[test]]
+name = "proof"
+path = "proof/main.rs"
+
+# Foundation checks: dependency direction, fixture scan, schema conformance
+# and the pending list.
+[[test]]
+name = "checks"
+path = "checks/main.rs"
+
+[dependencies]
+serde_json.workspace = true
+
+[dev-dependencies]
+openwiz-core = { path = "../crates/core" }
+openwiz-adapter-cloudroom = { path = "../crates/adapters/cloudroom" }
+openwiz-cli = { path = "../crates/cli" }
+
+[lints]
+workspace = true

@@ -1,0 +1,20 @@
+[package]
+name = "openwiz-cli"
+description = "The openwiz command: a thin client that parses commands and prints results"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "openwiz"
+path = "src/main.rs"
+
+[dependencies]
+openwiz-core = { path = "../core" }
+openwiz-adapter-cloudroom = { path = "../adapters/cloudroom" }
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

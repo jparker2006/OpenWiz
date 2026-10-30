@@ -1,0 +1,83 @@
+{
+  "schema": "openwiz.inventory.v1",
+  "source": {
+    "name": "room-cli",
+    "version": {
+      "known": "v127"
+    },
+    "tested_version": "v127",
+    "version_tested": true
+  },
+  "coverage": {
+    "state": "complete",
+    "counts": null
+  },
+  "freshness": {
+    "snapshot_at": 1700000600000
+  },
+  "gaps": [],
+  "data": {
+    "session": {
+      "id": "thr_syn_0005",
+      "title": {
+        "known": "Synthetic session 5"
+      },
+      "provider": {
+        "known": "codex"
+      },
+      "status": {
+        "known": "idle"
+      },
+      "location": {
+        "known": {
+          "kind": "cloud"
+        }
+      },
+      "group": {
+        "kind": "project",
+        "id": "prj_syn_0004",
+        "name": {
+          "known": "Synthetic shared name"
+        }
+      },
+      "parent": {
+        "known": "thr_syn_0001"
+      },
+      "hidden": {
+        "known": false
+      },
+      "archived": {
+        "known": false
+      },
+      "recap": {
+        "known": {
+          "kind": "purpose_as_reported",
+          "text": "Synthetic purpose 5.",
+          "truncated": false
+        }
+      },
+      "reported_configuration": {
+        "model": {
+          "known": "synthetic-model-a"
+        },
+        "effort": {
+          "known": "high"
+        }
+      },
+      "updated_at": {
+        "known": 1700000300000
+      },
+      "age_ms": {
+        "known": 300000
+      }
+    },
+    "final_output": {
+      "known": {
+        "kind": "no_final_output_yet"
+      }
+    },
+    "reported_error": {
+      "known": null
+    }
+  }
+}

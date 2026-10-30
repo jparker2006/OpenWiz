@@ -1,0 +1,18 @@
+{
+  "scenario": "thread-list-truncated",
+  "description": "thread list exits 0 but its JSON stops halfway.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "Truncated output is unobserved."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "thread",
+        "list",
+        "--json"
+      ],
+      "stdout_file": "thread-list.json"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "thread": {
+    "id": "thr_syn_0006",
+    "projectId": "prj_syn_0005",
+    "providerId": "claude-code",
+    "title": "Synthetic session 6",
+    "titleFallback": "Synthetic fallback title 6",
+    "status": "active",
+    "visibility": "visible",
+    "executionTarget": "cloud",
+    "environmentId": null,
+    "parentThreadId": null,
+    "sectionId": null,
+    "sourceThreadId": null,
+    "originKind": null,
+    "originPluginId": null,
+    "archivedAt": null,
+    "pinnedAt": null,
+    "deletedAt": null,
+    "lastReadAt": 1700000240000,
+    "latestAttentionAt": 1700000240000,
+    "createdAt": 1699914200000,
+    "updatedAt": 1700000240000,
+    "activeBackgroundAgentCount": 0,
+    "queuedMessageCount": 0,
+    "canSpawnChild": true,
+    "purpose": {
+      "text": "Synthetic purpose 6.",
+      "percent": 50,
+      "sourceSeq": 3,
+      "updatedAt": 1700000300000
+    },
+    "runtime": {
+      "displayStatus": "active",
+      "hostReconnectGraceExpiresAt": null
+    }
+  },
+  "execution": {
+    "model": "synthetic-model-b"
+  },
+  "environment": null,
+  "pendingTodos": null
+}

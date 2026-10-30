@@ -1,0 +1,22 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/core",
+    "crates/adapters/cloudroom",
+    "crates/cli",
+    "tests",
+]
+
+[workspace.package]
+version = "0.0.1"
+edition = "2024"
+rust-version = "1.99.1"
+publish = false
+
+# The only approved third-party crates. Anything else needs the maintainer's approval.
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"

@@ -1,0 +1,28 @@
+{
+  "scenario": "show-missing-fields",
+  "description": "thread show of thr_syn_0001 has no execution.model, no thread.parentThreadId and no purpose (purpose was absent in capture B); thr_syn_0006 has no execution.reasoningLevel.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "A missing execution.model, execution.reasoningLevel or thread.parentThreadId is unobserved."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0001",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0001.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0006",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0006.json"
+    }
+  ]
+}

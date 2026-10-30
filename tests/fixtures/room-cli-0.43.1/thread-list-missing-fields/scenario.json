@@ -1,0 +1,18 @@
+{
+  "scenario": "thread-list-missing-fields",
+  "description": "thread list rows with missing required fields: the first row has no id; thr_syn_0002 has no status or runtime, thr_syn_0003 no parentThreadId, thr_syn_0004 no updatedAt, thr_syn_0005 no projectId.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "Missing required fields are unobserved."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "thread",
+        "list",
+        "--json"
+      ],
+      "stdout_file": "thread-list.json"
+    }
+  ]
+}

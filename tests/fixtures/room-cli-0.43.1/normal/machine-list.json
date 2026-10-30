@@ -1,0 +1,21 @@
+[
+  {
+    "id": "mch_syn_0001",
+    "name": "Synthetic machine one",
+    "type": "persistent",
+    "status": "connected",
+    "machineProviderId": null,
+    "lifecycle": {
+      "phase": "active",
+      "suspendedAt": null,
+      "message": null,
+      "pendingLog": "Synthetic pending log",
+      "teardown": null
+    },
+    "maxPermissionMode": "full",
+    "lastSeenAt": 1700000595000,
+    "lastRejectedProtocolVersion": null,
+    "createdAt": 1699100600000,
+    "updatedAt": 1700000595000
+  }
+]

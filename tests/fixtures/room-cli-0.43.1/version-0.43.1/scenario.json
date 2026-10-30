@@ -1,0 +1,16 @@
+{
+  "scenario": "version-0.43.1",
+  "description": "room-cli reports 0.43.1, the version of captures A and C. The live-tested version is v127, so 0.43.1 is marked untested. Every other read is normal.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "Only the version text 0.43.1 and the shapes are from captures A and C; every value comes from the synthetic normal scenario."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "--version"
+      ],
+      "stdout_file": "version.txt"
+    }
+  ]
+}

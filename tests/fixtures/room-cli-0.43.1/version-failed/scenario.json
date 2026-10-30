@@ -1,0 +1,17 @@
+{
+  "scenario": "version-failed",
+  "description": "room-cli --version exits 1 with a stderr line that must never be echoed. Every other read is normal.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "A failing --version is unobserved; the stderr line is a synthetic marker standing for private text."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "--version"
+      ],
+      "exit": 1,
+      "stderr": "Synthetic private version marker"
+    }
+  ]
+}

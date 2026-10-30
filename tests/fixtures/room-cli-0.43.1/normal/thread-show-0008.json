@@ -1,0 +1,38 @@
+{
+  "thread": {
+    "id": "thr_syn_0008",
+    "projectId": "prj_syn_0002",
+    "providerId": "acp-hermes-agent",
+    "title": "Synthetic session 8",
+    "titleFallback": "Synthetic fallback title 8",
+    "status": "idle",
+    "visibility": "visible",
+    "executionTarget": "cloud",
+    "environmentId": null,
+    "parentThreadId": null,
+    "sectionId": null,
+    "sourceThreadId": null,
+    "originKind": null,
+    "originPluginId": null,
+    "archivedAt": 1699997000000,
+    "pinnedAt": null,
+    "deletedAt": null,
+    "lastReadAt": 1700000120000,
+    "latestAttentionAt": 1700000120000,
+    "createdAt": 1699914200000,
+    "updatedAt": 1700000120000,
+    "activeBackgroundAgentCount": 0,
+    "queuedMessageCount": 0,
+    "canSpawnChild": true,
+    "runtime": {
+      "displayStatus": "idle",
+      "hostReconnectGraceExpiresAt": null
+    }
+  },
+  "execution": {
+    "model": "synthetic-model-c",
+    "reasoningLevel": "high"
+  },
+  "environment": null,
+  "pendingTodos": null
+}

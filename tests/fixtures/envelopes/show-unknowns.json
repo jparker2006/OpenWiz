@@ -1,0 +1,92 @@
+{
+  "schema": "openwiz.inventory.v1",
+  "source": {
+    "name": "room-cli",
+    "version": {
+      "known": "v127"
+    },
+    "tested_version": "v127",
+    "version_tested": true
+  },
+  "coverage": {
+    "state": "partial",
+    "counts": null
+  },
+  "freshness": {
+    "snapshot_at": 1700000600000
+  },
+  "gaps": [
+    {
+      "kind": "missing_field",
+      "subject": "thr_syn_0001",
+      "detail": "status is missing"
+    },
+    {
+      "kind": "timed_out",
+      "subject": "thr_syn_0001",
+      "detail": "thread output timed out after 30000 ms"
+    }
+  ],
+  "data": {
+    "session": {
+      "id": "thr_syn_0001",
+      "title": {
+        "known": "Synthetic session 1"
+      },
+      "provider": {
+        "known": "codex"
+      },
+      "status": {
+        "unknown": "not reported by room-cli: status is missing"
+      },
+      "location": {
+        "known": {
+          "kind": "cloud"
+        }
+      },
+      "group": {
+        "kind": "project",
+        "id": "prj_syn_0001",
+        "name": {
+          "known": "Synthetic project one"
+        }
+      },
+      "parent": {
+        "unknown": "not reported by room-cli: parentThreadId is missing"
+      },
+      "hidden": {
+        "known": false
+      },
+      "archived": {
+        "known": false
+      },
+      "recap": {
+        "known": {
+          "kind": "purpose_as_reported",
+          "text": "Synthetic purpose 1.",
+          "truncated": false
+        }
+      },
+      "reported_configuration": {
+        "model": {
+          "unknown": "not reported by room-cli: execution.model is missing"
+        },
+        "effort": {
+          "known": "high"
+        }
+      },
+      "updated_at": {
+        "unknown": "not reported by room-cli: updatedAt is missing"
+      },
+      "age_ms": {
+        "unknown": "updated_at is unknown"
+      }
+    },
+    "final_output": {
+      "unknown": "thread output timed out after 30000 ms"
+    },
+    "reported_error": {
+      "unknown": "thread output timed out after 30000 ms"
+    }
+  }
+}

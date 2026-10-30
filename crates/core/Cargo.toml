@@ -1,0 +1,13 @@
+[package]
+name = "openwiz-core"
+description = "OpenWiz core: the inventory model, the honest envelope and the interfaces adapters implement"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+serde.workspace = true
+
+[lints]
+workspace = true

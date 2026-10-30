@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openwiz:schema:inventory:v1",
+  "title": "openwiz.inventory.v1",
+  "description": "The JSON envelope printed by openwiz ls --json and openwiz show --json (OpenWiz 0.0.1). Every value that is not known is {\"unknown\": reason}; nothing is guessed. Timestamps and ages are integer milliseconds.",
+  "$ref": "#/$defs/envelope",
+  "$defs": {
+    "envelope": {
+      "type": "object",
+      "required": ["schema", "source", "coverage", "freshness", "gaps", "data"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": { "const": "openwiz.inventory.v1" },
+        "source": { "$ref": "#/$defs/source" },
+        "coverage": { "$ref": "#/$defs/coverage" },
+        "freshness": { "$ref": "#/$defs/freshness" },
+        "gaps": { "type": "array", "items": { "$ref": "#/$defs/gap" } },
+        "data": {
+          "oneOf": [
+            { "$ref": "#/$defs/inventory" },
+            { "$ref": "#/$defs/session_view" }
+          ]
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["name", "version", "tested_version", "version_tested"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "$ref": "#/$defs/fact_string" },
+        "tested_version": { "type": "string" },
+        "version_tested": { "type": "boolean" }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["state", "counts"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "enum": ["complete", "partial"] },
+        "counts": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/counts" }
+          ]
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": ["listed", "unreadable", "excluded_hidden", "excluded_archived", "hidden_read", "archived_read", "matched", "offset", "limit", "shown"],
+      "additionalProperties": false,
+      "properties": {
+        "listed": { "type": "integer", "minimum": 0 },
+        "unreadable": { "type": "integer", "minimum": 0 },
+        "excluded_hidden": { "type": "integer", "minimum": 0 },
+        "excluded_archived": { "type": "integer", "minimum": 0 },
+        "hidden_read": { "type": "boolean", "description": "False: hidden sessions were not asked for, so how many exist is not known" },
+        "archived_read": { "type": "boolean", "description": "False: archived sessions were not asked for, so how many exist is not known" },
+        "matched": { "type": "integer", "minimum": 0 },
+        "offset": { "type": "integer", "minimum": 0 },
+        "limit": { "type": "integer", "minimum": 0 },
+        "shown": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "required": ["snapshot_at"],
+      "additionalProperties": false,
+      "properties": {
+        "snapshot_at": { "type": "integer" }
+      }
+    },
+    "gap": {
+      "type": "object",
+      "required": ["kind", "subject", "detail"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": ["untested_version", "command_failed", "timed_out", "budget_exhausted", "malformed", "missing_field", "wrong_type", "not_found"]
+        },
+        "subject": { "type": ["string", "null"] },
+        "detail": { "type": "string" }
+      }
+    },
+    "inventory": {
+      "type": "object",
+      "required": ["sessions"],
+      "additionalProperties": false,
+      "properties": {
+        "sessions": { "type": "array", "items": { "$ref": "#/$defs/session" } }
+      }
+    },
+    "session_view": {
+      "type": "object",
+      "required": ["session", "final_output", "reported_error"],
+      "additionalProperties": false,
+      "properties": {
+        "session": { "$ref": "#/$defs/session" },
+        "final_output": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": ["known"],
+              "additionalProperties": false,
+              "properties": { "known": { "$ref": "#/$defs/final_output" } }
+            },
+            { "$ref": "#/$defs/unknown" }
+          ]
+        },
+        "reported_error": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": ["known"],
+              "additionalProperties": false,
+              "properties": {
+                "known": {
+                  "oneOf": [
+                    { "type": "null" },
+                    { "$ref": "#/$defs/bounded_text" }
+                  ]
+                }
+              }
+            },
+            { "$ref": "#/$defs/unknown" }
+          ]
+        }
+      }
+    },
+    "session": {
+      "type": "object",
+      "required": ["id", "title", "provider", "status", "location", "group", "parent", "hidden", "archived", "recap", "reported_configuration", "updated_at", "age_ms"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "$ref": "#/$defs/fact_string" },
+        "provider": { "$ref": "#/$defs/fact_string" },
+        "status": { "$ref": "#/$defs/fact_string" },
+        "location": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": ["known"],
+              "additionalProperties": false,
+              "properties": { "known": { "$ref": "#/$defs/location" } }
+            },
+            { "$ref": "#/$defs/unknown" }
+          ]
+        },
+        "group": { "$ref": "#/$defs/grouping" },
+        "parent": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": ["known"],
+              "additionalProperties": false,
+              "properties": { "known": { "type": ["string", "null"] } }
+            },
+            { "$ref": "#/$defs/unknown" }
+          ]
+        },
+        "hidden": { "$ref": "#/$defs/fact_boolean" },
+        "archived": { "$ref": "#/$defs/fact_boolean" },
+        "recap": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": ["known"],
+              "additionalProperties": false,
+              "properties": { "known": { "$ref": "#/$defs/recap" } }
+            },
+            { "$ref": "#/$defs/unknown" }
+          ]
+        },
+        "reported_configuration": { "$ref": "#/$defs/reported_configuration" },
+        "updated_at": { "$ref": "#/$defs/fact_integer" },
+        "age_ms": { "$ref": "#/$defs/fact_integer" }
+      }
+    },
+    "location": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": { "kind": { "const": "cloud" } }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "machine"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "local" },
+            "machine": { "$ref": "#/$defs/fact_string" }
+          }
+        }
+      ]
+    },
+    "grouping": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "id", "name"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "project" },
+            "id": { "type": "string" },
+            "name": { "$ref": "#/$defs/fact_string" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "reason"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "ungrouped" },
+            "reason": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "recap": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "text", "truncated"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "purpose_as_reported" },
+            "text": { "type": "string", "maxLength": 120 },
+            "truncated": { "type": "boolean" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": { "kind": { "const": "no_recap_yet" } }
+        }
+      ]
+    },
+    "final_output": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "text", "truncated"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "const": "reported" },
+            "text": { "type": "string" },
+            "truncated": { "type": "boolean" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": { "kind": { "const": "no_final_output_yet" } }
+        }
+      ]
+    },
+    "reported_configuration": {
+      "description": "Model and effort as reported by the source. Never the serving model.",
+      "type": "object",
+      "required": ["model", "effort"],
+      "additionalProperties": false,
+      "properties": {
+        "model": { "$ref": "#/$defs/fact_string" },
+        "effort": { "$ref": "#/$defs/fact_string" }
+      }
+    },
+    "bounded_text": {
+      "type": "object",
+      "required": ["text", "truncated"],
+      "additionalProperties": false,
+      "properties": {
+        "text": { "type": "string" },
+        "truncated": { "type": "boolean" }
+      }
+    },
+    "unknown": {
+      "type": "object",
+      "required": ["unknown"],
+      "additionalProperties": false,
+      "properties": { "unknown": { "type": "string", "minLength": 1, "description": "Why the value is unknown" } }
+    },
+    "fact_string": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["known"],
+          "additionalProperties": false,
+          "properties": { "known": { "type": "string" } }
+        },
+        { "$ref": "#/$defs/unknown" }
+      ]
+    },
+    "fact_boolean": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["known"],
+          "additionalProperties": false,
+          "properties": { "known": { "type": "boolean" } }
+        },
+        { "$ref": "#/$defs/unknown" }
+      ]
+    },
+    "fact_integer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["known"],
+          "additionalProperties": false,
+          "properties": { "known": { "type": "integer" } }
+        },
+        { "$ref": "#/$defs/unknown" }
+      ]
+    }
+  }
+}

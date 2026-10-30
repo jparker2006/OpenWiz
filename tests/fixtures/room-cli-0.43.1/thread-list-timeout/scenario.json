@@ -1,0 +1,18 @@
+{
+  "scenario": "thread-list-timeout",
+  "description": "thread list never answers.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "A hung read is unobserved; the fake simply never answers."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "thread",
+        "list",
+        "--json"
+      ],
+      "hang": true
+    }
+  ]
+}

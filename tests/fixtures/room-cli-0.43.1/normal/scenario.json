@@ -1,0 +1,250 @@
+{
+  "scenario": "normal",
+  "description": "Normal case. Every value is synthetic. Shapes follow captures A, B and C; the --version text v127 follows capture V, which found those shapes compatible. See tests/fixtures/README.md.",
+  "synthetic_assumptions": [
+    "Integer timestamps are milliseconds since the Unix epoch (the unit is unobserved).",
+    "thr_syn_0007 has visibility 'hidden' and appears only with --include-hidden (no hidden session was observed).",
+    "project list --json --include-personal --hidden returns [] (C observed [] for --hidden; combining it with --include-personal is assumed).",
+    "thread show of an archived session (thr_syn_0008) has the same shape as an existing one (unobserved).",
+    "thr_syn_0005 has no final output yet, shown as an empty output string (unobserved).",
+    "thread show of a claude-code cloud session (thr_syn_0006) has the same shape as the codex one (unobserved).",
+    "thread show environment.status, lifecycle.phase, environmentProviderInstanceKey, workspaceProvisionType and pullRequest.status values are synthetic labels (only their types were recorded).",
+    "thr_syn_0003's project prj_syn_0099 is not in the project list, and thr_syn_0004's host mch_syn_0099 is not in the machine list. Capture A saw every projectId resolve and every local host listed, so both are invented to test the unverified cases.",
+    "The output of thread list with both --include-hidden and --include-archived (8 rows) is unobserved; it is assumed to be the union of the two."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "--version"
+      ],
+      "stdout_file": "version.txt"
+    },
+    {
+      "argv": [
+        "thread",
+        "list",
+        "--json"
+      ],
+      "stdout_file": "thread-list.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "list",
+        "--json",
+        "--include-hidden"
+      ],
+      "stdout_file": "thread-list-include-hidden.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "list",
+        "--json",
+        "--include-archived"
+      ],
+      "stdout_file": "thread-list-include-archived.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "list",
+        "--json",
+        "--include-hidden",
+        "--include-archived"
+      ],
+      "stdout_file": "thread-list-include-hidden-include-archived.json"
+    },
+    {
+      "argv": [
+        "project",
+        "list",
+        "--json",
+        "--include-personal"
+      ],
+      "stdout_file": "project-list.json"
+    },
+    {
+      "argv": [
+        "project",
+        "list",
+        "--json",
+        "--include-personal",
+        "--hidden"
+      ],
+      "stdout_file": "project-list-hidden.json"
+    },
+    {
+      "argv": [
+        "machine",
+        "list",
+        "--json"
+      ],
+      "stdout_file": "machine-list.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0001",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0001.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "output",
+        "thr_syn_0001",
+        "--json"
+      ],
+      "stdout_file": "thread-output-0001.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0002",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0002.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "output",
+        "thr_syn_0002",
+        "--json"
+      ],
+      "stdout_file": "thread-output-0002.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0003",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0003.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "output",
+        "thr_syn_0003",
+        "--json"
+      ],
+      "stdout_file": "thread-output-0003.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0004",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0004.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "output",
+        "thr_syn_0004",
+        "--json"
+      ],
+      "stdout_file": "thread-output-0004.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0005",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0005.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "output",
+        "thr_syn_0005",
+        "--json"
+      ],
+      "stdout_file": "thread-output-0005.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0006",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0006.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "output",
+        "thr_syn_0006",
+        "--json"
+      ],
+      "stdout_file": "thread-output-0006.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0007",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0007.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "output",
+        "thr_syn_0007",
+        "--json"
+      ],
+      "stdout_file": "thread-output-0007.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0008",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0008.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "output",
+        "thr_syn_0008",
+        "--json"
+      ],
+      "stdout_file": "thread-output-0008.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_9999",
+        "--json"
+      ],
+      "exit": 1,
+      "stderr": "Error: HTTP 404: Thread not found"
+    },
+    {
+      "argv": [
+        "thread",
+        "output",
+        "thr_syn_9999",
+        "--json"
+      ],
+      "exit": 1,
+      "stderr": "Error: HTTP 404: Thread not found"
+    }
+  ]
+}

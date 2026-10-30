@@ -1,0 +1,19 @@
+{
+  "scenario": "show-timeout",
+  "description": "thread show of thr_syn_0002 never answers; every other read is normal.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "A hung read is unobserved."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0002",
+        "--json"
+      ],
+      "hang": true
+    }
+  ]
+}

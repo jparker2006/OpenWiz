@@ -1,0 +1,27 @@
+{
+  "scenario": "unknown-fields",
+  "description": "Every thread list row, and thread show of thr_syn_0001, carry extra keys that 0.43.1 does not have.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "The extra keys are invented to stand for future room-cli fields."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "thread",
+        "list",
+        "--json"
+      ],
+      "stdout_file": "thread-list.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0001",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0001.json"
+    }
+  ]
+}

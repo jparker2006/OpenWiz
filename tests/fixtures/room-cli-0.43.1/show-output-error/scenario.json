@@ -1,0 +1,20 @@
+{
+  "scenario": "show-output-error",
+  "description": "thread output of thr_syn_0002 exits 1; every other read is normal.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "The HTTP 500 failure line is synthetic."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "thread",
+        "output",
+        "thr_syn_0002",
+        "--json"
+      ],
+      "exit": 1,
+      "stderr": "Error: HTTP 500: Synthetic server error"
+    }
+  ]
+}

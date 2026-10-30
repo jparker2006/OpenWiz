@@ -1,0 +1,16 @@
+{
+  "scenario": "version-unrecognised",
+  "description": "room-cli --version prints text that is neither N.N.N nor v<N>. Every other read is normal.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "Unrecognised version text is unobserved; it stands for any future format change."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "--version"
+      ],
+      "stdout_file": "version.txt"
+    }
+  ]
+}

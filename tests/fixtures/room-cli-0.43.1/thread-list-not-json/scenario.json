@@ -1,0 +1,18 @@
+{
+  "scenario": "thread-list-not-json",
+  "description": "thread list exits 0 but prints text that is not JSON.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "Malformed output is unobserved."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "thread",
+        "list",
+        "--json"
+      ],
+      "stdout_file": "thread-list.txt"
+    }
+  ]
+}

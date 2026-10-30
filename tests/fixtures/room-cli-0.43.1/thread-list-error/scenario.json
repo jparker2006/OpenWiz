@@ -1,0 +1,19 @@
+{
+  "scenario": "thread-list-error",
+  "description": "thread list exits 1. Only the 404 failure was observed; this 500 is synthetic.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "The HTTP 500 failure line is synthetic (failures other than not-found are unobserved)."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "thread",
+        "list",
+        "--json"
+      ],
+      "exit": 1,
+      "stderr": "Error: HTTP 500: Synthetic server error"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "scenario": "project-removed",
+  "description": "prj_syn_0001 is no longer in the project list; every other read is normal. Used after a normal run of the same source, so stale grouping from an earlier run is caught.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "A project disappearing from project list between two runs, while its sessions still name it, is unobserved; prj_syn_0001 is removed here to test that grouping uses only the same run's project list."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "project",
+        "list",
+        "--json",
+        "--include-personal"
+      ],
+      "stdout_file": "project-list.json"
+    }
+  ]
+}

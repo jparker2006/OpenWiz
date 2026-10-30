@@ -1,0 +1,71 @@
+[
+  {
+    "id": "prj_syn_0002",
+    "kind": "standard",
+    "name": "Synthetic project two",
+    "gitRemoteUrl": null,
+    "createdAt": 1699100600000,
+    "updatedAt": 1699200600000,
+    "sources": [
+      {
+        "id": "src_syn_0002",
+        "projectId": "prj_syn_0002",
+        "type": "local_path",
+        "hostId": "mch_syn_0001",
+        "path": "/synthetic/projects/0002",
+        "isDefault": true,
+        "createdAt": 1699100600000,
+        "updatedAt": 1699200600000
+      }
+    ]
+  },
+  {
+    "id": "prj_syn_0003",
+    "kind": "personal",
+    "name": "Synthetic personal workspace",
+    "gitRemoteUrl": null,
+    "createdAt": 1699100600000,
+    "updatedAt": 1699200600000,
+    "sources": []
+  },
+  {
+    "id": "prj_syn_0004",
+    "kind": "standard",
+    "name": "Synthetic shared name",
+    "gitRemoteUrl": "https://example.invalid/synthetic/repo-0004.git",
+    "createdAt": 1699100600000,
+    "updatedAt": 1699200600000,
+    "sources": [
+      {
+        "id": "src_syn_0004",
+        "projectId": "prj_syn_0004",
+        "type": "local_path",
+        "hostId": "mch_syn_0001",
+        "path": "/synthetic/projects/0004",
+        "isDefault": true,
+        "createdAt": 1699100600000,
+        "updatedAt": 1699200600000
+      }
+    ]
+  },
+  {
+    "id": "prj_syn_0005",
+    "kind": "standard",
+    "name": "Synthetic shared name",
+    "gitRemoteUrl": "https://example.invalid/synthetic/repo-0005.git",
+    "createdAt": 1699100600000,
+    "updatedAt": 1699200600000,
+    "sources": [
+      {
+        "id": "src_syn_0005",
+        "projectId": "prj_syn_0005",
+        "type": "local_path",
+        "hostId": "mch_syn_0001",
+        "path": "/synthetic/projects/0005",
+        "isDefault": true,
+        "createdAt": 1699100600000,
+        "updatedAt": 1699200600000
+      }
+    ]
+  }
+]

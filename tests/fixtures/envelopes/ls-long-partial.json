@@ -1,0 +1,202 @@
+{
+  "schema": "openwiz.inventory.v1",
+  "source": {
+    "name": "room-cli",
+    "version": {
+      "known": "v127"
+    },
+    "tested_version": "v127",
+    "version_tested": true
+  },
+  "coverage": {
+    "state": "partial",
+    "counts": {
+      "listed": 6,
+      "unreadable": 0,
+      "excluded_hidden": 0,
+      "excluded_archived": 0,
+      "hidden_read": false,
+      "archived_read": false,
+      "matched": 6,
+      "offset": 0,
+      "limit": 3,
+      "shown": 3
+    }
+  },
+  "freshness": {
+    "snapshot_at": 1700000600000
+  },
+  "gaps": [
+    {
+      "kind": "command_failed",
+      "subject": "thr_syn_0002",
+      "detail": "thread show exited 1: Error: HTTP 500: Synthetic server error"
+    }
+  ],
+  "data": {
+    "sessions": [
+      {
+        "id": "thr_syn_0001",
+        "title": {
+          "known": "Synthetic session 1"
+        },
+        "provider": {
+          "known": "codex"
+        },
+        "status": {
+          "known": "idle"
+        },
+        "location": {
+          "known": {
+            "kind": "cloud"
+          }
+        },
+        "group": {
+          "kind": "project",
+          "id": "prj_syn_0001",
+          "name": {
+            "known": "Synthetic project one"
+          }
+        },
+        "parent": {
+          "known": null
+        },
+        "hidden": {
+          "known": false
+        },
+        "archived": {
+          "known": false
+        },
+        "recap": {
+          "known": {
+            "kind": "purpose_as_reported",
+            "text": "Synthetic purpose 1.",
+            "truncated": false
+          }
+        },
+        "reported_configuration": {
+          "model": {
+            "known": "synthetic-model-a"
+          },
+          "effort": {
+            "known": "high"
+          }
+        },
+        "updated_at": {
+          "known": 1700000540000
+        },
+        "age_ms": {
+          "known": 60000
+        }
+      },
+      {
+        "id": "thr_syn_0002",
+        "title": {
+          "known": "Synthetic session 2"
+        },
+        "provider": {
+          "known": "claude-code"
+        },
+        "status": {
+          "known": "active"
+        },
+        "location": {
+          "known": {
+            "kind": "local",
+            "machine": {
+              "known": "Synthetic machine one"
+            }
+          }
+        },
+        "group": {
+          "kind": "project",
+          "id": "prj_syn_0002",
+          "name": {
+            "known": "Synthetic project two"
+          }
+        },
+        "parent": {
+          "known": null
+        },
+        "hidden": {
+          "known": false
+        },
+        "archived": {
+          "known": false
+        },
+        "recap": {
+          "known": {
+            "kind": "purpose_as_reported",
+            "text": "Synthetic purpose two is deliberately longer than one hundred and twenty characters, so the recap must be cut here: ünïc",
+            "truncated": true
+          }
+        },
+        "reported_configuration": {
+          "model": {
+            "unknown": "thread show failed: Error: HTTP 500: Synthetic server error"
+          },
+          "effort": {
+            "unknown": "thread show failed: Error: HTTP 500: Synthetic server error"
+          }
+        },
+        "updated_at": {
+          "known": 1700000480000
+        },
+        "age_ms": {
+          "known": 120000
+        }
+      },
+      {
+        "id": "thr_syn_0003",
+        "title": {
+          "known": "Synthetic session 3"
+        },
+        "provider": {
+          "known": "codex"
+        },
+        "status": {
+          "known": "error"
+        },
+        "location": {
+          "known": {
+            "kind": "cloud"
+          }
+        },
+        "group": {
+          "kind": "ungrouped",
+          "reason": "project prj_syn_0099 is not in the project list read in this run"
+        },
+        "parent": {
+          "known": null
+        },
+        "hidden": {
+          "known": false
+        },
+        "archived": {
+          "known": false
+        },
+        "recap": {
+          "known": {
+            "kind": "purpose_as_reported",
+            "text": "Synthetic purpose 3.",
+            "truncated": false
+          }
+        },
+        "reported_configuration": {
+          "model": {
+            "known": "synthetic-model-a"
+          },
+          "effort": {
+            "known": "high"
+          }
+        },
+        "updated_at": {
+          "known": 1700000420000
+        },
+        "age_ms": {
+          "known": 180000
+        }
+      }
+    ]
+  }
+}

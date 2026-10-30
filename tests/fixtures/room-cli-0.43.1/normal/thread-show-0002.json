@@ -1,0 +1,80 @@
+{
+  "thread": {
+    "id": "thr_syn_0002",
+    "projectId": "prj_syn_0002",
+    "providerId": "claude-code",
+    "title": "Synthetic session 2",
+    "titleFallback": "Synthetic fallback title 2",
+    "status": "active",
+    "visibility": "visible",
+    "environmentId": "env_syn_0002",
+    "parentThreadId": null,
+    "sectionId": null,
+    "sourceThreadId": null,
+    "originKind": null,
+    "originPluginId": null,
+    "archivedAt": null,
+    "pinnedAt": null,
+    "deletedAt": null,
+    "lastReadAt": 1700000480000,
+    "latestAttentionAt": 1700000480000,
+    "createdAt": 1699914200000,
+    "updatedAt": 1700000480000,
+    "activeBackgroundAgentCount": 0,
+    "queuedMessageCount": 0,
+    "canSpawnChild": true,
+    "purpose": {
+      "text": "Synthetic purpose two is deliberately longer than one hundred and twenty characters, so the recap must be cut here: ünïcödé ünïcödé ünïcödé ünïcödé end.",
+      "percent": 50,
+      "sourceSeq": 3,
+      "updatedAt": 1700000300000
+    },
+    "runtime": {
+      "displayStatus": "active",
+      "hostReconnectGraceExpiresAt": null
+    }
+  },
+  "execution": {
+    "model": "synthetic-model-b",
+    "reasoningLevel": "high"
+  },
+  "environment": {
+    "id": "env_syn_0002",
+    "name": null,
+    "projectId": "prj_syn_0002",
+    "hostId": "mch_syn_0001",
+    "path": "/synthetic/workspace/0002",
+    "isGitRepo": true,
+    "isWorktree": false,
+    "branchName": "synthetic/branch-0002",
+    "baseBranch": null,
+    "defaultBranch": null,
+    "mergeBaseBranch": null,
+    "status": "syn-ready",
+    "environmentProviderId": "project-checkout",
+    "lifecycle": {
+      "phase": "syn-active",
+      "retireAt": null,
+      "teardown": null
+    },
+    "environmentProviderSelection": {
+      "machine": {
+        "type": "persistent",
+        "hostId": "mch_syn_0001"
+      },
+      "inputs": {
+        "path": "/synthetic/workspace/0002"
+      }
+    },
+    "environmentProviderInstanceKey": "syn-instance-key",
+    "managed": false,
+    "workspaceProvisionType": "syn-provision",
+    "createdAt": 1699914200000,
+    "updatedAt": 1700000480000,
+    "pullRequest": {
+      "status": "syn-none",
+      "pullRequest": null
+    }
+  },
+  "pendingTodos": null
+}

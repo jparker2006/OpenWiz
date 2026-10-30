@@ -1,0 +1,36 @@
+{
+  "thread": {
+    "id": "thr_syn_0001",
+    "projectId": "prj_syn_0001",
+    "providerId": "codex",
+    "title": "Synthetic session 1",
+    "titleFallback": "Synthetic fallback title 1",
+    "status": "idle",
+    "visibility": "visible",
+    "executionTarget": "cloud",
+    "environmentId": null,
+    "sectionId": null,
+    "sourceThreadId": null,
+    "originKind": null,
+    "originPluginId": null,
+    "archivedAt": null,
+    "pinnedAt": null,
+    "deletedAt": null,
+    "lastReadAt": 1700000540000,
+    "latestAttentionAt": 1700000540000,
+    "createdAt": 1699914200000,
+    "updatedAt": 1700000540000,
+    "activeBackgroundAgentCount": 0,
+    "queuedMessageCount": 0,
+    "canSpawnChild": true,
+    "runtime": {
+      "displayStatus": "idle",
+      "hostReconnectGraceExpiresAt": null
+    }
+  },
+  "execution": {
+    "reasoningLevel": "high"
+  },
+  "environment": null,
+  "pendingTodos": null
+}

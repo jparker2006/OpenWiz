@@ -1,0 +1,18 @@
+{
+  "scenario": "thread-list-wrong-types",
+  "description": "thread list rows with wrong types: thr_syn_0001 status int, thr_syn_0002 updatedAt str, thr_syn_0003 projectId int, thr_syn_0004 purpose.text int, thr_syn_0005 parentThreadId int, thr_syn_0006 executionTarget int.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "Mistyped fields are unobserved."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "thread",
+        "list",
+        "--json"
+      ],
+      "stdout_file": "thread-list.json"
+    }
+  ]
+}

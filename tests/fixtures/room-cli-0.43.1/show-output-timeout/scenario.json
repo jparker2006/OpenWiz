@@ -1,0 +1,19 @@
+{
+  "scenario": "show-output-timeout",
+  "description": "thread output of thr_syn_0002 never answers; every other read is normal.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "A hung read is unobserved."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "thread",
+        "output",
+        "thr_syn_0002",
+        "--json"
+      ],
+      "hang": true
+    }
+  ]
+}
