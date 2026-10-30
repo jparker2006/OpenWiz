@@ -25,8 +25,8 @@ use std::sync::Arc;
 use crate::http::Reply;
 
 /// The page's Content-Security-Policy: the one the web page's own proofs
-/// load it under (`apps/web/test/support/serve.mjs` `PAGE_CSP`). Scripts and styles from this origin only, and no inline
-/// script or style.
+/// load it under (`apps/web/test/support/serve.mjs` `PAGE_CSP`). Scripts
+/// and styles from this origin only, and no inline script or style.
 pub const PAGE_CSP: &str = "default-src 'none'; script-src 'self'; style-src 'self'; \
 font-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; \
 form-action 'none'; frame-ancestors 'none'";

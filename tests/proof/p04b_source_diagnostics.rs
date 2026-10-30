@@ -719,9 +719,8 @@ fn unexpected_stdout_never_reaches_the_output() {
     );
 }
 
-/// Not-found is still recognised
-/// from the raw line, as before the fix (it contains `HTTP 404: Thread not
-/// found`), so `show` of a missing session still exits 3, while only the
+/// Not-found is still recognised from the raw line (it contains `HTTP 404:
+/// Thread not found`), so `show` of a missing session still exits 3, while only the
 /// safe line is shown.
 #[test]
 fn a_not_found_line_with_an_unsafe_suffix_is_still_not_found() {

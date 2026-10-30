@@ -405,8 +405,8 @@ fn the_server_calls_only_the_cores_list_and_show() {
             );
         }
     }
-    // The code that answers a web request (from `route`
-    // on) touches no file; the export is in memory since the start.
+    // The code that answers a web request (from `route` on) touches no
+    // file; the export is in memory since the start.
     let web = sources
         .iter()
         .find(|(p, _)| p.ends_with("web.rs"))

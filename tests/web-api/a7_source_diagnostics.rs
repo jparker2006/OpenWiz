@@ -1,17 +1,16 @@
 //! A7 (continued): no `room-cli` diagnostic text (its stderr, and what it
 //! prints on stdout where JSON, a version or a recorded value was
 //! expected) reaches any server response, error body or log, except a line
-//! in 0.0.1's safe grammar. Session content (titles, purposes, final output,
-//! a recorded error) is data, shown by design, and not covered here.
+//! in the adapter's safe grammar. Session content (titles, purposes, final
+//! output, a recorded error) is data, shown by design, and not covered here.
 //!
 //! `room-cli`'s stderr, and text it prints where JSON or a version was
 //! expected, could otherwise reach `error.message` and envelope gaps. The
 //! sanitizer is the adapter's (`crates/adapters/cloudroom`); these proofs
-//! show it through
-//! the server: every planted variant, for each read, through every route
-//! and option below, in the in-process server's bodies and log and in the
-//! built binary's bodies and stderr. Each body still equals
-//! `openwiz … --json` (A6), and `every_read_the_server_makes_is_planted`
+//! show it through the server: every planted variant, for each read,
+//! through every route and option below, in the in-process server's bodies
+//! and log and in the built binary's bodies and stderr. Each body still
+//! equals `openwiz … --json` (A6), and `every_read_the_server_makes_is_planted`
 //! fails if the server starts a read that has no row here.
 //!
 //! The variants are P4b's (`tests/proof/p04b_source_diagnostics.rs`),
@@ -64,10 +63,10 @@ const ROUTES: &[(&str, Option<&[&str]>)] = &[
 /// A reason phrase of exactly 60 characters, the longest kept.
 const PHRASE_60: &str = "Synthetic reason phrase of exactly sixty letters and spacesx";
 
-/// What 0.0.1 shows when nothing in the line is safe.
+/// What OpenWiz shows when nothing in the line is safe.
 const WITHHELD: &str = "room-cli error (detail withheld)";
 
-/// What 0.0.1 shows for a line that contains the not-found line with more
+/// What OpenWiz shows for a line that contains the not-found line with more
 /// after it, where a read's failure is shown. A detail read reports it as
 /// not found instead: `404 not_found` for `show`, or OpenWiz's own gap,
 /// `thread show reported <id> not found`, in a list or a show.
@@ -283,8 +282,7 @@ fn stderr_variants() -> Vec<Planted> {
             &["Internal Server Error", "10.0.0.7", "7:8443"],
             "Error: HTTP 500 (detail withheld)",
         ),
-        // The contract's
-        // empty-stderr branch.
+        // The contract's empty-stderr branch.
         planted("empty stderr", "", &[], "no error output"),
         planted(
             "not-found line with an unsafe suffix",
@@ -929,10 +927,10 @@ fn the_binary_shows_no_diagnostics_in_responses_or_its_log() {
     report(found);
 }
 
-/// A failed version read never stops a run, so
-/// its failure lands in a `200` envelope (`source.version` and a gap, which
-/// the viewer renders). Only safe facts reach it, never the source's text,
-/// even a line in the sanitizer's general grammar; nor the server's log.
+/// A failed version read never stops a run, so its failure lands in a `200`
+/// envelope (`source.version` and a gap, which the viewer renders). Only
+/// safe facts reach it, never the source's text, even a line in the
+/// sanitizer's general grammar; nor the server's log.
 #[test]
 fn a_failed_version_read_never_reaches_a_200_envelope() {
     const MARKER: &str = "Synthetic private version marker";
