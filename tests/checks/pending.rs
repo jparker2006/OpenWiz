@@ -3,8 +3,7 @@
 //!
 //! Rules:
 //! - In P1 to P7 and P9 to P12, a test is either `#[ignore = "pending: ticket 2"]`
-//!   or runs. The marker is removed with the code that satisfies the test; in
-//!   0.0.1 no test is pending.
+//!   or runs. Ticket 2 removes each marker before the code that satisfies it.
 //! - P8(a) tests and the foundation checks are never ignored.
 //! - No other `#[ignore` exists in the repository's Rust sources.
 //! - `tests/pending-ticket-2.txt` lists the pending tests exactly.

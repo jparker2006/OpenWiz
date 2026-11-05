@@ -3,7 +3,8 @@
 
 import type { Counts, Fact, Grouping, Session } from './envelope.ts';
 
-export type PageGroup = { key: string; group: Grouping; sessions: Session[] };
+/** `suffix`: the project id's last 4 characters, when another heading on the page shows the same name (G2). */
+export type PageGroup = { key: string; group: Grouping; sessions: Session[]; suffix: string | null };
 
 /**
  * One page's rows under their group headings: groups in the order their first
@@ -15,8 +16,11 @@ export function groupPage(sessions: readonly Session[]): PageGroup[] {
     const key = session.group.kind === 'project' ? `project:${session.group.id}` : 'ungrouped';
     const group = groups.get(key);
     if (group) group.sessions.push(session);
-    else groups.set(key, { key, group: session.group, sessions: [session] });
+    else groups.set(key, { key, group: session.group, sessions: [session], suffix: null });
   }
+  const names = new Map<string, number>();
+  for (const { group } of groups.values()) if (group.kind === 'project') names.set(factText(group.name), (names.get(factText(group.name)) ?? 0) + 1);
+  for (const g of groups.values()) if (g.group.kind === 'project' && (names.get(factText(g.group.name)) ?? 0) > 1) g.suffix = g.group.id.slice(-4);
   return [...groups.values()];
 }
 

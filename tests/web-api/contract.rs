@@ -2,12 +2,27 @@
 //! error kind, header and limit the tests above check.
 
 use openwiz_server::{
-    ALLOWED_HOST_ENV, DEFAULT_PORT, HEAD_TIMEOUT, MAX_CONNECTIONS, MAX_CORE_RUNS, MAX_FILE_BYTES,
-    MAX_HEAD_BYTES, MAX_HEADER_LINES, MAX_TARGET_BYTES, MAX_WEB_BYTES, MAX_WEB_FILES, PAGE_CSP,
-    REQUEST_DEADLINE, RETRY_AFTER_SECS, ROUTES, SLOT_WAIT, STATIC_CACHE, WEB_ROUTES, WRITE_TIMEOUT,
+    ALLOWED_HOST_ENV, BODY_TIMEOUT, DEFAULT_PORT, HEAD_TIMEOUT, MAX_CONNECTIONS, MAX_CORE_RUNS,
+    MAX_CREATES, MAX_FILE_BYTES, MAX_HEAD_BYTES, MAX_HEADER_LINES, MAX_SEND_BODY_BYTES, MAX_SENDS,
+    MAX_TARGET_BYTES, MAX_WEB_BYTES, MAX_WEB_FILES, PAGE_CSP, REQUEST_DEADLINE, RETRY_AFTER_SECS,
+    ROUTES, SLOT_WAIT, STATIC_CACHE, WEB_ROUTES, WRITE_TIMEOUT,
 };
 
 use crate::http::CLI_EXIT_TO_HTTP;
+
+/// `n` with a space between each group of three digits, as the contract
+/// writes numbers (`99 328`).
+fn group(n: usize) -> String {
+    let digits = n.to_string();
+    let mut out = String::new();
+    for (i, c) in digits.chars().enumerate() {
+        if i > 0 && (digits.len() - i).is_multiple_of(3) {
+            out.push(' ');
+        }
+        out.push(c);
+    }
+    out
+}
 
 const CONTRACT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../contracts/web-api.v1.md");
 
@@ -30,6 +45,31 @@ fn the_contract_documents_what_the_tests_check() {
         "`hidden`",
         "`archived`",
         "`{id}`",
+        "`{op_id}`",
+        "`mode=queue`",
+        "`op_id`",
+        "`mode`",
+        "`text`",
+        "`resume_paused_queue`",
+        "`accept_possible_duplicate`",
+        "`Origin`",
+        "`Sec-Fetch-Site`",
+        "`X-OpenWiz-Send`",
+        "`Content-Length`",
+        "openwiz.messaging.v1",
+        "openwiz.send-preview.v1",
+        "openwiz.send-lookup.v1",
+        "`harness`",
+        "`model`",
+        "`effort`",
+        "`attachments`",
+        "openwiz.new-thread.v1",
+        "openwiz.new-thread-preview.v1",
+        "openwiz.cloud-options.v1",
+        "openwiz.new-thread-status.v1",
+        "contracts/new-thread.v1.schema.json",
+        "There is no retry route",
+        "`/api/v1/new-threads/{op_id}/retry`",
     ] {
         need(param.to_owned());
     }
@@ -39,14 +79,20 @@ fn the_contract_documents_what_the_tests_check() {
     for (status, kind) in [
         (400, "bad_request"),
         (400, "invalid_request"),
+        (403, "forbidden_origin"),
+        (403, "missing_custom_header"),
         (404, "no_route"),
         (404, "not_found"),
         (405, "method_not_allowed"),
         (408, "request_timeout"),
+        (411, "length_required"),
+        (413, "body_too_large"),
+        (415, "unsupported_media_type"),
         (414, "target_too_long"),
         (421, "misdirected"),
         (431, "head_too_large"),
         (500, "internal"),
+        (500, "record_unavailable"),
         (502, "read_failed"),
         (503, "busy"),
         (504, "deadline"),
@@ -66,6 +112,7 @@ fn the_contract_documents_what_the_tests_check() {
         "`Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`",
         "`Connection: close`",
         "`Allow: GET`",
+        "`Allow: POST`",
         "`Retry-After: 5`",
     ] {
         need(header.to_owned());
@@ -87,6 +134,10 @@ fn the_contract_documents_what_the_tests_check() {
         format!("{MAX_TARGET_BYTES} bytes"),
         format!("{} KiB", MAX_HEAD_BYTES / 1024),
         format!("{MAX_HEADER_LINES} header lines"),
+        format!("{MAX_SENDS} sends"),
+        format!("**{MAX_CREATES} create**"),
+        format!("{} bytes", group(MAX_SEND_BODY_BYTES)),
+        format!("{} seconds of the end of the head", BODY_TIMEOUT.as_secs()),
         format!("`{ALLOWED_HOST_ENV}`"),
         format!("`{DEFAULT_PORT}`"),
         "openwiz.inventory.v1".to_owned(),
@@ -94,7 +145,7 @@ fn the_contract_documents_what_the_tests_check() {
     ] {
         need(value);
     }
-    // A8: the web page.
+    // A8 : the web page.
     need("`--web-root`".to_owned());
     need("`Allow: GET, HEAD`".to_owned());
     need(format!("`Content-Security-Policy: {PAGE_CSP}`"));
@@ -122,8 +173,6 @@ fn the_contract_documents_what_the_tests_check() {
     );
 }
 
-/// The `room-cli` version is never a gate, so no status or
-/// CLI exit is documented for an untested version any more.
 #[test]
 fn the_contract_has_no_untested_version_outcome() {
     let text = std::fs::read_to_string(CONTRACT).expect("contracts/web-api.v1.md");

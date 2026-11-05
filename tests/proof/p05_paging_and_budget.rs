@@ -210,7 +210,7 @@ fn the_cli_passes_limit_and_offset() {
     }
 }
 
-/// `--limit`
+/// New in ticket 1's correction round 1 . : `--limit`
 /// defaults to 100. With more than 100 sessions and no limit given, exactly
 /// the first 100 in the stable order are shown, whatever the source order.
 #[test]
@@ -258,7 +258,7 @@ fn the_default_page_is_the_first_100_in_stable_order() {
     );
 }
 
-/// The sort key, documented in `openwiz --help`: most
+/// New in ticket 2. The sort key, documented in `openwiz --help`: most
 /// recently updated first; ties by session id; sessions whose update time is
 /// unknown last, by session id. The same through `openwiz ls --json` and in
 /// the text rows.

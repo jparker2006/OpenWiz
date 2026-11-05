@@ -2,6 +2,18 @@
 
 All OpenWiz versions and revisions, newest first. Versioning is explained in [RELEASING.md](RELEASING.md). PACP has its own version history in [docs/pacp/v0.1.md](docs/pacp/v0.1.md#version-history).
 
+## 0.0.3–0.0.5 · 2026-11-05
+
+*Updated for 0.0.5. Staged public update; maintainer approval pending.*
+
+**Message, create and coordinate threads.**
+
+1. **Fixture test — 0.0.3:** Queue and Steer messages from the CLI and web, with operation records and explicit uncertain outcomes. Full delivery acceptance: **pending live test**.
+2. **Fixture test — 0.0.4:** preview and create a Cloud thread in an existing project; stage files and images locally, then attach them to Queue sends or creates. Full creation and attachment acceptance: **pending live test**.
+3. **Live observation, limited — 0.0.5:** eight fleet skills used in a development run, accepted with recorded gaps: fresh-child discovery and contract holds unobserved; five-ready-ticket launches and cross-version timing unproved; some running and cleanup required intervention. Exact-head reviews and matching merges were observed; helper checks are fixture tests.
+
+Export validation: Rust 1.99.1, Node.js 24.22.1, Linux and Chromium on synthetic tests, with the locked crates and packages in [dependencies](docs/dependencies.md). The fresh-clone log and its result belong to the private export record. Live result placeholders for 0.0.3 and 0.0.4, a quick Mac check, Safari/WebKit, real device radios and unattended fleet operation remain open; see [testing and gaps](docs/testing.md). No PACP conformance is claimed.
+
 ## 0.0.2 · 2026-10-30
 
 **Your threads on your phone, privately**
@@ -13,7 +25,7 @@ All OpenWiz versions and revisions, newest first. Versioning is explained in [RE
 5. Read-only, like 0.0.1: it never starts, messages or changes a thread, and it makes the same reads as `openwiz`, which in a live check woke no idle thread and marked none read.
 6. Status is a word and a symbol, not just a colour, and the page passes automated keyboard and screen-reader checks in Chromium.
 
-What was tested, and what is not proven: [docs/evidence/0.0.2-live-check.md](docs/evidence/0.0.2-live-check.md). Dependencies: [docs/dependencies.md](docs/dependencies.md).
+What was tested, and what is not proven: [docs/evidence/0.0.2-live-check.md](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/evidence/0.0.2-live-check.md). Dependencies: [docs/dependencies.md](docs/dependencies.md). *Updated for 0.0.5: report link points to its published tree.*
 
 ## 0.0.1 · 2026-10-30
 
@@ -26,7 +38,7 @@ What was tested, and what is not proven: [docs/evidence/0.0.2-live-check.md](doc
 5. Read-only: it never starts, messages or changes a thread, and in a live check on macOS with `room-cli` v127 no idle thread was woken or marked read.
 6. Runs with any `room-cli` version and never refuses an update; versions other than v127 are shown as untested.
 
-What was tested, and what is not proven: [docs/evidence/0.0.1-live-check.md](docs/evidence/0.0.1-live-check.md). Dependencies: [docs/dependencies.md](docs/dependencies.md).
+What was tested, and what is not proven: [docs/evidence/0.0.1-live-check.md](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/evidence/0.0.1-live-check.md). Dependencies: [docs/dependencies.md](docs/dependencies.md). *Updated for 0.0.5: report link points to its published tree.*
 
 ## 0.0.0 — revision 1 (unreleased, under review)
 

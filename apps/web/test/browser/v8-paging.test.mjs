@@ -53,6 +53,10 @@ test('next, next, previous: offsets from the envelope\'s own counts, nothing els
       else if (e.kind === 'detail') {
         assert.equal(e.search, '', 'a detail read takes no query');
         assert.match(e.path, /^\/api\/v1\/sessions\/[A-Za-z0-9_-]{1,128}$/);
+      } else if (e.kind === 'preview') {
+
+        assert.match(e.search, /^\?mode=(queue|steer)$/);
+        assert.match(e.path, /^\/api\/v1\/sessions\/[A-Za-z0-9_-]{1,128}\/preview$/);
       } else assert.fail(`a request outside the contract: ${e.path}`);
       assert.doesNotMatch(e.path + e.search, /cursor|revision|@r|limit|since|after/i);
       assert.equal(e.headers['x-requested-with'], 'XMLHttpRequest');

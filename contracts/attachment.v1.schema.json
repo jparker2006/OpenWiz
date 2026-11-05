@@ -1,0 +1,381 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openwiz:schema:attachment:v1",
+  "title": "openwiz.attachment.v1",
+  "description": "OpenWiz 0.0.4 attachments: one ready attachment's verified record (the root), its kind, its readiness and the fixed list of failure reasons (B1 phase 1, the core's model); and the reports of openwiz attachment add, ls and rm (B1 phase 2: add_report, list_report, remove_report, each with its schema id). Ready means only that the controller holds a verified copy: nothing here is sent or uploaded. CloudRoom's limits behind the reasons (10 MiB per image, 25 MiB per file, the image limit for a file whose extension CloudRoom types as an image) are source-read, not observed.",
+  "$ref": "#/$defs/attachment",
+  "$defs": {
+    "attachment": {
+      "description": "One ready attachment: the whole copy is on the controller, with its size, SHA-256, kind and safe name verified. It claims nothing about CloudRoom.",
+      "type": "object",
+      "required": [
+        "id",
+        "sha256",
+        "size_bytes",
+        "kind",
+        "name",
+        "display_name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/attachment_id"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "$ref": "#/$defs/kind"
+        },
+        "name": {
+          "$ref": "#/$defs/safe_name"
+        },
+        "display_name": {
+          "type": "string",
+          "description": "The owner's original file name, unchanged: untrusted text, for display only. Never a path to open."
+        }
+      }
+    },
+    "attachment_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+      "description": "Chosen by the controller; opaque. 1 to 64 ASCII letters, digits, _ and -, starting with a letter or digit, so it is also one safe path segment."
+    },
+    "sha256": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[0-9a-f]*$",
+      "description": "Lowercase hex SHA-256 of the attachment's bytes."
+    },
+    "kind": {
+      "description": "Decided from the bytes: image for PNG, JPEG, GIF and WebP; file for everything else. Never from a declared MIME type.",
+      "enum": [
+        "image",
+        "file"
+      ]
+    },
+    "safe_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 179,
+      "pattern": "^[A-Za-z0-9_][A-Za-z0-9._-]*$",
+      "description": "The staged name: the original's basename reduced to ASCII letters, digits, ., _ and -, never starting with . or -. At most 179 bytes, so CloudRoom's stored name (this stem, '-<time>-<random>', this extension: up to 21 more bytes) fits the Cloud core's 200. The agent sees that stored name, not this one (source-read, not observed)."
+    },
+    "readiness": {
+      "description": "One attachment's readiness. selected and uploading exist only in clients and in an upload in flight; only ready claims a verified copy on the controller.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "state"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "state": {
+              "enum": [
+                "selected",
+                "uploading",
+                "ready",
+                "removed",
+                "expired"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "state",
+            "reason"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "state": {
+              "const": "failed"
+            },
+            "reason": {
+              "$ref": "#/$defs/fail_reason"
+            }
+          }
+        }
+      ]
+    },
+    "fail_reason": {
+      "description": "Why an attachment can't become ready: unsupported_heif (HEIC/HEIF, never converted), type_unclear (an ISO media file whose first bytes don't settle whether it is HEIF), extension_mismatch (the name and the bytes disagree), image_too_large (over 10 MiB), file_too_large (over 25 MiB), image_typed_file_too_large (a file CloudRoom types as an image by its extension, over 10 MiB), folder, low_disk (under the 1 GiB floor), size_mismatch, connection_lost, signed_out, unreadable.",
+      "enum": [
+        "unsupported_heif",
+        "type_unclear",
+        "extension_mismatch",
+        "image_too_large",
+        "file_too_large",
+        "image_typed_file_too_large",
+        "folder",
+        "low_disk",
+        "size_mismatch",
+        "connection_lost",
+        "signed_out",
+        "unreadable"
+      ]
+    },
+    "staged": {
+      "description": "One attachment in the store, as a report shows it.",
+      "type": "object",
+      "required": [
+        "attachment",
+        "readiness",
+        "ready_at",
+        "age_ms",
+        "expires_at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "attachment": {
+          "$ref": "#/$defs/attachment"
+        },
+        "readiness": {
+          "$ref": "#/$defs/readiness"
+        },
+        "ready_at": {
+          "type": "integer",
+          "description": "When it became ready: Unix milliseconds."
+        },
+        "age_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expires_at": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "When it expires, 24 hours after it became ready (sheet the check); null while its operation may still use it."
+        }
+      }
+    },
+    "add_report": {
+      "description": "openwiz attachment add --json: every path given, each in exactly one of ready, failed and not_staged, by its index; and what this run's open found past its time-to-live, and deleted.",
+      "type": "object",
+      "required": [
+        "schema",
+        "ready",
+        "failed",
+        "not_staged",
+        "expired"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "openwiz.attachment-add.v1"
+        },
+        "ready": {
+          "type": "array",
+          "items": {
+            "description": "A path whose verified copy is ready.",
+            "type": "object",
+            "required": [
+              "index",
+              "path",
+              "staged"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "The path's or id's place in the command's arguments, from 0."
+              },
+              "path": {
+                "type": "string",
+                "description": "The path as given (any byte that isn't UTF-8 shown as U+FFFD): untrusted text."
+              },
+              "staged": {
+                "$ref": "#/$defs/staged"
+              }
+            }
+          }
+        },
+        "failed": {
+          "type": "array",
+          "items": {
+            "description": "A path that can't become ready: nothing of it was kept.",
+            "type": "object",
+            "required": [
+              "index",
+              "path",
+              "readiness",
+              "message"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "The path's or id's place in the command's arguments, from 0."
+              },
+              "path": {
+                "type": "string",
+                "description": "The path as given (any byte that isn't UTF-8 shown as U+FFFD): untrusted text."
+              },
+              "readiness": {
+                "$ref": "#/$defs/readiness"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "not_staged": {
+          "type": "array",
+          "items": {
+            "description": "A path the store failed on: nothing of it was kept. The error names no file.",
+            "type": "object",
+            "required": [
+              "index",
+              "path",
+              "error"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "The path's or id's place in the command's arguments, from 0."
+              },
+              "path": {
+                "type": "string",
+                "description": "The path as given (any byte that isn't UTF-8 shown as U+FFFD): untrusted text."
+              },
+              "error": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "expired": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/staged"
+          }
+        }
+      }
+    },
+    "list_report": {
+      "description": "openwiz attachment ls --json: the ready attachments, oldest first; those whose metadata can't be read or whose copy isn't the size recorded; and what this run's open found past its time-to-live, and deleted.",
+      "type": "object",
+      "required": [
+        "schema",
+        "attachments",
+        "broken",
+        "expired"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "openwiz.attachment-list.v1"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/staged"
+          }
+        },
+        "broken": {
+          "type": "array",
+          "items": {
+            "description": "Not ready: attachment rm deletes it.",
+            "type": "object",
+            "required": [
+              "id",
+              "readiness",
+              "message"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/attachment_id"
+              },
+              "readiness": {
+                "$ref": "#/$defs/readiness"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "expired": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/staged"
+          }
+        }
+      }
+    },
+    "remove_report": {
+      "description": "openwiz attachment rm --json: every id given, in order, with what was done; and what this run's open found past its time-to-live, and deleted.",
+      "type": "object",
+      "required": [
+        "schema",
+        "ids",
+        "expired"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "openwiz.attachment-remove.v1"
+        },
+        "ids": {
+          "type": "array",
+          "items": {
+            "description": "One id.",
+            "type": "object",
+            "required": [
+              "index",
+              "id",
+              "result",
+              "message"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "The path's or id's place in the command's arguments, from 0."
+              },
+              "id": {
+                "$ref": "#/$defs/attachment_id"
+              },
+              "result": {
+                "enum": [
+                  "removed",
+                  "expired",
+                  "refused",
+                  "not_found",
+                  "not_removed"
+                ],
+                "description": "removed: its copy and metadata are deleted; expired: this run's open deleted it at its time-to-live; refused: its operation is dispatching or uncertain, so it is kept; not_found: no staged attachment has this id; not_removed: the store failed on it."
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "expired": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/staged"
+          }
+        }
+      }
+    }
+  }
+}

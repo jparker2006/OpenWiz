@@ -1,4 +1,5 @@
-/* OpenWiz web · visual style v1. Styling only.
+/* OpenWiz web · visual style v1, adapted from the UI owner's handoff
+ * (reference/styles.css; rules in docs/design-rules.md). Styling only.
  * Dark first. Colour has one job each and never carries status alone:
  * gold = you're needed, wiz purple = live / now / focus, Lakers purple =
  * brand only, greys for everything else. No red or green.
@@ -217,9 +218,10 @@ bdi {
   letter-spacing: -0.01em;
   overflow-wrap: anywhere;
 }
+/* "Sessions": 24 px on phones (about half the space), 42 px from 900 px. */
 .disp.m {
-  font-size: 42px;
-  line-height: 40px;
+  font-size: 24px;
+  line-height: 24px;
 }
 .disp.s {
   font-size: 28px;
@@ -236,13 +238,18 @@ bdi {
   color: var(--ink-3);
   font-variant-numeric: tabular-nums;
 }
+/* A group heading: the project name as reported (never re-cased). */
 .kicker {
   margin: 24px 0 0;
-  font: 600 10px/12px var(--mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font: 600 11px/16px var(--mono);
   color: var(--ink-2);
   overflow-wrap: anywhere;
+}
+/* the project id's last 4 characters, only when two headings share a name. */
+.kicker .gid {
+  font-weight: 400;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
 }
 .sec {
   margin: 16px 0 4px;
@@ -258,28 +265,50 @@ code {
 
 /* ── markers: five tiers by shape; the word is always shown ── */
 .mk {
+  position: relative;
+  z-index: 0;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   max-width: 100%;
-  padding: 4px 6px;
-  border-radius: 3px;
+  padding: 4px 0;
   vertical-align: middle;
   font: 600 12px/12px var(--mono);
+}
+/* A tier's box hangs 6 px outside the text (the chip's 4 × 6), so every glyph
+ * lines up with the title above it and stays put when the tier changes. t1's
+ * gold is the marker's own background (so contrast checkers can read it),
+ * widened by two side shadows. */
+.mk.t2::before,
+.mk.t5::before {
+  content: '';
+  position: absolute;
+  inset: 0 -6px;
+  z-index: -1;
+  border-radius: 3px;
+  pointer-events: none;
+}
+.mk .glyph {
+  flex: none;
   white-space: nowrap;
 }
+/* The core's word is shown whole: a long one wraps, never an ellipsis. */
 .mk .word {
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .mk.t1 {
+  border-radius: 3px;
   background: var(--gold);
+  box-shadow: -6px 0 0 var(--gold), 6px 0 0 var(--gold);
   color: var(--on-light);
   font-weight: 700;
 }
 .mk.t2 {
   color: var(--ink);
   font-weight: 700;
+}
+.mk.t2::before {
   box-shadow: inset 0 0 0 1.5px var(--ink);
 }
 .mk.t3 {
@@ -293,8 +322,9 @@ code {
 .mk.t5 {
   color: var(--ink-2);
   font-style: italic;
-  outline: 1.5px dashed var(--ink-2);
-  outline-offset: -1.5px;
+}
+.mk.t5::before {
+  border: 1.5px dashed var(--ink-2);
 }
 .mod {
   font: 11px/16px var(--mono);
@@ -302,10 +332,11 @@ code {
   text-decoration: underline dotted var(--ink-3);
   text-underline-offset: 4px;
 }
+/* A state's shape: its border is a shape colour . */
 .tag {
   display: inline-block;
   padding: 0 4px;
-  border: 1px solid var(--line-2);
+  border: 1px solid var(--ink-2);
   border-radius: 3px;
   font: 11px/16px var(--mono);
   color: var(--ink-2);
@@ -333,16 +364,22 @@ main {
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
+/* The gaps toggle: partial's dashed tag and an open or closed caret, in a 44 px target. */
 .cov {
   min-height: 44px;
   margin: 0;
-  padding: 0 8px;
-  border: 1px dashed var(--line-2);
-  border-radius: 4px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
   background: none;
   color: var(--ink);
-  font: italic 11px/16px var(--mono);
+  font: 11px/16px var(--mono);
   cursor: pointer;
+}
+.cov .tag {
+  color: var(--ink);
 }
 .gaps {
   margin: 8px 0 0;
@@ -390,11 +427,12 @@ main {
   padding: 0;
 }
 .row {
+  position: relative;
   display: block;
   width: 100%;
   min-height: 44px;
   margin: 0;
-  padding: 12px 0;
+  padding: 8px 0;
   border: 0;
   background: none;
   background-image: var(--hair);
@@ -408,6 +446,15 @@ main {
 .row:hover,
 .row.on {
   background-color: var(--s1);
+}
+/* Selected ("you are here"): a wiz-purple bar in the gutter, so it shows
+ * without colour and every title keeps its column. */
+.row.on::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 -12px;
+  width: 2px;
+  background: var(--wiz);
 }
 .row-top {
   display: flex;
@@ -437,7 +484,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px 8px;
+  gap: 4px 16px;
   margin: 4px 0 0;
   min-width: 0;
 }
@@ -491,7 +538,8 @@ main {
 .btn:hover {
   background: var(--s3);
 }
-.btn:disabled {
+.btn:disabled,
+.btn[aria-disabled='true'] {
   color: var(--ink-3);
   background: var(--s1);
   cursor: default;
@@ -550,7 +598,7 @@ main {
 }
 .kv {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
+  grid-template-columns: 120px minmax(0, 1fr);
   gap: 8px 12px;
   margin: 12px 0;
   font: 12px/16px var(--mono);
@@ -577,9 +625,263 @@ main {
   color: var(--ink);
 }
 
+/* ── the composer : under the final output, in the panel and the sheet ── */
+.composer {
+  margin: 24px 0 0;
+  padding: 16px 0 0;
+  background-image: var(--hair);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+}
+.composer .sec {
+  display: block;
+  margin-top: 0;
+}
+.compose {
+  display: block;
+  width: 100%;
+  min-height: 88px;
+  margin: 0;
+  padding: 8px 12px;
+  resize: vertical;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  background: var(--s1);
+  color: var(--ink);
+  font: 14px/20px var(--sans);
+}
+/* Fixed while a send with it is out or may have been sent: a dashed edge, not only a colour. */
+.compose[readonly] {
+  border-style: dashed;
+  color: var(--ink-2);
+}
+.composer .tag {
+  margin: 8px 0 0;
+}
+.acts {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+}
+.act {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.act .btn {
+  flex: none;
+  min-width: 96px;
+}
+.effect {
+  min-width: 0;
+  margin: 0;
+  font: 12px/16px var(--mono);
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+/* What a send would also do: resume a paused queue. Its own line, in ink. */
+.effect.paused {
+  margin: 4px 0 0;
+  color: var(--ink);
+}
+.why {
+  margin: 0;
+  font: italic 12px/16px var(--mono);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.acts .meta {
+  margin: 0;
+}
+.attempts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.said {
+  margin: 12px 0 0;
+}
+.said-line {
+  margin: 4px 0 0;
+  font: 12px/16px var(--mono);
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.composer > .btn {
+  margin: 12px 0 0;
+}
+
+/* Outcomes: a word, a glyph and a shape each, never colour alone.
+ * sent [✓] solid outline · queued […] dotted outline · failed [x] gold block ·
+ * unsupported [/] double outline · uncertain [?] dashed, italic ·
+ * not sent [-] grey, no box · sending, checking, in progress [~] bold purple, no box */
+.oc {
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  font: 600 12px/12px var(--mono);
+  color: var(--ink);
+}
+.oc.sent::before,
+.oc.queued::before,
+.oc.unsupported::before,
+.oc.uncertain::before {
+  content: '';
+  position: absolute;
+  inset: 0 -6px;
+  z-index: -1;
+  border-radius: 3px;
+  pointer-events: none;
+}
+.oc.sent {
+  font-weight: 700;
+}
+.oc.sent::before {
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.oc.queued::before {
+  border: 1.5px dotted var(--ink);
+}
+.oc.failed {
+  border-radius: 3px;
+  background: var(--gold);
+  box-shadow: -6px 0 0 var(--gold), 6px 0 0 var(--gold);
+  color: var(--on-light);
+  font-weight: 700;
+}
+.oc.unsupported::before {
+  border: 4px double var(--ink);
+  inset: -2px -8px;
+}
+.oc.uncertain {
+  color: var(--ink-2);
+  font-style: italic;
+}
+.oc.uncertain::before {
+  border: 1.5px dashed var(--ink-2);
+}
+.oc.not-sent {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+.oc.moving {
+  color: var(--wiz);
+  font-weight: 700;
+}
+
+/* ── the launcher : a project's New thread, in the same panel and sheet ── */
+/* The project heading and its New thread: the name keeps its line, the action sits at its end. */
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+}
+.group-head .kicker {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+/* A quiet text action, 44 px tall: it opens the launcher and creates nothing. */
+.new-thread {
+  flex: none;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--ink-2);
+  font: 600 11px/16px var(--mono);
+  text-decoration: underline dotted;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.new-thread:hover {
+  color: var(--ink);
+}
+/* The open launcher's project: the same 2 px wiz-purple mark the selected row has, never only a tint. */
+.new-thread.on {
+  color: var(--ink);
+  text-decoration: underline solid var(--wiz) 2px;
+}
+.launcher .sec {
+  display: block;
+}
+.launcher .tag {
+  margin: 8px 0 0;
+}
+/* Harness, model and effort: three large controls, in that order, each showing its choice in words. */
+.picks {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0;
+}
+.pick {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+.pick-label {
+  font: 600 12px/16px var(--mono);
+  color: var(--ink-2);
+}
+.pick-select {
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  background: var(--s1);
+  color: var(--ink);
+  font: 600 16px/24px var(--mono);
+}
+/* Nothing chosen: a dashed edge and the placeholder's words, not only a colour. */
+.pick[data-value=''] .pick-select {
+  border-style: dashed;
+  color: var(--ink-2);
+  font-weight: 400;
+}
+.pick-select[aria-disabled='true'] {
+  color: var(--ink-3);
+}
+.launcher > .act {
+  margin: 8px 0 0;
+}
+.effects {
+  margin: 0;
+  padding: 0 0 0 16px;
+  font: 12px/16px var(--mono);
+  color: var(--ink);
+}
+.effects li {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+/* A reported setting that differs from the requested one: its own words, in ink and bold. */
+.said-line.differs {
+  color: var(--ink);
+  font-weight: 700;
+}
+.kv dd .said-line,
+.kv dd .meta {
+  display: block;
+  margin: 0 0 4px;
+}
+
 @media (min-width: 900px) {
   .top {
     padding: 0 24px;
+  }
+  .disp.m {
+    font-size: 42px;
+    line-height: 40px;
   }
   main {
     padding: 24px 32px 48px;
@@ -602,8 +904,147 @@ main {
     display: none;
   }
 }
+/* Wide enough for one line per row, with the panel open too: status, title, age. */
+@media (min-width: 1200px) {
+  .row {
+    display: grid;
+    grid-template-columns: 128px minmax(0, 1fr) auto;
+    grid-template-areas: 'mk title age' '. reason reason';
+    align-items: center;
+    column-gap: 16px;
+    padding: 12px 0;
+  }
+  .row-top,
+  .row-meta {
+    display: contents;
+  }
+  .row .mk {
+    grid-area: mk;
+    justify-self: start;
+  }
+  .title {
+    grid-area: title;
+  }
+  .age {
+    grid-area: age;
+  }
+  .reason {
+    grid-area: reason;
+    margin: 4px 0 0;
+  }
+}
 @media (min-width: 1400px) {
   :root {
     --sheet-w: 440px;
   }
+}
+
+/* ── the attachment tray : in the one prompt body, for the composer and the launcher ── */
+.prompt {
+  min-width: 0;
+}
+.tray {
+  margin: 8px 0 0;
+}
+.tray .act .btn {
+  min-width: 96px;
+}
+.tag.dotted {
+  margin: 8px 0 0;
+  border-style: dotted;
+}
+.atts {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+/* One row per attachment, on a dotted hairline, like the list's rows (rule 5). */
+.att {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 8px 0;
+  background-image: var(--hair);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+}
+.att-pic {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  background: var(--s1);
+  overflow: hidden;
+}
+/* A thumbnail is the owner's own file, drawn as an image only: never markup. */
+.att-img {
+  display: block;
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+}
+.att-glyph {
+  font: 12px/16px var(--mono);
+  color: var(--ink-3);
+}
+.att-text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+/* The name, cut in the middle by CSS: its end and extension always show. */
+.att-name {
+  display: flex;
+  min-width: 0;
+  font: 14px/20px var(--sans);
+  color: var(--ink);
+  white-space: pre;
+}
+.att-head {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.att-tail {
+  flex: none;
+}
+.att-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 4px;
+  margin: 4px 0 0;
+}
+.att-size,
+.att-progress {
+  font: 11px/16px var(--mono);
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.att .said-line {
+  display: block;
+}
+.att .meta {
+  margin: 4px 0 0;
+}
+.att-acts {
+  flex: none;
+  display: flex;
+  gap: 8px;
+}
+.att-btn {
+  padding: 0 12px;
+}
+.att-x {
+  width: 44px;
+  padding: 0;
+  font: 20px/20px var(--sans);
 }

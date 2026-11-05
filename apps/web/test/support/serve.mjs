@@ -1,7 +1,7 @@
 // A test-only server for `out/`, with the headers the page needs from
-// openwiz-server when it serves static files (A8). It mirrors A8; it does not
-// prove it. `/api/v1/...` goes to the real server over a fixture scenario, or
-// to a fake API.
+// openwiz-server once it serves static files (ticket 1's A8, S1-S9 in the
+// evidence README). It mirrors A8; it does not prove it. `/api/v1/...` goes to
+// ticket 1's real server over a fixture scenario, or to a fake API.
 
 import { createReadStream, existsSync, lstatSync } from 'node:fs';
 import { createServer, request as httpRequest } from 'node:http';
@@ -9,12 +9,13 @@ import { extname, join, normalize, sep } from 'node:path';
 
 import { OUT_DIR } from './paths.mjs';
 
+
 export const PAGE_CSP = [
   "default-src 'none'",
   "script-src 'self'",
   "style-src 'self'",
   "font-src 'self'",
-  "img-src 'self'",
+  "img-src 'self' blob:",
   "connect-src 'self'",
   "base-uri 'none'",
   "form-action 'none'",
@@ -36,7 +37,7 @@ const COMMON = {
   Connection: 'close',
 };
 
-/** The file for a request path, or null. */
+/** The file for a request path, or null (S2, S3). */
 function fileFor(path) {
   if (path === '/') return join(OUT_DIR, 'index.html');
   if (!/^\/(_next\/static|fonts)\/[A-Za-z0-9._/-]+$/.test(path)) return null;
@@ -51,18 +52,28 @@ function fileFor(path) {
 }
 
 /**
- * Starts the site. `api` is `{ port }` (the real server) or a function
- * `(req, res, url) => void` (a fake). Every request is logged.
+ * Starts the site. `api` is `{ port, allowedHost? }` (ticket 1's server) or a
+ * function `(req, res, url) => void` (a fake). Every request is logged.
+ *
+ * With `allowedHost`, the proxy does what the tunnel does in front of the
+ * real server : it forwards `Host: <allowedHost>`, and the page's
+ * own `Origin` as `https://<allowedHost>` (the page's origin through the
+ * tunnel). Any other `Origin` passes unchanged, so a foreign one is still
+ * refused.
  */
 export async function startSite(api) {
   const log = [];
+  // How many of the next POSTs lose their answer: the server finishes them, then the connection drops.
+  const drops = { post: 0 };
   const server = createServer((req, res) => {
     const url = new URL(req.url ?? '/', 'http://site.invalid');
     const entry = { method: req.method, path: url.pathname, search: url.search, headers: req.headers, at: Date.now() };
     log.push(entry);
     if (url.pathname.startsWith('/api/')) {
       if (typeof api === 'function') return api(req, res, url);
-      return proxy(req, res, api.port);
+      const drop = req.method === 'POST' && drops.post > 0;
+      if (drop) drops.post--;
+      return proxy(req, res, api.port, api.allowedHost ?? null, `http://${req.headers.host}`, drop);
     }
     const file = req.method === 'GET' ? fileFor(url.pathname) : null;
     if (!file) {
@@ -84,20 +95,32 @@ export async function startSite(api) {
   return {
     origin: `http://127.0.0.1:${port}`,
     log,
+    /** The next `n` POSTs reach the server and finish there, but their answers never reach the page (a lost acknowledgement). */
+    dropPostAnswers: (n = 1) => {
+      drops.post += n;
+    },
     close: () => new Promise((resolve) => server.close(resolve)),
   };
 }
 
-function proxy(req, res, port) {
+function proxy(req, res, port, allowedHost, siteOrigin, dropAnswer = false) {
+  const headers = { ...req.headers, host: allowedHost ?? `127.0.0.1:${port}`, connection: 'close' };
+  if (allowedHost && headers.origin === siteOrigin) headers.origin = `https://${allowedHost}`;
   const up = httpRequest(
     {
       host: '127.0.0.1',
       port,
       method: req.method,
       path: req.url,
-      headers: { ...req.headers, host: `127.0.0.1:${port}`, connection: 'close' },
+      headers,
     },
     (r) => {
+      if (dropAnswer) {
+        // The server has answered: drop the connection instead of passing the answer on.
+        r.resume();
+        r.on('end', () => res.socket?.destroy());
+        return;
+      }
       res.writeHead(r.statusCode ?? 502, r.headers);
       r.pipe(res);
     },
@@ -106,8 +129,10 @@ function proxy(req, res, port) {
     if (!res.headersSent) res.writeHead(502, { 'Content-Type': 'text/plain' });
     res.end('proxy error');
   });
-  req.on('close', () => {
+  // The client gave up: so does the proxy. (Not the request's own `close`, which a piped body ends early.)
+  res.on('close', () => {
     if (!res.writableEnded) up.destroy();
   });
-  up.end();
+  // A request body (the send's) goes through as it came.
+  req.pipe(up);
 }

@@ -1,6 +1,6 @@
 [package]
 name = "openwiz-server"
-description = "The read-only OpenWiz HTTP server: a thin client of the core over loopback"
+description = "The OpenWiz HTTP server: a thin client of the core over loopback, with one write (send)"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -13,6 +13,7 @@ path = "src/main.rs"
 [dependencies]
 openwiz-core = { path = "../core" }
 openwiz-adapter-cloudroom = { path = "../adapters/cloudroom" }
+openwiz-store = { path = "../store" }
 serde.workspace = true
 serde_json.workspace = true
 

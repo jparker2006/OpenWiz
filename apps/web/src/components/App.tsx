@@ -1,10 +1,11 @@
-// The page: the header with the envelope's coverage, snapshot and gaps, the
-// connection state, the list, and the detail. All state is the Viewer's
-// presentation state; every rule comes from the envelope.
+
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
-import { browserFetch } from '../api.ts';
+import { browserFetch, browserXhr } from '../api.ts';
+import { guardDrops, Uploads } from '../attachments.ts';
+import { browserStorage, Composers, newOpId } from '../composer.ts';
+import { Launchers } from '../launcher.ts';
 import type { Timers, Visibility } from '../poller.ts';
 import { clockText } from '../present.ts';
 import { TIMING } from '../timing.ts';
@@ -12,6 +13,7 @@ import { connection, isStale, listed, Viewer } from '../viewer.ts';
 import type { Snapshot } from '../viewer.ts';
 import { Detail } from './Detail.tsx';
 import { Inventory, KeepPlace } from './Inventory.tsx';
+import type { LaunchProject } from './Launcher.tsx';
 import { ConnectionPill, Notice } from './Status.tsx';
 
 const timers: Timers = {
@@ -56,6 +58,13 @@ export function App() {
     () => viewer.getState(),
     () => viewer.getState(),
   );
+  // One tray per target , shared by the composer and the launcher through the one prompt body.
+  const [uploads] = useState(
+    () => new Uploads({ fetch: browserFetch, xhr: browserXhr, storage: browserStorage(), timers, urls: { create: (f) => URL.createObjectURL(f), revoke: (u) => URL.revokeObjectURL(u) } }),
+  );
+  const [composers] = useState(() => new Composers({ fetch: browserFetch, storage: browserStorage(), timers, newOpId: () => newOpId(), uploads }));
+  const [launchers] = useState(() => new Launchers({ fetch: browserFetch, storage: browserStorage(), timers, newOpId: () => newOpId(), uploads }));
+  const [launch, setLaunch] = useState<LaunchProject | null>(null);
   const [gapsOpen, setGapsOpen] = useState(false);
   const firstRows = useRef(false);
   const returnTo = useRef<string | null>(null);
@@ -64,6 +73,17 @@ export function App() {
     viewer.start();
     return () => viewer.stop();
   }, [viewer]);
+
+  // A file dropped anywhere but a prompt body never opens in the browser; object URLs go with the page .
+  useEffect(() => {
+    const unguard = guardDrops(window);
+    const leave = () => uploads.unload();
+    window.addEventListener('pagehide', leave);
+    return () => {
+      unguard();
+      window.removeEventListener('pagehide', leave);
+    };
+  }, [uploads]);
 
   const { list, detail } = state;
   useStaleClock(list.last);
@@ -84,23 +104,33 @@ export function App() {
   }, [envelope]);
 
   const select = (id: string) => {
+    setLaunch(null);
     returnTo.current = id;
     viewer.select(id);
   };
-  const closeDetail = () => {
+  const openLaunch = (project: LaunchProject) => {
     viewer.select(null);
-    const id = returnTo.current;
     returnTo.current = null;
-    for (const el of document.querySelectorAll<HTMLElement>('main [data-session-id]')) {
-      if (el.dataset['sessionId'] === id) {
+    setLaunch(project);
+  };
+  const closeDetail = () => {
+    // Focus goes back where the panel was opened from: the session's row, or the project's New thread.
+    const id = launch ? launch.id : returnTo.current;
+    const from = (el: HTMLElement) => (launch ? el.dataset['newThread'] : el.dataset['sessionId']);
+    viewer.select(null);
+    setLaunch(null);
+    returnTo.current = null;
+    for (const el of document.querySelectorAll<HTMLElement>(launch ? 'main [data-new-thread]' : 'main [data-session-id]')) {
+      if (from(el) === id) {
         el.focus();
         break;
       }
     }
   };
+  const isListed = (id: string) => envelope?.data.sessions.some((row) => row.id === id) ?? false;
 
   return (
-    <div className={`app${detail ? ' panel-open' : ''}`}>
+    <div className={`app${detail || launch ? ' panel-open' : ''}`}>
       <header className="top">
         <span className="logo-slot" aria-hidden="true">
           logo slot
@@ -116,11 +146,18 @@ export function App() {
           {envelope ? (
             <p className="inv">
               {gaps.length > 0 ? (
-                <button type="button" className="cov" data-part="coverage" aria-expanded={gapsOpen} onClick={() => setGapsOpen((o) => !o)}>
-                  {envelope.coverage.state === 'complete' ? 'complete' : `partial · ${gaps.length} ${gaps.length === 1 ? 'gap' : 'gaps'}`}
+                <button type="button" className="cov" aria-expanded={gapsOpen} onClick={() => setGapsOpen((o) => !o)}>
+                  <span className={envelope.coverage.state === 'complete' ? undefined : 'tag dashed'} data-part="coverage">
+                    {envelope.coverage.state === 'complete' ? 'complete' : `partial · ${gaps.length} ${gaps.length === 1 ? 'gap' : 'gaps'}`}
+                  </span>
+                  <span aria-hidden="true">{gapsOpen ? '▴' : '▾'}</span>
                 </button>
+              ) : envelope.coverage.state === 'complete' ? (
+                <span data-part="coverage">complete</span>
               ) : (
-                <span data-part="coverage">{envelope.coverage.state === 'complete' ? 'complete' : 'partial · 0 gaps'}</span>
+                <span className="tag dashed" data-part="coverage">
+                  partial · 0 gaps
+                </span>
               )}
               <span aria-hidden="true">·</span>
               <span data-part="snapshot">snapshot {clockText(envelope.freshness.snapshot_at, now)}</span>
@@ -148,9 +185,11 @@ export function App() {
               envelope={envelope}
               previousMatched={list.previousMatched}
               selectedId={detail?.id ?? null}
+              launchId={launch?.id ?? null}
               fresh={!stale && list.failure === null}
               now={now}
               onSelect={select}
+              onNewThread={openLaunch}
               onPage={(offset) => {
                 viewer.goTo(offset);
                 window.scrollTo(0, 0);
@@ -163,9 +202,12 @@ export function App() {
       </main>
       <Detail
         detail={detail}
+        launch={launch ? { project: launch, launchers, uploads, listed: isListed, snapshotAt: list.last?.receivedAt ?? 0, onShowThread: select } : null}
         listed={listed(state)}
         stale={detail?.last ? isStale(detail.last, clocks, TIMING.staleAfterMs) : false}
         now={now}
+        composers={composers}
+        uploads={uploads}
         onClose={closeDetail}
       />
     </div>

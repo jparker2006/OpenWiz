@@ -1,6 +1,6 @@
 {
   "scenario": "normal",
-  "description": "Normal case. Every value is synthetic. Shapes follow captures A, B and C; the --version text v127 follows capture V, which found those shapes compatible. See tests/fixtures/README.md.",
+  "description": "Normal case. Every value is synthetic. Shapes follow captures A, B and C; the --version text v127 follows capture V, which found those shapes compatible . See tests/fixtures/README.md.",
   "synthetic_assumptions": [
     "Integer timestamps are milliseconds since the Unix epoch (the unit is unobserved).",
     "thr_syn_0007 has visibility 'hidden' and appears only with --include-hidden (no hidden session was observed).",

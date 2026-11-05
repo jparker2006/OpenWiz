@@ -152,7 +152,7 @@ test('rows shifting across the page boundary are on the next page, never doubled
   }
 });
 
-test('paging with the panel open keeps it, marked "no longer listed on this page"', async () => {
+test('paging with the panel open keeps it, marked "no longer listed on this page" (F7)', async () => {
   const all = rows(250);
   const fx = await fakeSite();
   fx.api.setList((url) => {
@@ -176,7 +176,7 @@ test('paging with the panel open keeps it, marked "no longer listed on this page
   }
 });
 
-test('a page read after the list changed says so: offset paging over a live list can miss or repeat a row', async () => {
+test('a page read after the list changed says so: offset paging over a live list can miss or repeat a row ', async () => {
   let source = rows(250);
   const fx = await fakeSite();
   fx.api.setList((url) => {

@@ -1,12 +1,16 @@
-// The details of one session, as `show` returns them: a modal bottom sheet on
-// phones, a side panel on desktop (≥ 900 px) (V9). Read-only: the only
-// control is Close.
+
 
 import { useEffect, useRef, useSyncExternalStore } from 'react';
 
 import type { Envelope, SessionView } from '../envelope.ts';
 import { ageText, boundedText, clockText, factText, unknownText } from '../present.ts';
+import type { Composers } from '../composer.ts';
+import type { Launchers } from '../launcher.ts';
+import type { Uploads } from '../attachments.ts';
 import type { DetailState } from '../viewer.ts';
+import { Composer } from './Composer.tsx';
+import { Launcher } from './Launcher.tsx';
+import type { LaunchProject } from './Launcher.tsx';
 import { Marker, Notice } from './Status.tsx';
 
 const WIDE = '(min-width: 900px)';
@@ -54,11 +58,11 @@ function Fields({ envelope, stale, now }: { envelope: Envelope<SessionView>; sta
         <dd data-field="location">
           <bdi>{location}</bdi>
         </dd>
-        <dt>purpose, as reported</dt>
+        <dt>reported purpose</dt>
         <dd data-field="purpose">
           <bdi>{purpose}</bdi>
         </dd>
-        <dt>reported configuration</dt>
+        <dt>reported config</dt>
         <dd data-field="configuration">
           model <bdi>{factText(config.model)}</bdi> · effort <bdi>{factText(config.effort)}</bdi>
         </dd>
@@ -122,17 +126,34 @@ function Fields({ envelope, stale, now }: { envelope: Envelope<SessionView>; sta
   );
 }
 
+/** The launcher's part of the panel: its project, and what it needs from the page. */
+export type LaunchPanel = {
+  project: LaunchProject;
+  launchers: Launchers;
+  uploads: Uploads;
+  listed: (id: string) => boolean;
+  snapshotAt: number;
+  onShowThread: (id: string) => void;
+};
+
 export function Detail({
   detail,
+  launch,
   listed,
   stale,
   now,
+  composers,
+  uploads,
   onClose,
 }: {
   detail: DetailState | null;
+  /** The launcher, when a project's New thread was pressed: it takes the panel's place of a session's details. */
+  launch: LaunchPanel | null;
   listed: boolean;
   stale: boolean;
   now: Date;
+  composers: Composers;
+  uploads: Uploads;
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -140,7 +161,7 @@ export function Detail({
   const switching = useRef(false);
   const loadedFor = useRef<string | null>(null);
   const wide = useWide();
-  const id = detail?.id ?? null;
+  const id = launch ? `launch:${launch.project.id}` : (detail?.id ?? null);
 
   useEffect(() => {
     const d = ref.current;
@@ -161,21 +182,22 @@ export function Detail({
   }, [id, wide]);
 
   useEffect(() => {
-    if (id === null) loadedFor.current = null;
+    if (id === null || launch) loadedFor.current = null;
     else if (detail?.last && loadedFor.current !== id) {
       loadedFor.current = id;
       performance.mark('detail-loaded');
     }
-  }, [id, detail?.last]);
+  }, [id, detail?.last, launch]);
 
   return (
     <dialog
       ref={ref}
       className="sheet"
       data-part="detail"
-      data-session-id={id ?? undefined}
-      aria-labelledby={detail?.last ? 'detail-title' : undefined}
-      aria-label={detail?.last ? undefined : 'Session details'}
+      data-session-id={launch ? undefined : (detail?.id ?? undefined)}
+      data-launch={launch ? launch.project.id : undefined}
+      aria-labelledby={launch ? undefined : detail?.last ? 'detail-title' : undefined}
+      aria-label={launch ? 'New thread' : detail?.last ? undefined : 'Session details'}
       onClose={() => {
         if (switching.current) {
           switching.current = false;
@@ -193,12 +215,14 @@ export function Detail({
     >
       <div className="sheet-grab" aria-hidden="true" />
       <header className="sheet-head">
-        <p className="sheet-cmd">show · read-only</p>
+        <p className="sheet-cmd">{launch ? 'new' : 'show · send'}</p>
         <button ref={closeButton} type="button" className="sheet-x" aria-label="Close" onClick={() => ref.current?.close()}>
           ✕
         </button>
       </header>
-      {detail ? (
+      {launch ? (
+        <Launcher key={launch.project.id} project={launch.project} launchers={launch.launchers} uploads={launch.uploads} listed={launch.listed} snapshotAt={launch.snapshotAt} onShowThread={launch.onShowThread} />
+      ) : detail ? (
         <>
           {!listed ? (
             <p className="tag dashed" data-part="no-longer-listed">
@@ -206,7 +230,14 @@ export function Detail({
             </p>
           ) : null}
           {detail.failure ? <Notice failure={detail.failure} lastGoodAt={detail.last?.envelope.freshness.snapshot_at ?? null} now={now} /> : null}
-          {detail.last ? <Fields envelope={detail.last.envelope} stale={stale} now={now} /> : detail.failure ? null : <p className="meta">reading…</p>}
+          {detail.last ? (
+            <>
+              <Fields envelope={detail.last.envelope} stale={stale} now={now} />
+              <Composer key={detail.id} id={detail.id} listed={listed} snapshotAt={detail.last.receivedAt} composers={composers} uploads={uploads} />
+            </>
+          ) : detail.failure ? null : (
+            <p className="meta">reading…</p>
+          )}
         </>
       ) : null}
     </dialog>

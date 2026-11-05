@@ -57,3 +57,5 @@ Anything the captures did not observe is a **synthetic assumption**. Each scenar
 | `thr_syn_0008` | cloud | idle | `prj_syn_0002` | Archived; no `purpose` key |
 
 Row `thr_syn_000N` was updated N minutes before the tests' fixed clock (`1700000600000`).
+
+*Updated for 0.0.5:* `room-cli-0.43.1/send/` adds synthetic message receipts, including reconstructed sent and Cloud queued shapes from individual observations. `room-cli-v127/new-thread/` includes a catalogue shape recorded with v131 and source-read create/status shapes; its folder name is historical. Every identifier, text and path is synthetic. The attachment and new-thread invocation shapes are based on help/source reads. Fixture coverage does not establish complete live acceptance for 0.0.3 or 0.0.4.

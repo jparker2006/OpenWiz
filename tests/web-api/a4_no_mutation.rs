@@ -1,8 +1,3 @@
-//! A4: no mutation surface. Only `GET` on the three allowlisted routes; every
-//! other method is `405` and every other path `404`, with no read. The
-//! server calls only the core's list and show, and makes exactly the reads
-//! the CLI makes. P8(a) (in `tests/proof`) scans `crates/server` too.
-
 use std::collections::BTreeMap;
 
 use std::io::Write;
@@ -32,23 +27,50 @@ fn server_sources() -> Vec<(String, String)> {
 }
 
 #[test]
-fn the_route_table_is_exactly_three_get_routes() {
+fn the_route_table_is_the_read_routes_the_send_and_the_create() {
+    let reads: Vec<&str> = ROUTES
+        .iter()
+        .filter(|r| r.method == "GET")
+        .map(|r| r.path)
+        .collect();
     assert_eq!(
-        ROUTES,
-        &[
-            Route {
-                method: "GET",
-                path: "/api/v1/inventory",
+        reads,
+        [
+            "/api/v1/inventory",
+            "/api/v1/sessions/{id}",
+            "/api/v1/sessions/{id}/preview",
+            "/api/v1/sessions/{id}/messages/{op_id}",
+            "/api/v1/health",
+            "/api/v1/cloud-options",
+            "/api/v1/new-threads/{op_id}",
+            "/api/v1/attachments",
+        ]
+    );
+    let posts: Vec<&Route> = ROUTES.iter().filter(|r| r.method != "GET").collect();
+    assert_eq!(
+        posts,
+        [
+            &Route {
+                method: "POST",
+                path: "/api/v1/sessions/{id}/messages",
             },
-            Route {
-                method: "GET",
-                path: "/api/v1/sessions/{id}",
+            &Route {
+                method: "POST",
+                path: "/api/v1/projects/{id}/threads/preview",
             },
-            Route {
-                method: "GET",
-                path: "/api/v1/health",
+            &Route {
+                method: "POST",
+                path: "/api/v1/projects/{id}/threads",
             },
-        ][..]
+            &Route {
+                method: "POST",
+                path: "/api/v1/attachments",
+            },
+            &Route {
+                method: "DELETE",
+                path: "/api/v1/attachments/{id}",
+            },
+        ]
     );
 }
 
@@ -69,7 +91,7 @@ fn every_other_method_is_405_and_reads_nothing() {
             let r = s.request(method, target);
             assert_eq!(r.status, 405, "{method} {target}: {}", r.status_line);
             assert_eq!(r.header("Allow"), Some("GET"), "{method} {target}");
-            // A response to HEAD has no body; its own test checks it.
+            // A response to HEAD has no body (J26); its own test checks it.
             if method != "HEAD" {
                 assert_eq!(r.error().0, "method_not_allowed");
             }
@@ -87,7 +109,7 @@ fn every_other_method_is_405_and_reads_nothing() {
     assert!(fake.invocations().is_empty(), "{:?}", fake.invocations());
 }
 
-/// HTTP forbids content in a response to `HEAD`. `HEAD` is still
+/// J26: HTTP forbids content in a response to `HEAD`. `HEAD` is still
 /// refused (`405`, `Allow: GET`), as is anything else, but with no body.
 #[test]
 fn a_head_request_is_refused_without_a_body() {
@@ -151,8 +173,8 @@ fn assert_no_body(what: &str, r: &Response, status: u16) {
     );
 }
 
-/// A HEAD request refused before its head parses still has no body, since
-/// its request line already says HEAD:
+/// J26, completed : a HEAD request refused before its head
+/// parses still has no body, since its request line already says HEAD:
 /// `414`, `431`, `505`, a malformed request line (`400`), a head that
 /// arrives too late (`408`) and the connection cap's `503`.
 #[test]
@@ -167,6 +189,9 @@ fn a_head_request_refused_before_its_head_parses_has_no_body() {
                 head_timeout: Duration::from_millis(800),
                 ..Limits::default()
             },
+            sending: None,
+            creating: None,
+            attaching: None,
         },
     );
     let host = s.host();
@@ -213,6 +238,9 @@ fn a_head_request_refused_before_its_head_parses_has_no_body() {
                 head_timeout: Duration::from_secs(5),
                 ..Limits::default()
             },
+            sending: None,
+            creating: None,
+            attaching: None,
         },
     );
     let _idle = TcpStream::connect(capped.addr).unwrap();
@@ -221,8 +249,6 @@ fn a_head_request_refused_before_its_head_parses_has_no_body() {
     assert_no_body("503", &r, 503);
     assert_eq!(r.header("Retry-After"), Some("5"));
 
-    // The method arrives in pieces, slower than the server peeks.
-    // A beginning of `HEAD ` may be HEAD, so the 503 still has no body.
     let host = capped.host();
     for first in ["H", "HEA", "HEAD"] {
         let mut split = TcpStream::connect(capped.addr).unwrap();
@@ -270,7 +296,9 @@ fn every_other_path_is_404_and_reads_nothing() {
         "/api/v1/sessions/",
         "/api/v1/sessions/thr_syn_0001/",
         "/api/v1/sessions/thr_syn_0001/output",
-        "/api/v1/sessions/thr_syn_0001/messages",
+        "/api/v1/sessions/thr_syn_0001/messages/",
+        "/api/v1/sessions/thr_syn_0001/messages/op-1/x",
+        "/api/v1/sessions/thr_syn_0001/preview/",
         "/api/v1/sessions/thr_syn_0001/launch",
         "/api/v1/launch",
         "/api/v1/messages",
@@ -293,6 +321,10 @@ fn every_other_path_is_404_and_reads_nothing() {
         assert_eq!(r.status, 404, "{target}: {}", r.text());
         assert_eq!(r.error().0, "no_route", "{target}");
     }
+
+    let r = s.get("/api/v1/sessions/thr_syn_0001/messages");
+    assert_eq!(r.status, 404, "{}", r.text());
+    assert_eq!(r.header("Allow"), None);
     assert!(fake.invocations().is_empty(), "{:?}", fake.invocations());
 }
 
@@ -387,26 +419,28 @@ fn the_server_calls_only_the_cores_list_and_show() {
             "std::fs",
             "File::open",
             "read_dir",
-            // No write path of any kind.
-            "messaging",
             "openwiz_store",
-            "Messenger",
-            "SendStore",
             "ThreadTell",
         ] {
-            let allowed_in_main = forbidden == "from_path()" && path.ends_with("main.rs");
-            // A8: only web.rs reads files: the web page's, once, at
+            let allowed_in_main =
+                ["from_path()", "openwiz_store"].contains(&forbidden) && path.ends_with("main.rs");
+            // A8 : only web.rs reads files: the web page's, once, at
             // start (checked below: never while answering a request).
             let allowed_in_web = ["std::fs", "File::open", "read_dir"].contains(&forbidden)
                 && path.ends_with("web.rs");
+
+            let allowed_for_attachments = forbidden == "openwiz_store"
+                && (path.ends_with("attachments.rs") || path.ends_with("lib.rs"));
             assert!(
-                !text.contains(forbidden) || allowed_in_main || allowed_in_web,
+                !text.contains(forbidden)
+                    || allowed_in_main
+                    || allowed_in_web
+                    || allowed_for_attachments,
                 "{path} contains {forbidden}"
             );
         }
     }
-    // The code that answers a web request (from `route` on) touches no
-    // file; the export is in memory since the start.
+
     let web = sources
         .iter()
         .find(|(p, _)| p.ends_with("web.rs"))
@@ -494,7 +528,7 @@ fn normal_dependencies(meta: &serde_json::Value, package: &str) -> Vec<String> {
 }
 
 #[test]
-fn the_server_depends_only_on_the_core_and_the_adapter_and_nothing_depends_on_it() {
+fn the_server_depends_only_on_the_core_the_adapter_and_the_store_and_nothing_depends_on_it() {
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
     let out = std::process::Command::new(env!("CARGO"))
         .args(["metadata", "--format-version", "1", "--locked", "--offline"])
@@ -509,11 +543,13 @@ fn the_server_depends_only_on_the_core_and_the_adapter_and_nothing_depends_on_it
     let meta: serde_json::Value = serde_json::from_slice(&out.stdout).expect("metadata JSON");
     let mut deps = normal_dependencies(&meta, "openwiz-server");
     deps.sort();
+
     assert_eq!(
         deps,
         [
             "openwiz-adapter-cloudroom",
             "openwiz-core",
+            "openwiz-store",
             "serde",
             "serde_json"
         ]

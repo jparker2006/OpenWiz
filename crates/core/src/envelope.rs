@@ -1,7 +1,7 @@
 //! The honest envelope around every result: the source and its version,
 //! coverage, freshness and known gaps.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::model::{Fact, Timestamp};
 
@@ -19,8 +19,9 @@ pub struct Envelope<T> {
     pub data: T,
 }
 
-/// Which source answered, and whether its version is the tested one.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+/// Which source answered, and whether its version is the tested one. Also
+/// recorded and reported by `send` .
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SourceInfo {
     /// Such as `room-cli`.
     pub name: String,
@@ -95,7 +96,7 @@ pub struct Gap {
 pub enum GapKind {
     /// The source's version could not be read, or is not a recognised
     /// version text. A known but untested version is not a gap: it is shown
-    /// by `version_tested` (the version is never a gate).
+    /// by `version_tested` .
     UntestedVersion,
     /// A read exited non-zero.
     CommandFailed,

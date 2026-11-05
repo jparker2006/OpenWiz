@@ -1,0 +1,3 @@
+interface:
+  display_name: "Plan Graph"
+  short_description: "Plan a confirmed grill into a spec, then approved tickets"

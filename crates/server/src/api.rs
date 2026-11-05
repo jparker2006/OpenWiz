@@ -1,5 +1,7 @@
 //! The routes: query parsing, the calls into the core, the CLI's outcome
-//! mapping, and single-flight with a cap on core runs.
+//! mapping, and single-flight with a cap on core runs. The send itself is
+//! `send.rs`'s, the create `new_thread.rs`'s, and the attachment routes
+//! `attachments.rs`'s: none of them is ever single-flighted.
 
 use std::collections::HashMap;
 use std::panic::{self, AssertUnwindSafe};
@@ -9,18 +11,33 @@ use std::time::Instant;
 
 use openwiz_core::envelope::Envelope;
 use openwiz_core::limits::RUN_BUDGET;
+use openwiz_core::messaging::send::Messenger;
+use openwiz_core::messaging::{InvalidRequest, Mode, preview};
 use openwiz_core::model::SessionId;
 use openwiz_core::ops::{self, Clock, Detail, ListRequest, OpError, ShowRequest};
 use openwiz_core::source::{Read, SessionSource};
 use serde::Serialize;
 
-use crate::Limits;
 use crate::http::{API_HEADERS, Reply};
+use crate::new_thread::{self, Asked};
+use crate::{Attaching, Creating, Limits};
 
 pub(crate) const INVENTORY: &str = "/api/v1/inventory";
 pub(crate) const SESSIONS: &str = "/api/v1/sessions/";
 pub(crate) const SESSION_ROUTE: &str = "/api/v1/sessions/{id}";
+pub(crate) const PREVIEW_ROUTE: &str = "/api/v1/sessions/{id}/preview";
+pub(crate) const LOOKUP_ROUTE: &str = "/api/v1/sessions/{id}/messages/{op_id}";
+pub(crate) const SEND_ROUTE: &str = "/api/v1/sessions/{id}/messages";
 pub(crate) const HEALTH: &str = "/api/v1/health";
+pub(crate) const CLOUD_OPTIONS: &str = "/api/v1/cloud-options";
+pub(crate) const PROJECTS: &str = "/api/v1/projects/";
+pub(crate) const THREADS_ROUTE: &str = "/api/v1/projects/{id}/threads";
+pub(crate) const THREADS_PREVIEW_ROUTE: &str = "/api/v1/projects/{id}/threads/preview";
+pub(crate) const NEW_THREADS: &str = "/api/v1/new-threads/";
+pub(crate) const NEW_THREAD_STATUS_ROUTE: &str = "/api/v1/new-threads/{op_id}";
+pub(crate) const ATTACHMENTS_ROUTE: &str = "/api/v1/attachments";
+pub(crate) const ATTACHMENTS: &str = "/api/v1/attachments/";
+pub(crate) const ATTACHMENT_ROUTE: &str = "/api/v1/attachments/{id}";
 
 /// The route a path names, if any. The id is one path segment, passed to
 /// the core as it is: nothing is decoded.
@@ -28,7 +45,25 @@ pub(crate) const HEALTH: &str = "/api/v1/health";
 pub(crate) enum Route {
     Inventory,
     Session(String),
+    /// `GET`: what a send to the session would do.
+    Preview(String),
+    /// `GET`: the send record of an op id for the session.
+    Lookup(String, String),
+    /// `POST`: the send.
+    Send(String),
     Health,
+    /// `GET`: the Cloud options .
+    CloudOptions,
+    /// `POST`: the create in a project .
+    Threads(String),
+    /// `POST`, never a write: what a create in a project would do .
+    ThreadsPreview(String),
+    /// `GET`: the new-thread record of an op id .
+    NewThreadStatus(String),
+    /// `GET`: the staged attachments; `POST`: one upload .
+    Attachments,
+    /// `DELETE`: the removal of one staged attachment .
+    Attachment(String),
 }
 
 impl Route {
@@ -36,9 +71,41 @@ impl Route {
         match path {
             INVENTORY => Some(Self::Inventory),
             HEALTH => Some(Self::Health),
+            CLOUD_OPTIONS => Some(Self::CloudOptions),
+            ATTACHMENTS_ROUTE => Some(Self::Attachments),
+            _ if path.starts_with(ATTACHMENTS) => {
+                let id = &path[ATTACHMENTS.len()..];
+                (!id.is_empty() && !id.contains('/')).then(|| Self::Attachment(id.to_owned()))
+            }
+            _ if path.starts_with(PROJECTS) => {
+                let parts: Vec<&str> = path[PROJECTS.len()..].split('/').collect();
+                match parts[..] {
+                    [id, "threads"] if !id.is_empty() => Some(Self::Threads(id.to_owned())),
+                    [id, "threads", "preview"] if !id.is_empty() => {
+                        Some(Self::ThreadsPreview(id.to_owned()))
+                    }
+                    _ => None,
+                }
+            }
+            _ if path.starts_with(NEW_THREADS) => {
+                let op_id = &path[NEW_THREADS.len()..];
+                (!op_id.is_empty() && !op_id.contains('/'))
+                    .then(|| Self::NewThreadStatus(op_id.to_owned()))
+            }
             _ => {
-                let id = path.strip_prefix(SESSIONS)?;
-                (!id.is_empty() && !id.contains('/')).then(|| Self::Session(id.to_owned()))
+                let rest = path.strip_prefix(SESSIONS)?;
+                let parts: Vec<&str> = rest.split('/').collect();
+                if parts.iter().any(|p| p.is_empty()) {
+                    return None;
+                }
+                let id = parts[0].to_owned();
+                match parts[1..] {
+                    [] => Some(Self::Session(id)),
+                    ["preview"] => Some(Self::Preview(id)),
+                    ["messages"] => Some(Self::Send(id)),
+                    ["messages", op_id] => Some(Self::Lookup(id, op_id.to_owned())),
+                    _ => None,
+                }
             }
         }
     }
@@ -48,7 +115,16 @@ impl Route {
         match self {
             Self::Inventory => INVENTORY,
             Self::Session(_) => SESSION_ROUTE,
+            Self::Preview(_) => PREVIEW_ROUTE,
+            Self::Lookup(..) => LOOKUP_ROUTE,
+            Self::Send(_) => SEND_ROUTE,
             Self::Health => HEALTH,
+            Self::CloudOptions => CLOUD_OPTIONS,
+            Self::Threads(_) => THREADS_ROUTE,
+            Self::ThreadsPreview(_) => THREADS_PREVIEW_ROUTE,
+            Self::NewThreadStatus(_) => NEW_THREAD_STATUS_ROUTE,
+            Self::Attachments => ATTACHMENTS_ROUTE,
+            Self::Attachment(_) => ATTACHMENT_ROUTE,
         }
     }
 }
@@ -66,6 +142,27 @@ pub(crate) enum Call {
     },
     /// `show <id>`.
     Show(String),
+    /// `send <id> --preview`, with `--steer` when `steer`.
+    Preview { id: String, steer: bool },
+    /// `models` .
+    CloudOptions,
+    /// `new --project-id <id> …` without `--yes`: the new-thread preview .
+    NewThreadPreview(Box<Asked>),
+    /// `new --status <op_id>` .
+    NewThreadStatus(String),
+}
+
+/// Parses the preview query: `mode=queue` or `mode=steer`, at most once.
+pub(crate) fn preview_call(id: &str, query: Option<&str>) -> Result<Call, &'static str> {
+    let steer = match query {
+        None | Some("") | Some("mode=queue") => false,
+        Some("mode=steer") => true,
+        Some(_) => return Err("the preview takes only mode=queue or mode=steer"),
+    };
+    Ok(Call::Preview {
+        id: id.to_owned(),
+        steer,
+    })
 }
 
 /// Parses the inventory query. Every parameter is optional, at most once,
@@ -129,7 +226,7 @@ fn number(value: &str) -> Option<usize> {
 }
 
 /// A JSON body, as `openwiz … --json` prints it.
-fn pretty<T: Serialize>(value: &T) -> Option<String> {
+pub(crate) fn pretty<T: Serialize>(value: &T) -> Option<String> {
     let mut text = serde_json::to_string_pretty(value).ok()?;
     text.push('\n');
     Some(text)
@@ -171,9 +268,36 @@ pub(crate) fn health(source: &dyn SessionSource) -> Reply {
     ok(pretty(&body).unwrap_or_default())
 }
 
+/// What a core run calls: the source, the send provider and the
+/// new-thread provider (when configured), and the clock.
+#[derive(Clone)]
+pub(crate) struct Core {
+    pub source: Arc<dyn SessionSource>,
+    pub messenger: Option<Arc<dyn Messenger>>,
+    pub creating: Option<Creating>,
+    pub attaching: Option<Attaching>,
+    pub clock: Arc<dyn Clock>,
+}
+
 /// Runs `call` through the core exactly as the CLI does.
-fn run(call: &Call, source: &dyn SessionSource, clock: &dyn Clock) -> Reply {
+fn run(call: &Call, core: &Core) -> Reply {
+    let (source, clock) = (core.source.as_ref(), core.clock.as_ref());
+    let messenger = core.messenger.as_deref();
+    let creating = core.creating.as_ref();
     let body = match call {
+        Call::CloudOptions | Call::NewThreadPreview(_) | Call::NewThreadStatus(_) => {
+            let Some(creating) = creating else {
+                return error(404, "no_route", "no such route");
+            };
+            return match call {
+                Call::CloudOptions => new_thread::run_options(creating, clock),
+                Call::NewThreadPreview(asked) => {
+                    new_thread::run_preview(creating, core.attaching.as_ref(), clock, asked)
+                }
+                Call::NewThreadStatus(op_id) => new_thread::run_status(creating, clock, op_id),
+                _ => unreachable!("matched above"),
+            };
+        }
         Call::List {
             long,
             hidden,
@@ -198,6 +322,19 @@ fn run(call: &Call, source: &dyn SessionSource, clock: &dyn Clock) -> Reply {
             };
             ops::show_report(source, clock, &request).map(|report| envelope(&report.envelope))
         }
+        Call::Preview { id, steer } => {
+            let Some(messenger) = messenger else {
+                return error(404, "no_route", "no such route");
+            };
+            let mode = if *steer { Mode::Steer } else { Mode::Queue };
+            return match preview::preview(messenger, clock, &SessionId(id.clone()), mode) {
+                Ok(report) => pretty(&report).map_or_else(
+                    || error(500, "internal", "the result could not be written"),
+                    ok,
+                ),
+                Err(InvalidRequest(why)) => error(400, "invalid_request", &why),
+            };
+        }
     };
     match body {
         Ok(Some(body)) => ok(body),
@@ -212,7 +349,7 @@ fn envelope<T: Serialize>(envelope: &Envelope<T>) -> Option<String> {
 
 /// The status, kind and message for an operation error: the CLI's message,
 /// under the status for the CLI's exit code (1 → 502, 2 → 400, 3 → 404).
-/// The version is never an error.
+/// The version is never an error .
 fn failure(source: &dyn SessionSource, error_: &OpError) -> Reply {
     match error_ {
         OpError::ListFailed(e) => error(
@@ -270,8 +407,7 @@ impl Runs {
         call: Call,
         deadline: Instant,
         limits: &Limits,
-        source: &Arc<dyn SessionSource>,
-        clock: &Arc<dyn Clock>,
+        core: &Core,
     ) -> Reply {
         let slot_deadline = deadline.min(Instant::now() + limits.slot_wait);
         let mut state = lock(&self.state);
@@ -281,7 +417,8 @@ impl Runs {
             }
             if state.running < limits.max_core_runs {
                 let flight = Arc::new(Flight::default());
-                if !self.spawn(call.clone(), flight.clone(), source.clone(), clock.clone()) {
+                let spawned = self.spawn(call.clone(), flight.clone(), core.clone());
+                if !spawned {
                     return error(500, "internal", "the core run could not be started");
                 }
                 state.running += 1;
@@ -327,21 +464,13 @@ impl Runs {
 
     /// Starts the core run for `call` on its own thread. The caller holds
     /// the state lock, so the run cannot finish before it is registered.
-    fn spawn(
-        self: &Arc<Self>,
-        call: Call,
-        flight: Arc<Flight>,
-        source: Arc<dyn SessionSource>,
-        clock: Arc<dyn Clock>,
-    ) -> bool {
+    fn spawn(self: &Arc<Self>, call: Call, flight: Arc<Flight>, core: Core) -> bool {
         let runs = self.clone();
         thread::Builder::new()
             .name("openwiz-server core run".to_owned())
             .spawn(move || {
-                let reply = panic::catch_unwind(AssertUnwindSafe(|| {
-                    run(&call, source.as_ref(), clock.as_ref())
-                }))
-                .unwrap_or_else(|_| error(500, "internal", "the core run failed"));
+                let reply = panic::catch_unwind(AssertUnwindSafe(|| run(&call, &core)))
+                    .unwrap_or_else(|_| error(500, "internal", "the core run failed"));
                 // Unregister first, so a request that arrives from now on
                 // starts a new run instead of taking this finished result.
                 let mut state = lock(&runs.state);

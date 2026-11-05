@@ -1,5 +1,5 @@
-// The browser for the proofs: a local Chromium (`OPENWIZ_CHROMIUM`, else
-// /usr/bin/chromium), driven by playwright-core. Every page records its requests, console errors and
+// The browser for the proofs: the image's Chromium, driven by playwright-core
+// (approved: W-5). Every page records its requests, console errors and
 // Content Security Policy violations.
 
 import { chromium } from 'playwright-core';
@@ -11,11 +11,22 @@ export function launchBrowser() {
   return chromium.launch({ executablePath: process.env.OPENWIZ_CHROMIUM ?? '/usr/bin/chromium' });
 }
 
+/** A test-only slowdown: `OPENWIZ_CPU_THROTTLE=N` runs every page's CPU N times slower (DevTools' throttling). */
+const CPU_THROTTLE = Number(process.env.OPENWIZ_CPU_THROTTLE ?? 1) || 1;
+
 /**
  * Opens `origin` in a fresh context. `clock`: install Playwright's fake clock
- * at that time before the page loads.
+ * at that time before the page loads; with `paused`, it never moves on its
+ * own, only by `runFor` (otherwise it also flows in real time). `stampReads`:
+ * record, in `window.__reads`, every API request the page makes and the
+ * page's own clock (`Date.now()`) at the moment it called `fetch`, so a proof
+ * can measure the page's timing exactly instead of when the server happened
+ * to see a request; and count in `window.__readsDone` the requests whose
+ * answer the page has read (or that failed), so a proof on a paused clock can
+ * wait until the page has handled every answer before it moves time
+ * (`pageIdle`).
  */
-export async function openPage(browser, origin, { viewport = PHONE, clock = null, path = '/', hasTouch = false } = {}) {
+export async function openPage(browser, origin, { viewport = PHONE, clock = null, paused = false, stampReads = false, path = '/', hasTouch = false } = {}) {
   const context = await browser.newContext({
     viewport,
     deviceScaleFactor: 1,
@@ -45,7 +56,37 @@ export async function openPage(browser, origin, { viewport = PHONE, clock = null
     window.__csp = [];
     document.addEventListener('securitypolicyviolation', (e) => window.__csp.push(`${e.violatedDirective} ${e.blockedURI}`));
   });
-  if (clock !== null) await page.clock.install({ time: clock });
+  if (stampReads) {
+    await page.addInitScript(() => {
+      window.__reads = [];
+      window.__readsDone = 0;
+      const real = window.fetch;
+      window.fetch = (url, init) => {
+        const path = String(url);
+        if (!path.startsWith('/api/')) return real(url, init);
+        window.__reads.push({ path, at: Date.now() });
+        const done = () => {
+          window.__readsDone++;
+        };
+        return real(url, init).then(
+          (res) => {
+            const text = res.text.bind(res);
+            res.text = () => text().finally(done);
+            return res;
+          },
+          (e) => {
+            done();
+            throw e;
+          },
+        );
+      };
+    });
+  }
+  if (clock !== null) {
+    await page.clock.install({ time: clock });
+    if (paused) await page.clock.pauseAt(clock);
+  }
+  if (CPU_THROTTLE > 1) await (await context.newCDPSession(page)).send('Emulation.setCPUThrottlingRate', { rate: CPU_THROTTLE });
   await page.goto(origin + path);
   return {
     context,
@@ -59,6 +100,13 @@ export async function openPage(browser, origin, { viewport = PHONE, clock = null
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * With `stampReads`: whether the page has read the answer to every API request
+ * it made. Its next timers are set by then (they follow in microtasks), so a
+ * paused clock can be moved without racing the page.
+ */
+export const pageIdle = (page) => page.evaluate(() => window.__reads.length === window.__readsDone);
 
 /** Polls `fn` from Node until it returns something truthy (works under a fake page clock). */
 export async function waitFor(fn, { timeout = 15_000, interval = 25, what = 'condition' } = {}) {
@@ -78,7 +126,7 @@ export async function waitFor(fn, { timeout = 15_000, interval = 25, what = 'con
 
 export const settleReal = (ms = 150) => sleep(ms);
 
-/** The page as the proofs read it. */
+/** The page as the proofs read it (the DOM contract in docs/dom.md terms). */
 export function readView(page) {
   return page.evaluate(() => {
     const text = (el) => (el ? el.textContent : null);

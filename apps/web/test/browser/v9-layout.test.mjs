@@ -148,7 +148,7 @@ test('screen-reader names: every row says its status word; the sheet or panel is
   const p = await ready(PHONE);
   try {
     const tree = await p.page.locator('main').ariaSnapshot();
-    // Each row's own accessible name has its own status word.
+    // Each row's own accessible name has its own status word (F9).
     for (const [id, word] of [
       ['thr_web_0001', 'error'],
       ['thr_web_0002', 'active'],

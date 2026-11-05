@@ -1,0 +1,1 @@
+Synthetic receipt that is not JSON

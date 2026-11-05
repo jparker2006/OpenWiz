@@ -21,7 +21,7 @@ export type ListState = {
   /**
    * The `matched` count of the page this one was reached from, so a change
    * between the two reads can be shown: offset paging over a live list can
-   * miss or repeat a session.
+   * miss or repeat a session .
    */
   previousMatched: number | null;
 };

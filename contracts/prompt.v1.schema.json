@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openwiz:schema:prompt:v1",
+  "title": "openwiz.prompt.v1",
+  "description": "OpenWiz 0.0.4's prompt payload, shared by send and new threads: the text and an ordered list of staged attachment ids. B2  relaxes 0.0.4's empty list: any number of ids, each at most once (no count cap), every one passing the one gate before anything is claimed or called. The text is not empty, not only whitespace (Unicode White_Space), has no NUL, and is at most 16 KiB of UTF-8 (MAX_TEXT_BYTES). The byte cap is the companion keyword maxUtf8Bytes, which a standard validator ignores and OpenWiz enforces; maxLength bounds the characters. The op id binds the attachments by their digest: SHA-256 of 'openwiz.prompt.attachments.v2\\n' and one line '<sha256> <size_bytes> <kind> <safe name>\\n' per attachment in the owner's order; no attachment has the fixed digest of 'openwiz.prompt.attachments.v1\\n'.",
+  "$ref": "#/$defs/prompt",
+  "$defs": {
+    "attachment_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+      "description": "1 to 64 ASCII letters, digits, _ or -, starting with a letter or digit."
+    },
+    "prompt": {
+      "type": "object",
+      "required": [
+        "text",
+        "attachments"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16384,
+          "maxUtf8Bytes": 16384,
+          "pattern": "^[^\\u0000]*[^\\u0000\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000][^\\u0000]*$",
+          "description": "Not empty, not only whitespace (Unicode White_Space), no NUL, at most 16 KiB of UTF-8. maxUtf8Bytes is OpenWiz's companion keyword for the byte cap: a standard validator ignores it, and OpenWiz enforces it."
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attachment_id"
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

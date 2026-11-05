@@ -1,12 +1,12 @@
 //! The inventory model: sessions, projects, locations, status, reported
 //! configuration, and unknowns that carry a reason.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// A value that is either known or explicitly unknown with a reason.
 /// Nothing is guessed: a value that was not read, or did not read cleanly,
 /// is `Unknown`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Fact<T> {
     Known(T),
@@ -25,12 +25,12 @@ impl<T> Fact<T> {
 }
 
 /// Milliseconds since the Unix epoch.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Timestamp(pub i64);
 
 /// A session id as reported by the source. Opaque to the core.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct SessionId(pub String);
 

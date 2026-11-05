@@ -1,22 +1,37 @@
 //! The `openwiz` command: parses `ls`, `ls -l`, `show` and `--json`, calls
-//! the core operations, and prints the results.
+//! the core operations, and prints the results. `send`, `new` and `models`
+//! have their own modules.
 //!
 //! Text and `--json` print the same envelope. The text follows the
 //! provisional text contract at the end of `tests/proof/support.rs`. Errors go
 //! to stderr as one `openwiz: ` line, with stdout left empty; the exit codes
 //! are the `EXIT_*` constants, documented in [`help`].
+//!
+//! `send`, OpenWiz's first write, is in [`send`]; `new` (its second) and
+//! `models` are in [`new_thread`]; `attachment add`, `ls` and `rm`, which
+//! stage files on this machine only, are in [`attachment`].
+
+pub mod attach;
+pub mod attachment;
+pub mod new_thread;
+pub mod send;
 
 use std::collections::HashSet;
 use std::io::Write;
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 use openwiz_adapter_cloudroom::TESTED_VERSION;
-use openwiz_core::envelope::{Completeness, Envelope};
+use openwiz_core::attachment::{
+    FILE_MAX_BYTES, FREE_DISK_FLOOR_BYTES, IMAGE_MAX_BYTES, UNSENT_TTL,
+};
+use openwiz_core::envelope::{Completeness, Envelope, SourceInfo};
 use openwiz_core::limits::{FINAL_OUTPUT_MAX_BYTES, MAX_LIMIT, READ_TIMEOUT, RUN_BUDGET};
+use openwiz_core::messaging::{MAX_TEXT_BYTES, OP_ID_MAX_LEN};
 use openwiz_core::model::{
     BoundedText, Fact, FinalOutput, Grouping, Inventory, Location, Recap, Session, SessionId,
     SessionView, Timestamp,
 };
+use openwiz_core::new_thread::start::{FOLLOW_MAX_READS, FOLLOW_WINDOW};
 use openwiz_core::ops::{self, Clock, Detail, ListRequest, OpError, Report, ShowRequest};
 use openwiz_core::source::{Read, SessionSource};
 use serde::Serialize;
@@ -84,11 +99,26 @@ impl Clock for SystemClock {
 /// `openwiz --help`.
 pub fn help() -> String {
     format!(
-        "openwiz: a read-only inventory of CloudRoom sessions, read through room-cli.
+        "openwiz: an inventory of CloudRoom sessions, read through room-cli, and two writes: send and new.
+It also keeps files you choose ready on this machine (attachment); send and new attach them.
 
 Usage:
   openwiz ls [-l] [-a] [--hidden] [--limit N] [--offset N] [--json]
   openwiz show <id> [--json]
+  openwiz send <id> [<text>] [--steer] [--op-id <op id>] [--json]
+               [--resume-paused-queue] [--accept-possible-duplicate]
+               [--attach <path>]... [--attachment <id>]... [--] [<text>]
+  openwiz send <id> --preview [--steer] [--json]
+  openwiz send <id> --op-id <op id> --check [--json]
+  openwiz new <project> --harness <h> --model <m> --effort <e> [--op-id <op id>]
+              [--text-sha256 <hex>] [--attach <path>]... [--attachment <id>]...
+              [--yes] [--json] [--] [<text>]
+  openwiz new --project-id <id> --harness <h> --model <m> --effort <e> [...] [--] [<text>]
+  openwiz new --status <op id> [--json]
+  openwiz models [--json]
+  openwiz attachment add [--json] [--] <path>...
+  openwiz attachment ls [--json]
+  openwiz attachment rm [--json] <id>...
   openwiz --help
 
   ls          sessions, grouped under /factories/<project>/
@@ -107,17 +137,167 @@ Every run reads room-cli --version and shows it. Any version runs; one other tha
 Each read stops after {read} seconds and is not retried; a run stops after {budget} seconds.
 A result is complete or partial: its gaps say what is missing.
 
+send <id> <text>
+  Sends one text message to one target: one existing session, one target per call
+  (a shell loop calls it once per target). A file path in the text is sent as text,
+  never attached. The text is the argument after the id (put -- before
+  text that starts with -), or else read from stdin, byte for byte; it must not be
+  empty or only whitespace, contain no NUL, and be at most {text_cap} bytes of UTF-8.
+  --steer     ask to steer the current turn; the default is queue. The mode is always
+              passed to room-cli explicitly, never auto, and never retried in another mode
+  --op-id     the operation id (1 to {op_max} ASCII letters, digits, _ or -); one op id
+              makes at most one call, ever, for one target, mode and text. Without it a
+              new one is made and shown on stderr before anything is sent
+  --json      print the openwiz.messaging.v1 report instead of text
+  --resume-paused-queue
+              send even though the target's queue appears paused (or that cannot be
+              ruled out); sending resumes it, and the queued messages may run after this one
+  --accept-possible-duplicate
+              send even though an earlier send of this text to this target is uncertain,
+              or one in the same mode is still in progress under another op id
+  --attach <path>
+              attach this file: it is staged first, as attachment add does (repeatable)
+  --attachment <id>
+              attach a file staged before, by its id (repeatable). Both keep their order,
+              which the op id binds; room-cli gets the files first, then the images.
+              Every attachment must be ready: if any path fails, or any attachment is
+              missing, expired, changed or in use by another send or new, nothing is read
+              or sent, and each one is named. Queue only: Steer can't carry attachments.
+              After a queued or sent outcome is recorded, the staged copies are deleted
+              (CloudRoom keeps its own); after a failure they are kept until they expire;
+              while uncertain, they are kept. Delivery to the agent's machine is never
+              reported
+  --preview   read the target and show what a send in this mode would do: its effects
+              and the read's time, or why it would be refused. Takes no text; makes
+              no claim and no call, and never opens the send record (2 or 3 reads).
+              --json prints openwiz.send-preview.v1
+  --check     show the send record of --op-id for this target: its outcome, in progress,
+              or no record. Takes no text; makes no claim and no call, and never runs
+              room-cli. --json prints openwiz.send-lookup.v1
+
+  The report keeps the requested mode apart from the reported delivery: queued,
+  sent (the provider accepted the message, not that the work completed), failed
+  or uncertain. Effects are worked out from one read of the target just before
+  sending, and shown with its age. They can change between the read and the dispatch,
+  so the outcome is what the provider reported. An uncertain send keeps its text in
+  the send record and is never resent by itself. The send record is kept in the
+  owner's state directory, readable by the owner only.
+
+new <project> --harness <h> --model <m> --effort <e> <text>
+  Creates and starts one Cloud thread in one existing project: a standard project
+  with a GitHub remote, named as the inventory shows it (name, or name~<last 6 of its
+  id>), or by --project-id. One project per call. The harness, model and effort are
+  all required and passed as given: nothing is defaulted or substituted, and a choice
+  CloudRoom does not offer right now (openwiz models) is refused. The text is the
+  argument after the project (put -- before text that starts with -), or else read
+  from stdin, as for send: at most {text_cap} bytes of UTF-8. --attach and --attachment
+  attach files to the first prompt, as for send (without --yes, --attach stages the file
+  on this machine only, and the printed command attaches it by --attachment).
+  --yes       create it. Without --yes, new reads what a create would read, prints the
+              effects and the exact command to run (the same op id, settings and text;
+              every value quoted for sh, bash and zsh, in $'...' when it holds
+              characters that are not safe to show), and creates nothing
+  --op-id     the operation id; one op id makes at most one create, ever, for one
+              project, settings and text. Without it a new one is made and shown
+  --text-sha256
+              create only if the text's SHA-256 is this hex; the printed command passes
+              it, so a text a shell or a paste changed is refused and nothing is created
+  --json      print the openwiz.new-thread.v1 report (openwiz.new-thread-preview.v1
+              without --yes) instead of text
+  --status    show the new-thread record of an op id: its outcome and, once created, its
+              start stage from one read. Takes nothing else; makes no claim and never
+              creates. --json prints openwiz.new-thread-status.v1
+
+  Created means CloudRoom recorded the thread and its first prompt, never that it started:
+  after a create, new reads the start stage at most {follow_reads} times over {follow_secs} seconds
+  and shows the last. The requested configuration is shown apart from the configuration
+  CloudRoom reports. An uncertain create keeps its text in the record and is never sent
+  again: there is no retry. Resolve it in CloudRoom; a new create needs a new op id.
+
+models
+  The Cloud harnesses, models and efforts CloudRoom offers right now, from one cloud status
+  read, as reported (it may answer from a saved copy); harnesses it lists but OpenWiz
+  cannot offer, with the reason. Nothing is marked default. --json prints
+  openwiz.cloud-options.v1.
+
+attachment add <path>...
+  Copies each file into this machine's private attachment store, in the owner's state
+  directory (readable by the owner only), and verifies the copy: its size, SHA-256, kind
+  and safe name. Ready means only that this machine holds that verified copy. Each source
+  is opened read-only and never changed; a link is followed only to a regular file, and
+  folders aren't supported yet. The kind comes from the bytes: PNG, JPEG, GIF and WebP are
+  images; HEIC and HEIF are refused, never converted; anything else is a file, kept
+  unchanged (a ZIP is never unpacked). A name whose extension doesn't match the content is
+  refused, never renamed. Only CloudRoom's limits apply: {image_mib} MiB per image, and per
+  file whose extension CloudRoom types as an image; {file_mib} MiB per other file; no count.
+  Staging never leaves less than {floor_gib} GiB free on the store's volume. Every path is
+  reported, in order, ready with its id or failed with its reason.
+attachment ls
+  The ready attachments, with their age and when they expire: one that no send uses is
+  deleted {ttl_hours} hours after it became ready. Whenever the store is opened, copies left
+  unfinished are deleted, and expired ones are deleted and reported once.
+attachment rm <id>...
+  Deletes each attachment's copy and metadata, unless an operation may still use it.
+  attachment never sends or uploads anything, and never runs room-cli. A file path in a
+  send's text is sent as text, never attached; send and new attach with --attach and
+  --attachment. --json prints openwiz.attachment-add.v1,
+  openwiz.attachment-list.v1 or openwiz.attachment-remove.v1.
+
 Exit codes:
   0  a result was printed, complete or partial
+  0  send: queued, or sent (the provider accepted the message, not that the work completed)
   1  a read failed
   2  usage error, or a request out of bounds
   3  show: the session was not found
+  3  send: the target was not found; nothing was sent
+  5  send: failed; nothing was delivered (rejected, or refused before sending; or an
+     --attach path failed, and every path is reported as attachment add would)
+  6  send: uncertain; the message may or may not have been accepted
+  7  send: in progress in another process with this op id; no call was made
+  8  send: the op id is bound to a different target, mode or text; no call was made
+  9  send: possible duplicate of an uncertain or in-progress send; nothing was sent
+  10 send: the send record could not be used; nothing was sent
+  11 send --check: no record of this op id for this target; nothing was sent with it
+  0  send --preview: a send would go ahead to its one call
+  3  send --preview: the target was not found
+  5  send --preview: a send would be refused, or needs --resume-paused-queue
+  send --check exits as the record's outcome does (0, 3, 5, 6, 7), or 8 when the op id
+  is bound to another target
+  0  new: created (CloudRoom recorded it and its first prompt; never that it started)
+  5  new: refused or failed; nothing was created (or an --attach path failed)
+  6  new: uncertain; the thread may or may not have been created
+  7  new: in progress in another process with this op id; no call was made
+  8  new: the op id is bound to a different project, settings or text; no call was made
+  10 new: the new-thread record could not be used; nothing was created
+  11 new --status: no record of this op id; nothing was created with it
+  12 new without --yes: the effects and the command were printed; nothing was created
+  new --status exits as the record's outcome does (0, 5, 6, 7)
+  0  models: options were printed
+  13 models: nothing can be offered right now; the report says why
+  0  attachment: every path ready, every id removed or expired, or the list printed
+  3  attachment rm: an id was not found; the others were removed
+  5  attachment add: a path failed; every path is reported, and the others are ready
+  10 attachment: the attachment store could not be used; a path or id it failed on is reported
+  14 attachment rm: refused while its operation is dispatching or uncertain; it is kept
 On an error, stdout is empty and stderr has one line starting with \"openwiz: \".
+For send, an error is a usage error (2) or an unusable send record (10); otherwise
+send prints its report on stdout for every outcome (0, 3 to 9, 11), and a new op id's
+line on stderr before sending. new and models do the same: a usage error (2) or an
+unusable record (10) on stderr, and their report on stdout for every other exit code.
+attachment does the same: a usage error (2), or a store that can't be opened (10), on stderr.
 ",
         default = ops::ListRequest::default().limit,
         kib = FINAL_OUTPUT_MAX_BYTES / 1024,
         read = READ_TIMEOUT.as_secs(),
         budget = RUN_BUDGET.as_secs(),
+        text_cap = MAX_TEXT_BYTES,
+        op_max = OP_ID_MAX_LEN,
+        follow_reads = FOLLOW_MAX_READS,
+        follow_secs = FOLLOW_WINDOW.as_secs(),
+        image_mib = IMAGE_MAX_BYTES / (1024 * 1024),
+        file_mib = FILE_MAX_BYTES / (1024 * 1024),
+        floor_gib = FREE_DISK_FLOOR_BYTES / (1024 * 1024 * 1024),
+        ttl_hours = UNSENT_TTL.as_secs() / 3600,
     )
 }
 
@@ -399,19 +579,25 @@ fn header<T>(command: &str, envelope: &Envelope<T>) -> String {
         Completeness::Complete => "complete".to_owned(),
         Completeness::Partial => format!("partial, {} gaps", envelope.gaps.len()),
     };
-    let tested = if envelope.source.version_tested {
+    format!(
+        "openwiz {command} · {} · snapshot {} · {state}\n",
+        source_text(&envelope.source),
+        utc(envelope.freshness.snapshot_at)
+    )
+}
+
+/// `<source> <version> (tested)`, or `(untested; live-tested: <version>)`:
+/// how `ls`, `show` and `send` report the version .
+pub(crate) fn source_text(source: &SourceInfo) -> String {
+    let tested = if source.version_tested {
         "tested".to_owned()
     } else {
-        format!(
-            "untested; live-tested: {}",
-            clean(&envelope.source.tested_version)
-        )
+        format!("untested; live-tested: {}", clean(&source.tested_version))
     };
     format!(
-        "openwiz {command} · {} {} ({tested}) · snapshot {} · {state}\n",
-        clean(&envelope.source.name),
-        fact(&envelope.source.version),
-        utc(envelope.freshness.snapshot_at)
+        "{} {} ({tested})",
+        clean(&source.name),
+        fact(&source.version)
     )
 }
 

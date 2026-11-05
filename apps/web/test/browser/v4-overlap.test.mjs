@@ -83,7 +83,7 @@ test('a detail read slower than the interval is never overlapped, and the list k
   }
 });
 
-test('a read that never answers: at its timeout the page says so, the request stays open until the server\'s bound, then the retry', async () => {
+test('a read that never answers: at its timeout the page says so, the request stays open until the server\'s bound, then the retry ', async () => {
   const fx = await setup();
   fx.api.setList(() => HANG);
   const p = await openPage(browser, fx.site.origin, { clock: START });
@@ -117,7 +117,7 @@ function paged(fx) {
   });
 }
 
-test('a page change after the page\'s timeout still waits for the server to answer the old read', async () => {
+test('a page change after the page\'s timeout still waits for the server to answer the old read ', async () => {
   const fx = await setup();
   paged(fx);
   const p = await openPage(browser, fx.site.origin, { clock: START, viewport: DESKTOP });
@@ -144,7 +144,7 @@ test('a page change after the page\'s timeout still waits for the server to answ
   }
 });
 
-test('after a dropped connection, a page change waits for the server\'s bound since the read was sent', async () => {
+test('after a dropped connection, a page change waits for the server\'s bound since the read was sent ', async () => {
   const fx = await setup();
   const all = manyRows(250);
   let drop = false;
@@ -178,7 +178,7 @@ test('after a dropped connection, a page change waits for the server\'s bound si
   }
 });
 
-test('changing page while a list read is held starts no second list read until it ends', async () => {
+test('changing page while a list read is held starts no second list read until it ends (F1)', async () => {
   const fx = await setup();
   const all = manyRows(250);
   fx.api.setList((url) => {
@@ -209,7 +209,7 @@ test('changing page while a list read is held starts no second list read until i
   }
 });
 
-test('choosing another session while a detail read is held starts no second detail read until it ends', async () => {
+test('choosing another session while a detail read is held starts no second detail read until it ends (F1)', async () => {
   const fx = await setup();
   const p = await openPage(browser, fx.site.origin, { clock: START, viewport: DESKTOP });
   try {

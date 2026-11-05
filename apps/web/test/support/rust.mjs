@@ -1,8 +1,9 @@
-// The real openwiz-server, run over one of the fixture scenarios with the
-// repository's fake room-cli first on PATH. Synthetic data only.
+// Ticket 1's openwiz-server, run over one of 0.0.1's fixture scenarios with
+// the repository's fake room-cli first on PATH, as ticket 1's procedure P0
+// does. Synthetic data only.
 
 import { execFileSync, spawn } from 'node:child_process';
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -30,15 +31,28 @@ export function scenarios() {
     .sort();
 }
 
-/** Starts openwiz-server on a free loopback port over `scenario`. */
-export async function startFixtureServer(scenario) {
+/**
+ * Starts openwiz-server on a free loopback port over `scenario`. With
+ * `allowedHost` , it also takes that host name, which is what lets
+ * it send; its send record is a private directory.
+ */
+export async function startFixtureServer(scenario, { allowedHost = null, responses = null } = {}) {
   buildBinaries();
   const dir = mkdtempSync(join(tmpdir(), 'openwiz-web-'));
   symlinkSync(FAKE, join(dir, 'room-cli'));
-  writeFileSync(join(dir, 'fake-room-cli.scenario'), join(SCENARIOS_DIR, scenario, 'scenario.json'));
-  const child = spawn(SERVER, ['--port', '0'], {
+  let file = join(SCENARIOS_DIR, scenario, 'scenario.json');
+  if (responses) {
+    // The test's own responses, tried before `scenario`'s, as tests/messaging's override does. Synthetic.
+    mkdirSync(join(dir, 'own'));
+    file = join(dir, 'own', 'scenario.json');
+    const own = { scenario: 'own', description: 'A test’s own responses.', extends: join(SCENARIOS_DIR, scenario), synthetic_assumptions: ['Written by the test.'], responses };
+    writeFileSync(file, JSON.stringify(own, null, 2));
+  }
+  writeFileSync(join(dir, 'fake-room-cli.scenario'), file);
+  const args = ['--port', '0', ...(allowedHost ? ['--allowed-host', allowedHost] : [])];
+  const child = spawn(SERVER, args, {
     cwd: dir,
-    env: { PATH: `${dir}:/usr/bin:/bin`, HOME: dir },
+    env: { PATH: `${dir}:/usr/bin:/bin`, HOME: dir, OPENWIZ_STATE_DIR: join(dir, 'state') },
     stdio: ['ignore', 'ignore', 'pipe'],
   });
   let stderr = '';

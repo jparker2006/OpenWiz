@@ -30,8 +30,8 @@ fn each_row_has_its_age_from_the_snapshot() {
     }
 }
 
-/// The text header shows the source, its version and the snapshot time
-/// (text contract 1 in `support.rs`).
+/// Changed in ticket 1's correction round 1 : the text now has to
+/// show the snapshot time too (text contract 1 in `support.rs`).
 #[test]
 fn text_header_shows_the_source_version_and_snapshot_time() {
     assert_eq!(utc_text(T0.0), "2023-11-14T22:23:20Z", "the helper itself");
@@ -68,8 +68,8 @@ fn text_header_shows_the_source_version_and_snapshot_time() {
     }
 }
 
-/// Each row's age in the text (text contract 5), known or unknown, matches
-/// the JSON.
+/// New in ticket 1's correction round 1 : each row's age in the text
+/// (text contract 5), known or unknown, matches the JSON.
 #[test]
 fn text_rows_show_their_age() {
     for scenario in ["normal", "thread-list-missing-fields"] {
@@ -99,8 +99,6 @@ fn text_rows_show_their_age() {
     }
 }
 
-/// An update time so far out that the age cannot be computed gives an unknown age, never a
-/// panic or a wrapped value.
 #[test]
 fn an_out_of_range_update_time_gives_an_unknown_age() {
     let mut records: Vec<_> = (1..=2).map(scripted_record).collect();

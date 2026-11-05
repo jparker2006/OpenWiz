@@ -1,5 +1,5 @@
 // V1 at the text level: values appear word for word, as the CLI prints them;
-// rows sit under the group the envelope gives them.
+// rows sit under the group the envelope gives them (G1).
 
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -11,7 +11,7 @@ import { session } from '../support/synthetic.ts';
 const p = (id: string, name: string) => ({ kind: 'project' as const, id, name: { known: name } });
 const u = (reason: string) => ({ kind: 'ungrouped' as const, reason });
 
-test('one page groups by project id or ungrouped, in first-appearance order, page order kept', () => {
+test('one page groups by project id or ungrouped, in first-appearance order, page order kept (G1)', () => {
   const rows: Session[] = [
     session(1, { group: p('prj_web_0001', 'One') }),
     session(2, { group: u('project prj_web_0099 is not in this run\'s project list') }),
@@ -34,6 +34,30 @@ test('one page groups by project id or ungrouped, in first-appearance order, pag
   // Every row exactly once.
   assert.deepEqual(groups.flatMap((g) => g.sessions).map((s) => s.id).toSorted(), rows.map((s) => s.id).toSorted());
   assert.deepEqual(groupPage([]), []);
+});
+
+test('only headings that share a name on one page get the project id\'s last 4 characters', () => {
+  const rows: Session[] = [
+    session(1, { group: p('prj_web_0004', 'Twin') }),
+    session(2, { group: p('prj_web_0001', 'One') }),
+    session(3, { group: p('prj_web_0005', 'Twin') }),
+    session(4, { group: u('a synthetic reason') }),
+    session(5, { group: { kind: 'project', id: 'prj_web_0006', name: { unknown: 'not named' } } }),
+    session(6, { group: { kind: 'project', id: 'prj_web_0007', name: { unknown: 'not named' } } }),
+    session(7, { group: p('prj_web_0008', 'twin') }),
+  ];
+  assert.deepEqual(
+    groupPage(rows).map((g) => [g.key, g.suffix]),
+    [
+      ['project:prj_web_0004', '0004'],
+      ['project:prj_web_0001', null],
+      ['project:prj_web_0005', '0005'],
+      ['ungrouped', null],
+      ['project:prj_web_0006', '0006'],
+      ['project:prj_web_0007', '0007'],
+      ['project:prj_web_0008', null],
+    ],
+  );
 });
 
 test('unknowns and facts are word for word', () => {

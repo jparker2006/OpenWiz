@@ -56,6 +56,15 @@ impl TestServer {
             .collect()
     }
 
+    /// The log once every request so far has finished: a connection's line
+    /// is written after its response is sent, and the connection counts as
+    /// open until then, so receiving a response does not prove its line is
+    /// there yet . Waits up to 10 s.
+    pub fn settled_log(&self) -> String {
+        self.wait_for("every request and its log line", |s| s.connections == 0);
+        self.log_text()
+    }
+
     /// Waits until `check` holds for the server's counts.
     pub fn wait_for(&self, what: &str, check: impl Fn(openwiz_server::Stats) -> bool) {
         let until = Instant::now() + Duration::from_secs(10);

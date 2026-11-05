@@ -1,5 +1,7 @@
 # OpenWiz overview
 
+*Updated for 0.0.5:* older implemented-scope notes below describe 0.0.1 or 0.0.2. The current fixture-tested interface also includes send, new-thread and attachment flows; complete live acceptance is pending live test. See [current scope](../README.md) and the [API contract](../contracts/web-api.v1.md). Proposal sections retain their original status.
+
 **Status: Proposed.** This describes intended design, not built software.
 
 ## The problem

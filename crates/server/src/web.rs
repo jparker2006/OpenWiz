@@ -1,10 +1,10 @@
 //! The web page: `apps/web`'s static export, from one directory given by
-//! `--web-root` (A8). An explicit list that matches the export's layout:
+//! `--web-root` . An explicit list that matches the export's layout:
 //! `/` is `index.html`, and `/_next/static/…` and `/fonts/…` are files under
 //! the root with an extension in [`TYPES`]. Nothing else is served.
 //!
 //! **Loaded once, at start, into memory; no request touches the
-//! filesystem**. Replacing the root, an ancestor or a file
+//! filesystem** . Replacing the root, an ancestor or a file
 //! afterwards changes nothing, and a request can never open a FIFO. A new
 //! export needs a restart.
 //!
@@ -24,15 +24,12 @@ use std::sync::Arc;
 
 use crate::http::Reply;
 
-/// The page's Content-Security-Policy: the one the web page's own proofs
-/// load it under (`apps/web/test/support/serve.mjs` `PAGE_CSP`). Scripts
-/// and styles from this origin only, and no inline script or style.
 pub const PAGE_CSP: &str = "default-src 'none'; script-src 'self'; style-src 'self'; \
-font-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; \
+font-src 'self'; img-src 'self' blob:; connect-src 'self'; base-uri 'none'; \
 form-action 'none'; frame-ancestors 'none'";
 
-/// `Cache-Control` for `/_next/static/…` and `/fonts/…`. A default, for now:
-/// the user's own browser only, never a shared cache.
+/// `Cache-Control` for `/_next/static/…` and `/fonts/…`. The builder's
+/// default : the owner's browser only, never a shared cache.
 pub const STATIC_CACHE: &str = "private, max-age=31536000, immutable";
 
 /// `Cache-Control` for the page itself: it names one build's assets.

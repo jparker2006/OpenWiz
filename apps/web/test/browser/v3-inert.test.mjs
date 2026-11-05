@@ -61,7 +61,7 @@ test('hostile text in every list field is shown as text, and runs nothing', asyn
     try {
       await waitFor(async () => (await readView(p.page)).groups.length > 0, { what: 'rows' });
       const view = await readView(p.page);
-      // Under their groups: the order the page shows is the grouped order.
+      // Under their groups (G1): the order the page shows is the grouped order.
       const want = expect.groups(sessions).flatMap((g) => g.rows);
       const rows = view.groups.flatMap((g) => g.rows);
       assert.deepEqual(
@@ -178,14 +178,17 @@ test('the built pages have no inline script, handler or style attribute', () => 
   }
 });
 
+
 test('the page CSP has no unsafe source, and the site serves it', async () => {
-  assert.doesNotMatch(PAGE_CSP, /unsafe|data:|blob:|\*/);
+  assert.doesNotMatch(PAGE_CSP, /unsafe|data:|\*/);
+  const blobs = PAGE_CSP.split('; ').filter((d) => d.includes('blob:'));
+  assert.deepEqual(blobs, ["img-src 'self' blob:"], 'blob: only for images');
   assert.match(PAGE_CSP, /script-src 'self'/);
   const res = await fetch(`${fx.site.origin}/`);
   assert.equal(res.headers.get('content-security-policy'), PAGE_CSP);
 });
 
-test('the emitted JavaScript has no eval or Function(...), except the recorded noModule polyfills exception', () => {
+test('the emitted JavaScript has no eval or Function(...), except the recorded noModule polyfills exception ', () => {
   const html = readFileSync(join(OUT_DIR, 'index.html'), 'utf8');
   const noModule = [...html.matchAll(/<script\b[^>]*\snoModule=""[^>]*\ssrc="([^"]+)"/g)].map((m) => m[1]);
   const js = files(join(OUT_DIR, '_next')).filter((f) => f.endsWith('.js'));
@@ -196,6 +199,6 @@ test('the emitted JavaScript has no eval or Function(...), except the recorded n
     if (/\beval\s*\(|\bFunction\s*\(/.test(text)) found.push(f.slice(OUT_DIR.length));
   }
   // The only allowed file is the polyfills chunk that pages load with `noModule`:
-  // no browser that runs ES modules (every supported one) loads it.
+  // no browser that runs ES modules (every supported one) loads it .
   assert.deepEqual(found.filter((f) => !noModule.includes(f)), [], 'eval or Function(...) in a chunk the page runs');
 });

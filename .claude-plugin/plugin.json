@@ -1,0 +1,25 @@
+{
+  "name": "openwiz",
+  "description": "OpenWiz's fleet skills: grill a design, plan it as a graph of tickets, launch a fleet of builders, build and review each ticket, hand off, set up a project and triage its issues.",
+  "author": {
+    "name": "OpenWiz"
+  },
+  "keywords": [
+    "fleets",
+    "orchestration",
+    "grilling",
+    "planning",
+    "code-review",
+    "triage"
+  ],
+  "skills": [
+    "./skills/grill",
+    "./skills/plan-graph",
+    "./skills/launch-fleet",
+    "./skills/build-ticket",
+    "./skills/review-ticket",
+    "./skills/handoff",
+    "./skills/setup",
+    "./skills/triage"
+  ]
+}

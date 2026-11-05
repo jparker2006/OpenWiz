@@ -1,0 +1,3 @@
+interface:
+  display_name: "Setup"
+  short_description: "Write a project's fleet settings once"

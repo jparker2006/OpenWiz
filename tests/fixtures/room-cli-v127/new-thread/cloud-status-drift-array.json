@@ -1,0 +1,510 @@
+[
+  {
+    "ready": true,
+    "harnesses": [
+      {
+        "id": "codex",
+        "model": "syn-codex-default",
+        "reasoning_levels": [
+          "none",
+          "minimal",
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "provider": null,
+        "attachments": {
+          "files": true,
+          "images": true
+        },
+        "compact": true,
+        "goal": true,
+        "prompt_reasoning": true,
+        "provider_selection": true,
+        "rewind": true,
+        "service_tier": false,
+        "skill_mentions": true,
+        "steer": true,
+        "subagents": true,
+        "usage": true,
+        "models": [
+          {
+            "model": "syn-codex-model-01",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "syn-codex-model-02",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "syn-codex-model-03",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "syn-codex-model-04",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "syn-codex-model-05",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "syn-codex-model-06",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "syn-codex-model-07",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "syn-codex-model-08",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "syn-codex-model-09",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "model": "syn-codex-model-10",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "pi",
+        "model": "syn-pi-default",
+        "reasoning_levels": [
+          "none",
+          "minimal",
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "provider": "syn-provider",
+        "attachments": {
+          "files": true,
+          "images": true
+        },
+        "compact": true,
+        "goal": true,
+        "prompt_reasoning": true,
+        "provider_selection": true,
+        "rewind": true,
+        "service_tier": false,
+        "skill_mentions": true,
+        "steer": true,
+        "subagents": true,
+        "usage": true
+      },
+      {
+        "id": "cursor",
+        "model": "syn-cursor-default",
+        "reasoning_levels": [
+          "none",
+          "minimal",
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "provider": null,
+        "attachments": {
+          "files": true,
+          "images": true
+        },
+        "compact": true,
+        "goal": true,
+        "prompt_reasoning": true,
+        "provider_selection": true,
+        "rewind": true,
+        "service_tier": false,
+        "skill_mentions": true,
+        "steer": true,
+        "subagents": true,
+        "usage": true,
+        "models": null
+      },
+      {
+        "id": "claude-code",
+        "model": "syn-claude-code-default",
+        "reasoning_levels": [
+          "none",
+          "minimal",
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "provider": null,
+        "attachments": {
+          "files": true,
+          "images": true
+        },
+        "compact": true,
+        "goal": true,
+        "prompt_reasoning": true,
+        "provider_selection": true,
+        "rewind": true,
+        "service_tier": false,
+        "skill_mentions": true,
+        "steer": true,
+        "subagents": true,
+        "usage": true,
+        "models": [
+          {
+            "model": "syn-claude-model-01",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "syn-claude-model-02",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "syn-claude-model-03",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "syn-claude-model-04",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "syn-claude-model-05",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "syn-claude-model-06",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "syn-claude-model-07",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "syn-claude-model-08",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "model": "syn-claude-model-09",
+            "reasoning_levels": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fx",
+        "model": "syn-fx-default",
+        "reasoning_levels": [
+          "none",
+          "minimal",
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "provider": null,
+        "attachments": {
+          "files": true,
+          "images": true
+        },
+        "compact": true,
+        "goal": true,
+        "prompt_reasoning": true,
+        "provider_selection": true,
+        "rewind": true,
+        "service_tier": false,
+        "skill_mentions": true,
+        "steer": true,
+        "subagents": true,
+        "usage": true
+      },
+      {
+        "id": "opencode",
+        "model": "syn-opencode-default",
+        "reasoning_levels": [
+          "none",
+          "minimal",
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "provider": null,
+        "attachments": {
+          "files": true,
+          "images": true
+        },
+        "compact": true,
+        "goal": true,
+        "prompt_reasoning": true,
+        "provider_selection": true,
+        "rewind": true,
+        "service_tier": false,
+        "skill_mentions": true,
+        "steer": true,
+        "subagents": true,
+        "usage": true
+      },
+      {
+        "id": "hermes",
+        "model": "syn-hermes-default",
+        "reasoning_levels": [
+          "none",
+          "minimal",
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "provider": null,
+        "attachments": {
+          "files": true,
+          "images": true
+        },
+        "compact": true,
+        "goal": true,
+        "prompt_reasoning": true,
+        "provider_selection": true,
+        "rewind": true,
+        "service_tier": false,
+        "skill_mentions": true,
+        "steer": true,
+        "subagents": true,
+        "usage": true
+      },
+      {
+        "id": "devin",
+        "model": "syn-devin-default",
+        "reasoning_levels": [
+          "none",
+          "minimal",
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "provider": null,
+        "attachments": {
+          "files": true,
+          "images": true
+        },
+        "compact": true,
+        "goal": true,
+        "prompt_reasoning": true,
+        "provider_selection": true,
+        "rewind": true,
+        "service_tier": false,
+        "skill_mentions": true,
+        "steer": true,
+        "subagents": true,
+        "usage": true
+      },
+      {
+        "id": "openclaw",
+        "model": "syn-openclaw-default",
+        "reasoning_levels": [
+          "none",
+          "minimal",
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "provider": null,
+        "attachments": {
+          "files": true,
+          "images": true
+        },
+        "compact": true,
+        "goal": true,
+        "prompt_reasoning": true,
+        "provider_selection": true,
+        "rewind": true,
+        "service_tier": false,
+        "skill_mentions": true,
+        "steer": true,
+        "subagents": true,
+        "usage": true
+      }
+    ],
+    "model": "syn-model-default",
+    "plan": "syn-plan",
+    "macAccessLevel": "syn-access-level",
+    "planUsage": {
+      "credits": 10,
+      "creditsLimit": 100,
+      "extraCredits": 0,
+      "extraCreditsTotal": 0,
+      "plan": "syn-plan",
+      "og": null
+    },
+    "localLogins": {
+      "synthetic-login": true
+    },
+    "previews": {
+      "count": 0,
+      "explained": false,
+      "state": "syn-preview-state",
+      "issue": null,
+      "message": null
+    },
+    "attachments": true,
+    "compact": true,
+    "copyLogins": false,
+    "macAccess": true,
+    "macAccessSupported": true,
+    "queue_cancel": true,
+    "queue_edit": true,
+    "queue_reorder": true,
+    "rewind": true,
+    "signingIn": false,
+    "steer": true,
+    "teleport": true,
+    "usedCloud": true,
+    "workspaces": true,
+    "macAccessLevels": [
+      "syn-access-level"
+    ],
+    "lastCloudAt": 1700000000000,
+    "cloudQueue": null,
+    "error": null,
+    "projectId": null,
+    "repository": null,
+    "signInError": null,
+    "storage": null,
+    "sync": null
+  }
+]

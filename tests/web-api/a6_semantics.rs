@@ -1,5 +1,5 @@
 //! A6: inventory semantics are unchanged. For every 0.0.1 fixture scenario,
-//! each API body is byte for byte what `openwiz … --json` prints for the
+//! each inventory and session body is byte for byte what `openwiz … --json` prints for the
 //! same options and the same (fixed) clock, and passes the schema check.
 //! Each error carries the CLI's own message, under the status the contract
 //! gives the CLI's exit code. 0.0.1's P1 to P12 run unchanged in
@@ -188,11 +188,134 @@ fn every_timeout_case_matches_the_cli() {
                 argv.push("--json");
                 let (code, out, err) = fake.cli(&argv);
                 let r = by_server.join().expect("server request");
-                compare(target, &argv, &r, code, &out, &err);
+                compare_timeout(target, &argv, &r, code, &out, &err);
             }));
         }
     }
     for case in cases {
         case.join().expect("timeout case");
     }
+}
+
+/// [`compare`] for a timeout case. The server and the CLI each measure
+/// their own read timeout, so "timed out after N ms" may differ by a
+/// millisecond : N is ignored on both sides, everything else is
+/// compared byte for byte.
+fn compare_timeout(target: &str, argv: &[&str], r: &Response, code: i32, out: &str, err: &str) {
+    let r = Response {
+        body: any_ms(&r.text()).into_bytes(),
+        ..r.clone()
+    };
+    compare(target, argv, &r, code, &any_ms(out), &any_ms(err));
+}
+
+fn map_ms(s: &str, f: impl Fn(u64) -> String) -> String {
+    const AT: &str = "timed out after ";
+    const UNIT: &str = " ms";
+    let mut rest = s;
+    let mut mapped = String::new();
+    while let Some(i) = rest.find(AT) {
+        let (head, tail) = rest.split_at(i + AT.len());
+        let digits = tail.len() - tail.trim_start_matches(|c: char| c.is_ascii_digit()).len();
+        mapped.push_str(head);
+        if digits > 0 && tail[digits..].starts_with(UNIT) {
+            let ms: u64 = tail[..digits].parse().expect("a millisecond count");
+            mapped.push_str(&f(ms));
+            rest = &tail[digits..];
+        } else {
+            rest = tail;
+        }
+    }
+    mapped.push_str(rest);
+    mapped
+}
+
+#[test]
+fn only_the_millisecond_count_is_ignored() {
+    assert_eq!(
+        any_ms("thread list timed out after 15000 ms"),
+        any_ms("thread list timed out after 15001 ms")
+    );
+    for (a, b) in [
+        (
+            "thread list timed out after 3 retries",
+            "thread list timed out after 4 retries",
+        ),
+        (
+            "thread list timed out after 15 s",
+            "thread list timed out after 16 s",
+        ),
+        (
+            "thread list timed out after 15000ms",
+            "thread list timed out after 15001ms",
+        ),
+        (
+            "thread list timed out after 15000 ms",
+            "thread show timed out after 15000 ms",
+        ),
+        (
+            "thread list timed out after ms",
+            "thread list timed out after 1 ms",
+        ),
+    ] {
+        assert_ne!(any_ms(a), any_ms(b), "{a:?} vs {b:?} must stay distinct");
+    }
+}
+
+fn any_ms(s: &str) -> String {
+    map_ms(s, |_| "N".to_owned())
+}
+
+fn one_ms_later(s: &str) -> String {
+    map_ms(s, |ms| (ms + 1).to_string())
+}
+
+#[test]
+fn a_timeout_one_ms_apart_still_matches() {
+    let cases = [
+        ("thread-list-timeout", "/api/v1/inventory", vec!["ls"]),
+        (
+            "show-timeout",
+            "/api/v1/inventory?detail=2",
+            vec!["ls", "-l"],
+        ),
+    ]
+    .map(|(scenario, target, args)| {
+        thread::spawn(move || {
+            let fake = Fake::new(&format!("web_a6_one_ms_{scenario}"), scenario);
+            let mut argv = args;
+            argv.push("--json");
+            let (code, out, err) = fake.cli(&argv);
+            assert!(
+                out.contains("timed out after ") || err.contains("timed out after "),
+                "{scenario}: no timeout in {out}{err}"
+            );
+            let body = if code == 0 {
+                one_ms_later(&out)
+            } else {
+                let message = err.strip_prefix("openwiz: ").expect("stderr").trim_end();
+                serde_json::json!({ "error": { "kind": "read_failed", "message": one_ms_later(message) } })
+                    .to_string()
+            };
+            let r = Response {
+                status: if code == 0 { 200 } else { 502 },
+                status_line: String::new(),
+                headers: Vec::new(),
+                body: body.into_bytes(),
+            };
+            compare_timeout(target, &argv, &r, code, &out, &err);
+        })
+    });
+    for case in cases {
+        case.join().expect("one ms apart");
+    }
+    // Only the number is ignored: which read timed out still counts.
+    assert_eq!(
+        any_ms("thread list timed out after 15000 ms"),
+        any_ms("thread list timed out after 15001 ms")
+    );
+    assert_ne!(
+        any_ms("thread list timed out after 15000 ms"),
+        any_ms("thread show timed out after 15000 ms")
+    );
 }

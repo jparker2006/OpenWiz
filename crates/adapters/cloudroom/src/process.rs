@@ -4,9 +4,15 @@
 //! A read is stopped at the earlier of the run's deadline and
 //! [`READ_TIMEOUT`]; a stopped child is killed and reaped. Nothing is retried.
 //!
+//! **The environment scrub** (sheet the check): every call runs without the
+//! CloudRoom thread-context variables, [`is_scrubbed`], so a `room-cli`
+//! started from inside a CloudRoom thread can't act for that thread or
+//! rewrite the model asked for. `ROOM_SERVER_URL` is always kept. Everything
+//! else in the environment passes through unchanged.
+//!
 //! Only the child itself is killed. A process it started that keeps the
 //! pipes open is not; the read then times out without waiting longer.
-//! Whether `room-cli` starts such processes is unobserved.
+//! Whether `room-cli` starts such processes is unobserved .
 
 use std::io::Read as _;
 use std::path::Path;
@@ -20,8 +26,8 @@ use openwiz_core::source::SourceError;
 
 use crate::allowlist::Invocation;
 
-/// The most stdout a read may print. `thread list` was observed to print
-/// about 1.2 MB for several hundred sessions. Provisional.
+/// The most stdout a read may print. `thread list` printed about 1.2 MB for
+/// 763 sessions in capture C. Provisional.
 pub const MAX_STDOUT_BYTES: usize = 32 * 1024 * 1024;
 
 /// The most stderr kept from a read; only its first line is used, through
@@ -35,30 +41,122 @@ const DRAIN_GRACE: Duration = Duration::from_millis(100);
 /// How often a running read is checked.
 const POLL: Duration = Duration::from_millis(5);
 
+pub const SCRUBBED_ENV: &[&str] = &["ROOM_THREAD_ID", "ROOM_PROJECT_ID"];
+
+/// The prefix of every other removed name.
+pub const SCRUBBED_ENV_PREFIX: &str = "BB_";
+
+/// The one CloudRoom variable that is never removed: where `room-cli`'s
+/// server is.
+pub const KEPT_ENV: &str = "ROOM_SERVER_URL";
+
+/// Whether the variable `name` is removed from every `room-cli` call.
+pub fn is_scrubbed(name: &str) -> bool {
+    is_scrubbed_bytes(name.as_bytes())
+}
+
+/// [`is_scrubbed`] on the name's bytes, so a name that is not UTF-8 is
+/// judged by the same rule.
+fn is_scrubbed_bytes(name: &[u8]) -> bool {
+    name != KEPT_ENV.as_bytes()
+        && (SCRUBBED_ENV.iter().any(|n| n.as_bytes() == name)
+            || name.starts_with(SCRUBBED_ENV_PREFIX.as_bytes()))
+}
+
+/// Removes the [`is_scrubbed`] variables from `command`'s environment.
+fn scrub(command: &mut Command) -> &mut Command {
+    for (name, _) in std::env::vars_os() {
+        if is_scrubbed_bytes(name.as_encoded_bytes()) {
+            command.env_remove(&name);
+        }
+    }
+    command
+}
+
+/// How a call failed, before its stderr is judged.
+enum Failure {
+    /// It was stopped, could not run, or printed too much.
+    Source(SourceError),
+    /// It exited non-zero, or without an exit code, with this stderr.
+    Exited {
+        exit_code: Option<i32>,
+        stderr: Vec<u8>,
+    },
+}
+
 /// Runs `program` with exactly `invocation.argv()` and returns its stdout.
 pub fn run(
     program: &Path,
     invocation: &Invocation,
     deadline: Instant,
 ) -> Result<Vec<u8>, SourceError> {
+    execute(program, invocation, deadline).map_err(|failure| match failure {
+        Failure::Source(e) => e,
+        Failure::Exited { exit_code, stderr } => SourceError::CommandFailed {
+            exit_code,
+            detail: diagnostic(&stderr),
+        },
+    })
+}
+
+/// A failed `thread spawn`: its exit code and the first non-empty line of
+/// its stderr, **raw**, so that the adapter can match it against the
+/// documented refusals (`Error: Failed to create thread: HTTP <status>:
+/// <message>`), which [`diagnostic`]'s safe grammar would withhold. Only
+/// `new_thread::spawn_error` reads the line, and nothing of it is passed on.
+pub(crate) enum SpawnFailure {
+    Source(SourceError),
+    Exited {
+        exit_code: Option<i32>,
+        first_line: String,
+    },
+}
+
+/// [`run`] for the one create: the same runner, scrub and deadline, with a
+/// failed call's raw first stderr line (see [`SpawnFailure`]).
+pub(crate) fn run_spawn(
+    program: &Path,
+    invocation: &Invocation,
+    deadline: Instant,
+) -> Result<Vec<u8>, SpawnFailure> {
+    execute(program, invocation, deadline).map_err(|failure| match failure {
+        Failure::Source(e) => SpawnFailure::Source(e),
+        Failure::Exited { exit_code, stderr } => SpawnFailure::Exited {
+            exit_code,
+            first_line: String::from_utf8_lossy(&stderr)
+                .lines()
+                .map(str::trim)
+                .find(|l| !l.is_empty())
+                .unwrap_or_default()
+                .to_owned(),
+        },
+    })
+}
+
+fn execute(program: &Path, invocation: &Invocation, deadline: Instant) -> Result<Vec<u8>, Failure> {
     let started = Instant::now();
-    let stop_at = deadline.min(started + READ_TIMEOUT);
+    // A call carrying attachments gets their allowance on top (B2).
+    let stop_at = deadline.min(started + READ_TIMEOUT + invocation.allowance());
     if started >= stop_at {
-        return Err(SourceError::TimedOut { after_ms: 0 });
+        return Err(Failure::Source(SourceError::TimedOut { after_ms: 0 }));
     }
-    let mut child = Command::new(program)
+    let mut child = scrub(&mut Command::new(program))
         .args(invocation.argv())
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
-        .map_err(|e| SourceError::Unavailable {
-            detail: format!("{} could not be started: {e}", program.display()),
+        .map_err(|e| {
+            Failure::Source(SourceError::Unavailable {
+                detail: format!("{} could not be started: {e}", program.display()),
+            })
         })?;
     let stdout = collect(child.stdout.take(), MAX_STDOUT_BYTES);
     let stderr = collect(child.stderr.take(), MAX_STDERR_BYTES);
-    let timed_out = || SourceError::TimedOut {
-        after_ms: u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX),
+    let timed_out = || {
+        Failure::Source(SourceError::TimedOut {
+            after_ms: u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX),
+        })
     };
 
     let status = loop {
@@ -74,9 +172,9 @@ pub fn run(
             }
             Err(e) => {
                 stop(&mut child);
-                return Err(SourceError::Unavailable {
+                return Err(Failure::Source(SourceError::Unavailable {
                     detail: format!("waiting for {} failed: {e}", program.display()),
-                });
+                }));
             }
         }
     };
@@ -91,16 +189,16 @@ pub fn run(
     let err = stderr.recv_timeout(left).unwrap_or_default();
 
     if out.len() > MAX_STDOUT_BYTES {
-        return Err(SourceError::Malformed {
+        return Err(Failure::Source(SourceError::Malformed {
             detail: format!("printed more than {MAX_STDOUT_BYTES} bytes"),
-        });
+        }));
     }
     if status.success() {
         return Ok(out);
     }
-    Err(SourceError::CommandFailed {
+    Err(Failure::Exited {
         exit_code: status.code(),
-        detail: diagnostic(&err),
+        stderr: err,
     })
 }
 
@@ -111,7 +209,8 @@ const MAX_REASON_CHARS: usize = 60;
 /// this line is kept; one that only contains its `HTTP 404: Thread not
 /// found` is reported as this line and ` (detail withheld)`. So `thread
 /// show` and `thread output` (for `show` and `ls -l`) still find not-found by
-/// prefix, as before, and nothing else of the line is shown.
+/// prefix, as before, while `send`'s target read and `thread tell` still
+/// match only the exact line, and nothing else of the line is shown.
 pub const NOT_FOUND_LINE: &str = "Error: HTTP 404: Thread not found";
 
 /// The line shown for a failed read: `room-cli`'s first non-empty stderr
@@ -121,7 +220,7 @@ pub const NOT_FOUND_LINE: &str = "Error: HTTP 404: Thread not found";
 /// withheld)`, or nothing of it. No digit beyond the status, punctuation,
 /// control or non-ASCII character from `room-cli` is shown, so no path,
 /// address, `KEY=value` or terminal control; a word of letters still can
-/// be. Provisional.
+/// be. Provisional; see the source-diagnostics fix's evidence README.
 fn diagnostic(stderr: &[u8]) -> String {
     let text = String::from_utf8_lossy(stderr);
     let Some(line) = text.lines().map(str::trim).find(|l| !l.is_empty()) else {

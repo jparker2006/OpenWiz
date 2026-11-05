@@ -7,10 +7,6 @@ use openwiz_core::ops::ListRequest;
 
 use crate::support::*;
 
-/// The `room-cli` version is never a gate: `room-cli` updates often. Any
-/// version is read, shown and the run goes on; one other than the
-/// live-tested version is marked untested. The live-tested version is v127,
-/// so 0.43.1 is untested too.
 #[test]
 fn an_untested_version_is_reported_and_never_stops() {
     for (scenario, version) in [("version-0.44.0", "0.44.0"), ("version-0.43.1", "0.43.1")] {
@@ -51,8 +47,6 @@ fn an_untested_version_is_reported_and_never_stops() {
     }
 }
 
-/// Version text that is neither `N.N.N` nor `v<N>` is never echoed; the
-/// version is unknown with a reason, a gap says so, and the run goes on.
 #[test]
 fn an_unrecognised_version_is_unknown_and_never_stops() {
     let fake = Fake::new("p12_unrecognised_version", "version-unrecognised");
@@ -70,9 +64,6 @@ fn an_unrecognised_version_is_unknown_and_never_stops() {
     assert!(!out.contains("Synthetic not a version"), "{out}");
 }
 
-/// A failed version read is unknown with a controlled reason. The source's
-/// own error text is never echoed in text, JSON or stderr, even a line that
-/// passes the stderr sanitizer's general grammar, and the run goes on.
 #[test]
 fn a_failed_version_read_never_echoes_its_error_text() {
     const MARKER: &str = "Synthetic private version marker";
@@ -229,10 +220,6 @@ fn normal_with_thread_list(test: &str, edit: impl Fn(&mut serde_json::Value)) ->
     fake
 }
 
-/// A value of the
-/// right type that 0.43.1 never had (a new `visibility` or
-/// `executionTarget`) is unknown, the row stays listed, and the drift is a
-/// gap, so coverage is partial.
 #[test]
 fn unrecognised_values_are_reported_as_drift() {
     let fake = normal_with_thread_list("p12_unrecognised_values", |rows| {

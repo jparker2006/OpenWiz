@@ -24,6 +24,9 @@ fn config(limits: Limits) -> Config {
         allowed_host: None,
         web_root: None,
         limits,
+        sending: None,
+        creating: None,
+        attaching: None,
     }
 }
 

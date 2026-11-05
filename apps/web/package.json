@@ -1,9 +1,9 @@
 {
   "name": "openwiz-web",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "private": true,
   "type": "module",
-  "description": "OpenWiz 0.0.2: the read-only web viewer over openwiz-server's API. A static export, same-origin under /.",
+  "description": "OpenWiz: a static web client for inventory, messaging, new threads and attachments.",
   "engines": {
     "node": "24.22.1"
   },

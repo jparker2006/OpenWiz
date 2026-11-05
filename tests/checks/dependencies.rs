@@ -131,8 +131,7 @@ fn serde_and_serde_json_are_the_only_direct_dependencies() {
 #[test]
 fn dependencies_md_records_every_locked_crate_with_its_checksum() {
     let lock = fs::read_to_string(root().join("Cargo.lock")).expect("Cargo.lock");
-    let record =
-        fs::read_to_string(root().join("docs/dependencies.md")).expect("docs/dependencies.md");
+    let record = fs::read_to_string(root().join("docs/dependencies.md")).expect("dependencies.md");
     let mut locked = 0;
     for block in lock.split("[[package]]").skip(1) {
         let field = |key: &str| {

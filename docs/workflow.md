@@ -1,5 +1,7 @@
 # OpenWiz workflow: controller, factory loop and proof
 
+*Updated for 0.0.5:* historical public reports now link to the published public tree.
+
 **Status: Proposed.** This describes intended behaviour. Nothing here is built. Every name in the examples is invented. Unresolved points are marked **Unresolved**.
 
 **The controller** is the one Rust core that owns authoritative state, permissions, routing and coordination. **Each project orchestrator** runs its factory's workflow under the controller, and is not a second authority.
@@ -153,7 +155,7 @@ Rules:
 
 In the diagrams this is the **Define proof** step, which comes before Build.
 
-Example claims for the planned 0.0.1 inventory, as written before it was built. *Updated for 0.0.1:* what 0.0.1 actually tested, and what it did not prove, is in [evidence/0.0.1-live-check.md](evidence/0.0.1-live-check.md); the third claim's live comparison was not made.
+Example claims for the planned 0.0.1 inventory, as written before it was built. *Updated for 0.0.1:* what 0.0.1 actually tested, and what it did not prove, is in [evidence/0.0.1-live-check.md](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/evidence/0.0.1-live-check.md); the third claim's live comparison was not made.
 
 | Claim | Required evidence |
 | --- | --- |

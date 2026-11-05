@@ -1,5 +1,7 @@
 # OpenWiz interface: commands, decisions and screens
 
+*Updated for 0.0.5:* older implemented-scope notes below describe 0.0.1 or 0.0.2. The current fixture-tested interface also includes send, new-thread and attachment flows; complete live acceptance is pending live test. See [current scope](../README.md) and the [API contract](../contracts/web-api.v1.md). Proposal sections retain their original status.
+
 **Status: Proposed.** This is decided design for the first runnable versions. **Nothing here is built**: no command, button or screen exists. Examples use invented names.
 
 *Updated for 0.0.1:* 0.0.1 has a first, read-only form of `ls`, `ls -l` and `show`, as the program `openwiz` (see the [README](../README.md#what-001-does)). It is narrower than this design: no paths, `cd`, revisions, `next` or `blockers`; sessions are grouped by project only, unplaced ones under `/factories/_ungrouped/`; `ls -l` shows the reported model and effort and the purpose, with no loop step or `Next:`; and `show` gives the final output, not recent messages or evidence. Its text has no status glyphs yet. Nothing else on this page exists. *Updated for 0.0.2:* 0.0.2 adds a first, read-only web page of the same list: groups by project, each status as a word and a glyph, and a details sheet; no buttons, decision sheets or other screens.

@@ -16,6 +16,13 @@ name = "fake-room-cli"
 path = "fake-room-cli/main.rs"
 test = false
 
+# The store-level send harness (OpenWiz 0.0.3): the core's send, called the
+# way a server would, with test-only crash points. Never shipped.
+[[bin]]
+name = "send-harness"
+path = "send-harness/main.rs"
+test = false
+
 # The 0.0.1 proof cases P1 to P12.
 [[test]]
 name = "proof"
@@ -27,21 +34,38 @@ path = "proof/main.rs"
 name = "checks"
 path = "checks/main.rs"
 
-# OpenWiz 0.0.2: the web API's proof tests (A3 to A8) and its
+# OpenWiz 0.0.2 ticket 1: the web API's proof tests (A3 to A7) and its
 # contract check, over the same fixtures and fake room-cli.
 [[test]]
 name = "web-api"
 path = "web-api/main.rs"
 
+# The 0.0.3 messaging proof cases M1 to M15.
+[[test]]
+name = "messaging"
+path = "messaging/main.rs"
+
+# OpenWiz 0.0.4: new threads (A1, the implementation). Empty until A1 fills it.
+[[test]]
+name = "new-thread"
+path = "new-thread/main.rs"
+
+# OpenWiz 0.0.4: attachments (B1, the implementation). Empty until B1 fills it.
+[[test]]
+name = "attachments"
+path = "attachments/main.rs"
+
 [dependencies]
 serde_json.workspace = true
-
-[dev-dependencies]
+# For the send harness binary, which needs them as normal dependencies.
 openwiz-core = { path = "../crates/core" }
 openwiz-adapter-cloudroom = { path = "../crates/adapters/cloudroom" }
 openwiz-cli = { path = "../crates/cli" }
+openwiz-store = { path = "../crates/store" }
+
 # The web API tests start openwiz-server in-process. A dev-dependency only,
 # so no normal dependency points at the server.
+[dev-dependencies]
 openwiz-server = { path = "../crates/server" }
 
 [lints]

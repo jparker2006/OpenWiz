@@ -1,0 +1,3 @@
+interface:
+  display_name: "Review Ticket"
+  short_description: "Review a pull request and post the verdict on it"

@@ -1,0 +1,15 @@
+{
+  "name": "openwiz",
+  "owner": {
+    "name": "OpenWiz"
+  },
+  "description": "OpenWiz's fleet skills, as one installable plugin.",
+  "plugins": [
+    {
+      "name": "openwiz",
+      "source": "./",
+      "description": "The eight fleet skills: grill, plan-graph, launch-fleet, build-ticket, review-ticket, handoff, setup and triage.",
+      "category": "development"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 // What the page must show for an envelope (V1), written independently of the
 // app's own code: the CLI's text rules (crates/cli/src/lib.rs) and the
-// page's own wording, nothing more.
+// design rules' wording, nothing more.
 
 export const unknown = (reason) => `unknown (${reason})`;
 export const fact = (f) => ('known' in f ? f.known : unknown(f.unknown));
@@ -40,7 +40,7 @@ export function status(f) {
 
 const groupKey = (g) => (g.kind === 'project' ? `project:${g.id}` : 'ungrouped');
 
-/** One page under its group headings: first-appearance order, page order kept. */
+/** One page under its group headings: first-appearance order, page order kept (G1). */
 export function groups(sessions) {
   const out = [];
   for (const s of sessions) {
@@ -52,7 +52,10 @@ export function groups(sessions) {
     }
     g.rows.push(row(s));
   }
-  return out;
+  // G2 : headings that share a name on this page end with the project id's last 4 characters.
+  const projects = out.filter((g) => g.key !== 'ungrouped');
+  const shared = new Set(projects.filter((g) => projects.filter((x) => x.heading === g.heading).length > 1));
+  return out.map((g) => (shared.has(g) ? { ...g, heading: `${g.heading} · ${g.key.slice(-4)}` } : g));
 }
 
 export function row(s) {

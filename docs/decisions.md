@@ -1,5 +1,9 @@
 # Decisions
 
+*Updated for 0.0.5:* older implemented-scope notes below describe 0.0.1 or 0.0.2. The current fixture-tested interface also includes send, new-thread and attachment flows; complete live acceptance is pending live test. See [current scope](../README.md) and the [API contract](../contracts/web-api.v1.md). Proposal sections retain their original status.
+
+*Updated for 0.0.5:* historical public reports now link to the published public tree.
+
 ## Decided for this preview (2026-10-22; revised for OpenWiz)
 
 These are design decisions. None of them is a built feature or a verified integration.
@@ -38,7 +42,7 @@ These are design decisions. None of them is a built feature or a verified integr
 
 ## 0.0.1: a read-only inventory
 
-*Updated for 0.0.1:* **Status: Released** in 0.0.1. What it does is in the [README](../README.md#what-001-does); what it adds is in the [changelog](../CHANGELOG.md); what was tested, and what is not proven, is in [evidence/0.0.1-live-check.md](evidence/0.0.1-live-check.md). It differs from the plan below in three ways: sessions are grouped by project only (not by version, spec or ticket), unplaced sessions appear under `/factories/_ungrouped/`, and whether a read can wake a session or mark it read is not yet proven.
+*Updated for 0.0.1:* **Status: Released** in 0.0.1. What it does is in the [README](../README.md#what-001-does); what it adds is in the [changelog](../CHANGELOG.md); what was tested, and what is not proven, is in [evidence/0.0.1-live-check.md](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/evidence/0.0.1-live-check.md). It differs from the plan below in three ways: sessions are grouped by project only (not by version, spec or ticket), unplaced sessions appear under `/factories/_ungrouped/`, and whether a read can wake a session or mark it read is not yet proven.
 
 The plan, as written before it was built: the first runnable version has one job: a **read-only inventory, written in Rust, of the user's real CloudRoom sessions**.
 
@@ -51,7 +55,7 @@ Its release notes will state the CloudRoom CLI version it was tested against and
 
 ## 0.0.2: the inventory on your phone
 
-*Updated for 0.0.2:* **Status: Released** in 0.0.2. What it adds is in the [changelog](../CHANGELOG.md); what was tested, and what is not proven, is in [evidence/0.0.2-live-check.md](evidence/0.0.2-live-check.md). Decided for it:
+*Updated for 0.0.2:* **Status: Released** in 0.0.2. What it adds is in the [changelog](../CHANGELOG.md); what was tested, and what is not proven, is in [evidence/0.0.2-live-check.md](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/evidence/0.0.2-live-check.md). Decided for it:
 
 - **The server is a second thin client of the core,** like the CLI: the inventory and session routes call the same operation with the same options and return the CLI's `--json`; a health route returns the server's own metadata. It adds no field, operation or rule ([contract](../contracts/web-api.v1.md)).
 - **Loopback only, and remote access through Cloudflare.** The server listens on `127.0.0.1`; a Cloudflare Tunnel and an Access login in front of one hostname let in only the owner ([setup](web-access.md)). The server does not check Access's token itself.

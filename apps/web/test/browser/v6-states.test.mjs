@@ -255,7 +255,7 @@ test('stale data is never shown as live: a hidden page that returns is stale unt
   }
 });
 
-test('the detail\'s coverage is its envelope\'s own state; its gaps are shown apart from it', async () => {
+test('the detail\'s coverage is its envelope\'s own state; its gaps are shown apart from it ', async () => {
   const gap = { kind: 'timed_out', subject: 'thr_web_0002', detail: 'thread output timed out after 15 s' };
   const cases = [
     ['partial, no gaps', { state: 'partial', gaps: [] }, 'partial', []],

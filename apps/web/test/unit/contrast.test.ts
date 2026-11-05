@@ -1,5 +1,5 @@
 // V2: WCAG AA contrast of the stylesheet's own tokens: 4.5:1 for text, 3:1
-// for the shapes that tell statuses and states apart.
+// for the shapes that tell statuses and states apart (N3).
 
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -44,4 +44,22 @@ test('shapes: every colour that draws a status or state shape is at least 3:1', 
       assert.ok(r >= 3, `--${shape} on --${surface}: ${r.toFixed(2)}:1`);
     }
   }
+});
+
+
+test('shapes: every colour a status or state shape rule draws with is at least 3:1', () => {
+  const SHAPE_RULE = /\.mk|\.tag|\.shape|\.row\.on::before|\[data-connection/;
+  const DRAWN = /^\s*(border[a-z-]*|outline[a-z-]*|box-shadow|background(-color)?)\s*:\s*(.+)$/;
+  const used: string[] = [];
+  for (const block of css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const selector = (block[1] ?? '').trim();
+    if (!SHAPE_RULE.test(selector)) continue;
+    for (const decl of (block[2] ?? '').split(';')) {
+      const m = DRAWN.exec(decl);
+      for (const v of m?.[3]?.matchAll(/var\(--([a-z0-9-]+)\)/g) ?? []) used.push(`${selector} → --${v[1]}`);
+    }
+  }
+  assert.ok(used.length >= 10, `found the shape rules (${used.length})`);
+  const weak = used.filter((u) => SURFACES.some((surface) => ratio(token(u.split('--').at(-1) ?? ''), token(surface)) < 3));
+  assert.deepEqual(weak, []);
 });

@@ -1,5 +1,6 @@
-// PROVISIONAL engineering choices, made on fixtures. They are not targets:
-// no performance baseline on a real account has been measured.
+// PROVISIONAL engineering choices, for fixture work only. They are not
+// targets: ticket 1's real baseline (A9) has not run, and the maintainer approves the
+// numbers .
 
 export type Timing = {
   /** From the end of one list read to the start of the next. */
@@ -28,7 +29,7 @@ export const TIMING: Timing = {
   // (above the core's 30 s run budget plus the 5 s slot wait), then 10 s to
   // write the response: 60 s from the request's arrival. Plus 10 s for transit.
   // The contract does not bound transit, or a run that ignores the core's
-  // budget ("A run past it keeps its slot"): a known gap.
+  // budget ("A run past it keeps its slot"): the evidence README's gap.
   laneHoldMs: 70_000,
   backoffMs: [2_000, 4_000, 8_000, 16_000, 30_000],
   staleAfterMs: 30_000,

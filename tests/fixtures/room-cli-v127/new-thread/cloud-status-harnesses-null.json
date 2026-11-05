@@ -1,0 +1,50 @@
+{
+  "ready": true,
+  "harnesses": null,
+  "model": "syn-model-default",
+  "plan": "syn-plan",
+  "macAccessLevel": "syn-access-level",
+  "planUsage": {
+    "credits": 10,
+    "creditsLimit": 100,
+    "extraCredits": 0,
+    "extraCreditsTotal": 0,
+    "plan": "syn-plan",
+    "og": null
+  },
+  "localLogins": {
+    "synthetic-login": true
+  },
+  "previews": {
+    "count": 0,
+    "explained": false,
+    "state": "syn-preview-state",
+    "issue": null,
+    "message": null
+  },
+  "attachments": true,
+  "compact": true,
+  "copyLogins": false,
+  "macAccess": true,
+  "macAccessSupported": true,
+  "queue_cancel": true,
+  "queue_edit": true,
+  "queue_reorder": true,
+  "rewind": true,
+  "signingIn": false,
+  "steer": true,
+  "teleport": true,
+  "usedCloud": true,
+  "workspaces": true,
+  "macAccessLevels": [
+    "syn-access-level"
+  ],
+  "lastCloudAt": 1700000000000,
+  "cloudQueue": null,
+  "error": null,
+  "projectId": null,
+  "repository": null,
+  "signInError": null,
+  "storage": null,
+  "sync": null
+}

@@ -1,0 +1,416 @@
+{
+  "repo": "synthetic-owner/synthetic-repo",
+  "default": "main",
+  "files": "from check.json (test.sh copies them in)",
+  "issues": [
+    {
+      "number": 40,
+      "title": "Synthetic spec: gadgets (0.0.6)",
+      "state": "OPEN",
+      "parent": null,
+      "labels": [],
+      "body": "The spec.",
+      "comments": [
+        {
+          "id": 4001,
+          "at": "2026-11-01T08:00:00Z",
+          "body": "**Plan graph approved by Robin, 2026-11-01, revision 1:** \"approved\"\n\n| Ticket | Title | Blocked by | Label |\n| --- | --- | --- | --- |\n| #41 | G1: gadget reader | #61 | ready-for-agent |\n| #42 | G2: gadget writer | #43 | ready-for-agent |\n| #43 | G3: gadget spike | none | ready-for-agent |\n| #44 | G4: gadget export | #62 | ready-for-agent |\n| #45 | G5: gadget import | #81 | ready-for-agent |\n| #46 | G6: gadget icons | none | ready-for-agent |\n| #47 | G7: gadget sizes | none | ready-for-agent |\n| #48 | G8: gadget colours | none | ready-for-agent |\n| #49 | G9: gadget search | none | ready-for-agent |\n| #54 | G10: gadget sort | none | ready-for-agent |\n| #55 | G11: gadget filter | none | ready-for-agent |\n| #56 | G12: gadget share | #63 | ready-for-agent |\n\nFingerprint: `@@FP@@`"
+        }
+      ]
+    },
+    {
+      "number": 41,
+      "title": "G1: gadget reader",
+      "state": "OPEN",
+      "parent": 40,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [
+        61
+      ],
+      "body": "Blocked by the older version's O1.",
+      "comments": []
+    },
+    {
+      "number": 42,
+      "title": "G2: gadget writer",
+      "state": "OPEN",
+      "parent": 40,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [
+        43
+      ],
+      "body": "Blocked by G3, closed without a merge.",
+      "comments": []
+    },
+    {
+      "number": 43,
+      "title": "G3: gadget spike",
+      "state": "CLOSED",
+      "parent": 40,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [],
+      "body": "Closed by hand.",
+      "comments": []
+    },
+    {
+      "number": 44,
+      "title": "G4: gadget export",
+      "state": "OPEN",
+      "parent": 40,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [
+        62
+      ],
+      "body": "Blocked by O2, merged into a release branch.",
+      "comments": []
+    },
+    {
+      "number": 45,
+      "title": "G5: gadget import",
+      "state": "OPEN",
+      "parent": 40,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [
+        81
+      ],
+      "body": "Blocked by N1, in a spec with no approval.",
+      "comments": []
+    },
+    {
+      "number": 46,
+      "title": "G6: gadget icons",
+      "state": "OPEN",
+      "parent": 40,
+      "labels": [],
+      "blockedBy": [],
+      "body": "No ready label.",
+      "comments": []
+    },
+    {
+      "number": 47,
+      "title": "G7: gadget sizes",
+      "state": "OPEN",
+      "parent": 40,
+      "labels": [
+        "ready-for-agent",
+        "needs-answer"
+      ],
+      "blockedBy": [],
+      "body": "Ready, but waiting on an answer.",
+      "comments": []
+    },
+    {
+      "number": 48,
+      "title": "G8: gadget colours",
+      "state": "OPEN",
+      "parent": 40,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [],
+      "body": "Already started.",
+      "comments": [
+        {
+          "id": 4801,
+          "at": "2026-11-01T09:00:00Z",
+          "body": "launch-fleet: started, thread thr_syn48"
+        }
+      ]
+    },
+    {
+      "number": 49,
+      "title": "G9: gadget search",
+      "state": "OPEN",
+      "parent": 40,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [],
+      "body": "Has an open pull request.",
+      "comments": []
+    },
+    {
+      "number": 54,
+      "title": "G10: gadget sort",
+      "state": "OPEN",
+      "parent": 40,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [],
+      "body": "A start is claimed.",
+      "comments": [
+        {
+          "id": 5401,
+          "at": "2026-11-01T11:58:00Z",
+          "body": "launch-fleet: starting"
+        }
+      ]
+    },
+    {
+      "number": 55,
+      "title": "G11: gadget filter",
+      "state": "OPEN",
+      "parent": 40,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [],
+      "body": "CloudRoom refused its start.",
+      "comments": [
+        {
+          "id": 5501,
+          "at": "2026-11-01T11:00:00Z",
+          "body": "launch-fleet: start refused: plan limit reached"
+        }
+      ]
+    },
+    {
+      "number": 56,
+      "title": "G12: gadget share",
+      "state": "OPEN",
+      "parent": 40,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [
+        63
+      ],
+      "body": "Blocked by O3, reopened after its merge.",
+      "comments": []
+    },
+    {
+      "number": 57,
+      "title": "G13: a low finding, filed after the approval",
+      "state": "OPEN",
+      "parent": 40,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [],
+      "body": "A low finding: added to the graph after the approval, then sorted ready-for-agent by triage.",
+      "comments": []
+    },
+    {
+      "number": 50,
+      "title": "Synthetic spec: edited after approval",
+      "state": "OPEN",
+      "parent": null,
+      "labels": [],
+      "body": "The spec.",
+      "comments": [
+        {
+          "id": 5001,
+          "at": "2026-11-01T08:00:00Z",
+          "body": "**Plan graph approved by Robin, 2026-11-01, revision 1:** \"approved\"\n\n| Ticket | Title | Blocked by | Label |\n| --- | --- | --- | --- |\n| #51 | E1: first | none | ready-for-agent |\n| #52 | E2: second | none | ready-for-agent |\n\nFingerprint: `24fe234a1a2a463ef9bb5b56f469085803f75e6190ce9a1b6f3bbd21a3f2397f`"
+        }
+      ]
+    },
+    {
+      "number": 51,
+      "title": "E1: first",
+      "state": "OPEN",
+      "parent": 50,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [],
+      "body": "",
+      "comments": []
+    },
+    {
+      "number": 52,
+      "title": "E2: second, renamed after the approval",
+      "state": "OPEN",
+      "parent": 50,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [],
+      "body": "Its title changed after the approval.",
+      "comments": []
+    },
+    {
+      "number": 53,
+      "title": "E3: follow-up",
+      "state": "OPEN",
+      "parent": 50,
+      "labels": [
+        "needs-triage"
+      ],
+      "blockedBy": [],
+      "body": "A low finding.",
+      "comments": []
+    },
+    {
+      "number": 60,
+      "title": "Synthetic spec: older version (0.0.5)",
+      "state": "OPEN",
+      "parent": null,
+      "labels": [],
+      "body": "The spec.",
+      "comments": [
+        {
+          "id": 6001,
+          "at": "2026-10-31T08:00:00Z",
+          "body": "**Plan graph approved by Robin, 2026-11-01, revision 1:** \"approved\"\n\n| Ticket | Title | Blocked by | Label |\n| --- | --- | --- | --- |\n| #61 | O1: merged | none | ready-for-agent |\n| #62 | O2: merged into a release branch | none | ready-for-agent |\n| #63 | O3: reopened | none | ready-for-agent |\n\nFingerprint: `@@FP@@`"
+        }
+      ]
+    },
+    {
+      "number": 61,
+      "title": "O1: merged",
+      "state": "CLOSED",
+      "parent": 60,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [],
+      "body": "",
+      "comments": []
+    },
+    {
+      "number": 62,
+      "title": "O2: merged into a release branch",
+      "state": "CLOSED",
+      "parent": 60,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [],
+      "body": "",
+      "comments": []
+    },
+    {
+      "number": 63,
+      "title": "O3: reopened",
+      "state": "OPEN",
+      "parent": 60,
+      "labels": [
+        "needs-triage"
+      ],
+      "blockedBy": [],
+      "body": "Reopened after its merge: needs triage.",
+      "comments": []
+    },
+    {
+      "number": 80,
+      "title": "Synthetic spec: not approved",
+      "state": "OPEN",
+      "parent": null,
+      "labels": [],
+      "body": "The spec.",
+      "comments": []
+    },
+    {
+      "number": 81,
+      "title": "N1: merged",
+      "state": "CLOSED",
+      "parent": 80,
+      "labels": [
+        "ready-for-agent"
+      ],
+      "blockedBy": [],
+      "body": "",
+      "comments": []
+    }
+  ],
+  "pulls": [
+    {
+      "number": 71,
+      "state": "MERGED",
+      "draft": false,
+      "base": "main",
+      "head": "7171717171717171717171717171717171717171",
+      "headline": "#61: green",
+      "closes": [
+        61
+      ],
+      "rollup": "SUCCESS",
+      "checks": [],
+      "mergedAt": "2026-10-31T10:00:00Z",
+      "updatedAt": "2026-10-31T10:00:00Z",
+      "comments": [],
+      "files": []
+    },
+    {
+      "number": 72,
+      "state": "MERGED",
+      "draft": false,
+      "base": "release-0.0.5",
+      "head": "7272727272727272727272727272727272727272",
+      "headline": "#62: green",
+      "closes": [
+        62
+      ],
+      "rollup": "SUCCESS",
+      "checks": [],
+      "mergedAt": "2026-10-31T10:00:00Z",
+      "updatedAt": "2026-10-31T10:00:00Z",
+      "comments": [],
+      "files": []
+    },
+    {
+      "number": 73,
+      "state": "MERGED",
+      "draft": false,
+      "base": "main",
+      "head": "7373737373737373737373737373737373737373",
+      "headline": "#63: green",
+      "closes": [
+        63
+      ],
+      "rollup": "SUCCESS",
+      "checks": [],
+      "mergedAt": "2026-10-31T10:00:00Z",
+      "updatedAt": "2026-10-31T10:00:00Z",
+      "comments": [],
+      "files": []
+    },
+    {
+      "number": 91,
+      "state": "MERGED",
+      "draft": false,
+      "base": "main",
+      "head": "9191919191919191919191919191919191919191",
+      "headline": "#81: green",
+      "closes": [
+        81
+      ],
+      "rollup": "SUCCESS",
+      "checks": [],
+      "mergedAt": "2026-10-31T10:00:00Z",
+      "updatedAt": "2026-10-31T10:00:00Z",
+      "comments": [],
+      "files": []
+    },
+    {
+      "number": 99,
+      "state": "OPEN",
+      "draft": false,
+      "base": "main",
+      "head": "9999999999999999999999999999999999999999",
+      "headline": "#49: work in progress",
+      "closes": [
+        49
+      ],
+      "rollup": null,
+      "checks": [],
+      "mergedAt": null,
+      "updatedAt": "2026-11-01T10:00:00Z",
+      "comments": [],
+      "files": []
+    }
+  ],
+  "refs": []
+}

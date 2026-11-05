@@ -1,6 +1,7 @@
-//! A8: `openwiz-server` serves the web page, `apps/web`'s static export,
-//! from one configured directory (`--web-root`), on the same origin as the
-//! API. Claims W1 to W11, one section each below.
+//! A8 : `openwiz-server` serves the web page, `apps/web`'s static
+//! export, from one configured directory (`--web-root`), on the same origin
+//! as the API. Claims W1-W10 in
+//! the release checks.
 //!
 //! The export trees here are synthetic and made by the tests, except W8 and
 //! W9, which read `apps/web/out` as `npm run build` makes it.
@@ -11,14 +12,15 @@ use std::io::{BufRead, BufReader, Read, Write};
 use std::net::{SocketAddr, TcpStream};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::{Arc, Condvar, Mutex};
 use std::time::{Duration, Instant};
 
 use openwiz_server::{
-    Config, MAX_FILE_BYTES, MAX_WEB_BYTES, MAX_WEB_FILES, PAGE_CSP, STATIC_CACHE, WEB_ROUTES,
+    Config, Log, MAX_FILE_BYTES, MAX_WEB_BYTES, MAX_WEB_FILES, PAGE_CSP, STATIC_CACHE, WEB_ROUTES,
     WebRoot,
 };
 
-use crate::fake::Fake;
+use crate::fake::{self, Fake};
 use crate::http::{Response, TestServer, serve, serve_with, server_binary};
 
 const WEB_OUT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../apps/web/out");
@@ -82,17 +84,17 @@ fn tree(name: &str) -> Tree {
     for (url, bytes) in &files {
         let rel = if *url == "/" { "index.html" } else { &url[1..] };
         let path = root.join(rel);
-        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        crate::dirs::private_dir_all(path.parent().unwrap()).unwrap();
         fs::write(&path, bytes).unwrap();
     }
     // Emitted by a build, never served.
     fs::write(root.join("404.html"), b"<!DOCTYPE html>404").unwrap();
     fs::write(root.join("robots.txt"), b"synthetic").unwrap();
-    fs::create_dir_all(root.join("_next/BUILDID_syn-1")).unwrap();
+    crate::dirs::private_dir_all(root.join("_next/BUILDID_syn-1")).unwrap();
     // Secrets beside the root.
     fs::write(base.join("secret.txt"), SECRET).unwrap();
     fs::write(base.join("secret.js"), SECRET).unwrap();
-    fs::create_dir_all(base.join("outside/fonts")).unwrap();
+    crate::dirs::private_dir_all(base.join("outside/fonts")).unwrap();
     fs::write(base.join("outside/index.html"), SECRET).unwrap();
     fs::write(base.join("outside/fonts/OFL.txt"), SECRET).unwrap();
     fs::write(base.join("outside/fonts/secret.txt"), SECRET).unwrap();
@@ -203,11 +205,11 @@ fn w2_the_web_root_is_a_directory_with_a_regular_index() {
     symlink("out", &base.join("via-link"));
     assert!(WebRoot::open(&base.join("via-link")).is_ok());
     let no_index = base.join("no-index");
-    fs::create_dir_all(&no_index).unwrap();
+    crate::dirs::private_dir_all(&no_index).unwrap();
     let dir_index = base.join("dir-index");
-    fs::create_dir_all(dir_index.join("index.html")).unwrap();
+    crate::dirs::private_dir_all(dir_index.join("index.html")).unwrap();
     let link_index = base.join("link-index");
-    fs::create_dir_all(&link_index).unwrap();
+    crate::dirs::private_dir_all(&link_index).unwrap();
     symlink("../out/index.html", &link_index.join("index.html"));
     for bad in [
         base.join("missing"),
@@ -223,7 +225,7 @@ fn w2_the_web_root_is_a_directory_with_a_regular_index() {
 /// One trap planted in a clean tree: `(what, plant)`.
 type Trap = (&'static str, fn(&Path, &Path));
 
-/// Each trap, alone in a clean tree, stops the start (W2).
+/// Each trap, alone in a clean tree, stops the start .
 const TRAPS: &[Trap] = &[
     ("a symlink out of the root", |root, _| {
         symlink("../../secret.txt", &root.join("fonts/escape.txt"));
@@ -259,7 +261,7 @@ const TRAPS: &[Trap] = &[
         fs::write(root.join(".DS_Store"), b"x").unwrap();
     }),
     ("a dot directory", |root, _| {
-        fs::create_dir_all(root.join("fonts/.git")).unwrap();
+        crate::dirs::private_dir_all(root.join("fonts/.git")).unwrap();
         fs::write(root.join("fonts/.git/x.txt"), b"x").unwrap();
     }),
     ("a source map", |root, _| {
@@ -573,7 +575,10 @@ fn w7_the_page_csp_is_6s_and_runs_no_inline_script() {
     ] {
         assert!(!PAGE_CSP.contains(banned), "{banned} in {PAGE_CSP}");
     }
-    // The same policy the web page's own proofs load it under.
+
+    let blobs: Vec<&&str> = directives.iter().filter(|d| d.contains("blob:")).collect();
+    assert_eq!(blobs, [&"img-src 'self' blob:"], "{PAGE_CSP}");
+
     let mjs = fs::read_to_string(WEB_SERVE_MJS).expect("apps/web/test/support/serve.mjs");
     let list = mjs
         .split("export const PAGE_CSP = [")
@@ -593,7 +598,7 @@ fn w7_the_page_csp_is_6s_and_runs_no_inline_script() {
         theirs,
         "PAGE_CSP differs from apps/web's"
     );
-    // The caching default (see `STATIC_CACHE`).
+    // The builder's caching default (see the evidence README).
     assert_eq!(STATIC_CACHE, "private, max-age=31536000, immutable");
 }
 
@@ -809,7 +814,7 @@ fn w9_the_real_export_has_no_inline_script() {
     assert!(pages >= 2, "{pages} pages");
 }
 
-// W11 ---------------------------------------------------------------------
+// W11  ---------------------------------------------------------
 
 /// `GET target`, or `None` without a whole response within `within`.
 fn get_within(addr: SocketAddr, target: &str, within: Duration) -> Option<Response> {
@@ -865,8 +870,7 @@ fn w11_the_root_replaced_changed_or_deleted_after_start_changes_nothing() {
             assert_not_served(&format!("{when}: {url}"), &s.get(url));
         }
     };
-    // A reproduction: the root renamed, its pathname now a symlink to
-    // a directory outside with its own index.html and fonts/.
+
     let old = base.join("out-old");
     fs::rename(&t.root, &old).unwrap();
     symlink("outside", &t.root);
@@ -884,12 +888,85 @@ fn w11_the_root_replaced_changed_or_deleted_after_start_changes_nothing() {
 
 // W10 --------------------------------------------------------------------
 
+/// A web server whose log lets the API's lines land late . The server
+/// logs a request after it has closed the connection , so a line may
+/// arrive after later requests have been answered. Here each `/api/` line
+/// is held back until the page's line (`GET / 200`) arrives, or for at most
+/// a second, and every other line waits for the held ones: so they land at
+/// the latest moment the server allows, inside any window read too early.
+/// A waiting line keeps its connection's slot: W10 holds at most 13 of 32.
+fn serve_tree_late_api_log(fake: &Fake, tree: &Tree) -> TestServer {
+    struct Late {
+        released: bool,
+        held: usize,
+    }
+    let log = Arc::new(Mutex::new(Vec::new()));
+    let lines = log.clone();
+    let late = Arc::new((
+        Mutex::new(Late {
+            released: false,
+            held: 0,
+        }),
+        Condvar::new(),
+    ));
+    let sink: Log = Arc::new(move |line: &str| {
+        let (state, changed) = &*late;
+        let mut s = state.lock().unwrap();
+        if line.contains(" /api/") && !s.released {
+            s.held += 1;
+            let until = Instant::now() + Duration::from_secs(1);
+            while !s.released {
+                let left = until.saturating_duration_since(Instant::now());
+                if left.is_zero() {
+                    break;
+                }
+                s = changed.wait_timeout(s, left).unwrap().0;
+            }
+            s.held -= 1;
+        } else {
+            if line.starts_with("GET / 200 ") {
+                s.released = true;
+                changed.notify_all();
+            }
+            while s.held > 0 {
+                s = changed.wait(s).unwrap();
+            }
+        }
+        lines.lock().unwrap().push(line.to_owned());
+        changed.notify_all();
+    });
+    let listener = openwiz_server::bind(0).expect("bind loopback");
+    let server = openwiz_server::start(
+        listener,
+        web_config(&tree.root),
+        Arc::new(fake.source()),
+        Arc::new(fake::clock()),
+        sink,
+    )
+    .expect("start the server");
+    let addr = server.local_addr();
+    TestServer { server, addr, log }
+}
+
+/// The server's log once it holds exactly `lines` lines, waiting up to 10 s.
+fn logged(s: &TestServer, lines: usize) -> String {
+    let until = Instant::now() + Duration::from_secs(10);
+    while s.log_text().lines().count() < lines && Instant::now() < until {
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let log = s.log_text();
+    assert_eq!(log.lines().count(), lines, "the log lines: {log}");
+    log
+}
+
 #[test]
 fn w10_the_api_is_unaffected_and_web_paths_obey_host() {
     let fake = Fake::new("web_a8_w10", "normal");
     let t = tree("w10");
     let plain = serve(&fake);
-    let web = serve_tree(&fake, &t);
+    let web = serve_tree_late_api_log(&fake, &t);
+    // Requests sent to `web`, each logged once.
+    let mut sent = 0;
     for target in [
         "/api/v1/health",
         "/api/v1/inventory",
@@ -901,12 +978,14 @@ fn w10_the_api_is_unaffected_and_web_paths_obey_host() {
         "/api/v1/../../fonts/OFL.txt",
     ] {
         let (a, b) = (plain.get(target), web.get(target));
+        sent += 1;
         assert_eq!(a.status, b.status, "{target}");
         assert_eq!(a.headers, b.headers, "{target}");
         assert_eq!(a.body, b.body, "{target}");
     }
     for method in ["POST", "HEAD", "DELETE"] {
         let r = web.request(method, "/api/v1/inventory");
+        sent += 1;
         assert_eq!(r.status, 405, "{method}");
         assert_eq!(r.header("Allow"), Some("GET"), "{method}");
     }
@@ -914,6 +993,7 @@ fn w10_the_api_is_unaffected_and_web_paths_obey_host() {
     for url in ["/", "/fonts/OFL.txt"] {
         let r = web
             .send(format!("GET {url} HTTP/1.1\r\nHost: other.example.invalid\r\n\r\n").as_bytes());
+        sent += 1;
         assert_eq!(r.status, 421, "{url}");
         assert_api_headers(url, &r);
     }
@@ -927,47 +1007,28 @@ fn w10_the_api_is_unaffected_and_web_paths_obey_host() {
     let r = named.send(b"GET /fonts/OFL.txt HTTP/1.1\r\nHost: openwiz.example.invalid\r\n\r\n");
     assert_eq!(r.status, 200);
     assert_eq!(r.body, t.files["/fonts/OFL.txt"]);
-    // The log names the route template only, never the file or query.
-    let before = web.log_text().lines().count();
-    for target in [
-        "/",
-        "/_next/static/chunks/main-0a1b2c3d.js",
-        "/fonts/OFL.txt",
-        "/fonts/Secret-name.txt",
-        "/fonts/OFL.txt?v=quiet",
+    // The log names the route template only, never the file or query. The
+    // server logs a request after it has closed the connection : wait
+    // for every earlier request's line first, then for each request's own.
+    let mut log = logged(&web, sent);
+    for (target, route) in [
+        ("/", "GET / 200"),
+        (
+            "/_next/static/chunks/main-0a1b2c3d.js",
+            "GET /_next/static/* 200",
+        ),
+        ("/fonts/OFL.txt", "GET /fonts/* 200"),
+        ("/fonts/Secret-name.txt", "GET /fonts/* 404"),
+        ("/fonts/OFL.txt?v=quiet", "GET /fonts/* 400"),
     ] {
         let _ = web.get(target);
+        sent += 1;
+        log = logged(&web, sent);
+        // The line, less its time: "{method} {route} {status}".
+        let line = log.lines().last().unwrap();
+        let logged_route = &line[..line.rfind(' ').unwrap()];
+        assert_eq!(logged_route, route, "{target}: {log}");
     }
-    // The server logs after it has answered and closed: wait for the lines.
-    let until = Instant::now() + Duration::from_secs(5);
-    while web.log_text().lines().count() < before + 5 && Instant::now() < until {
-        std::thread::sleep(Duration::from_millis(10));
-    }
-    let log = web.log_text();
-    let lines: Vec<&str> = log.lines().skip(before).collect();
-    let routes: Vec<String> = lines
-        .iter()
-        .map(|l| {
-            l.rsplitn(3, ' ')
-                .collect::<Vec<_>>()
-                .into_iter()
-                .rev()
-                .take(2)
-                .collect::<Vec<_>>()
-                .join(" ")
-        })
-        .collect();
-    assert_eq!(
-        routes,
-        [
-            "GET / 200",
-            "GET /_next/static/* 200",
-            "GET /fonts/* 200",
-            "GET /fonts/* 404",
-            "GET /fonts/* 400",
-        ],
-        "{log}"
-    );
     for word in [
         "main-0a1b2c3d",
         "OFL",

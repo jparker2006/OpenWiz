@@ -1,4 +1,4 @@
-// The list: one page of the core's order under its group headings, thin
+// The list: one page of the core's order under its group headings (G1), thin
 // rows (name, status, age), the empty states and the page controls. Refreshes
 // keep the rows on screen where they were (V5).
 
@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 
 import type { Envelope, Inventory as InventoryData, Session } from '../envelope.ts';
 import { ageText, clockText, factText, groupPage, pageRange, unknownText } from '../present.ts';
+import type { LaunchProject } from './Launcher.tsx';
 import { Marker } from './Status.tsx';
 
 function Row({ session, selected, onSelect }: { session: Session; selected: boolean; onSelect: (id: string) => void }) {
@@ -41,6 +42,23 @@ function Row({ session, selected, onSelect }: { session: Session; selected: bool
         </span>
       </button>
     </li>
+  );
+}
+
+/** A project heading's New thread : opens the launcher for that project. It creates nothing. */
+function NewThread({ project, open, onNewThread }: { project: LaunchProject; open: boolean; onNewThread: (project: LaunchProject) => void }) {
+  const name = `${factText(project.name)}${project.suffix === null ? '' : ` · ${project.suffix}`}`;
+  return (
+    <button
+      type="button"
+      className={`new-thread${open ? ' on' : ''}`}
+      data-new-thread={project.id}
+      aria-label={`New thread in ${name}`}
+      aria-expanded={open}
+      onClick={() => onNewThread(project)}
+    >
+      New thread
+    </button>
   );
 }
 
@@ -94,17 +112,23 @@ export function Inventory({
   envelope,
   previousMatched,
   selectedId,
+  launchId,
   fresh,
   now,
   onSelect,
+  onNewThread,
   onPage,
 }: {
   envelope: Envelope<InventoryData>;
   previousMatched: number | null;
   selectedId: string | null;
+  /** The project whose launcher is open, if any. */
+  launchId: string | null;
   fresh: boolean;
   now: Date;
   onSelect: (id: string) => void;
+  /** A project heading's New thread : opens the launcher in the panel or sheet. */
+  onNewThread: (project: LaunchProject) => void;
   onPage: (offset: number) => void;
 }) {
   const sessions = envelope.data.sessions;
@@ -127,7 +151,15 @@ export function Inventory({
       ) : null}
       {groupPage(sessions).map((g) => (
           <section className="group" key={g.key} data-group-key={g.key}>
-            <h2 className="kicker">{g.group.kind === 'project' ? <bdi>{factText(g.group.name)}</bdi> : 'ungrouped'}</h2>
+            <div className="group-head">
+              <h2 className="kicker">
+                {g.group.kind === 'project' ? <bdi>{factText(g.group.name)}</bdi> : 'ungrouped'}
+                {g.suffix === null ? null : <span className="gid">{` · ${g.suffix}`}</span>}
+              </h2>
+              {g.group.kind === 'project' ? (
+                <NewThread project={{ id: g.group.id, name: g.group.name, suffix: g.suffix }} open={launchId === g.group.id} onNewThread={onNewThread} />
+              ) : null}
+            </div>
             <ul className="rows">
               {g.sessions.map((s) => (
                 <Row key={s.id} session={s} selected={s.id === selectedId} onSelect={onSelect} />

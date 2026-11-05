@@ -1,23 +1,3 @@
-//! P4 (continued) Source diagnostics: text `room-cli` prints when a read
-//! fails, or prints where JSON or a version was expected, never reaches
-//! OpenWiz's output, except a line in the safe grammar.
-//!
-//! New in 0.0.2, for the web API's rule (A7) that errors and logs never
-//! include paths, the environment, stack traces or credentials. The safe
-//! grammar is provisional:
-//!
-//! - `Error: HTTP <3 digits>`, optionally `: ` and a reason phrase of ASCII
-//!   letters and single spaces (at most 60 characters), is kept as it is;
-//! - otherwise, if the line has `HTTP <3 digits>`, it becomes
-//!   `Error: HTTP <code> (detail withheld)`;
-//! - otherwise `room-cli error (detail withheld)`.
-//!
-//! Each failing read is checked through the core, the in-process `openwiz`
-//! and the release `openwiz` binary, in text and `--json`. The committed
-//! fixtures (`tests/fixtures/room-cli-0.43.1/diagnostics-*`) hold what the
-//! fixture scan allows; the variants it forbids in committed files are
-//! written here, at run time, into each test's own directory.
-
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::OnceLock;
@@ -202,7 +182,6 @@ fn stderr_variants() -> Vec<Planted> {
             &["SyntheticLongToken"],
             WITHHELD,
         ),
-        // The limits.
         planted(
             "reason phrase of 60 characters",
             &format!("Error: HTTP 500: {PHRASE_60}"),
@@ -359,7 +338,7 @@ fn fake_with(test: &str, scenario: &str, edit: impl FnOnce(&mut Value)) -> Fake 
 }
 
 /// What the failing response prints on stdout; a failed read's stdout is
-/// never used.
+/// never used .
 const FAILED_STDOUT: &str =
     "Synthetic stdout of a failed read at /Users/synthetic-owner/failed-read-stdout";
 const FAILED_STDOUT_MARKER: &str = "failed-read-stdout";
@@ -482,8 +461,7 @@ fn check_failing_read(read: FailingRead) {
         );
         let mut markers = variant.markers;
         markers.push(FAILED_STDOUT_MARKER.to_owned());
-        // A failed version read keeps safe facts only, so even the safe
-        // line is never shown for it.
+
         let kept = if read.read == "room-cli --version" {
             markers.push(variant.kept.clone());
             "exited 1 (detail withheld)".to_owned()
@@ -582,8 +560,6 @@ fn thread_output_diagnostics_never_reach_the_output() {
     });
 }
 
-/// The version read goes through the same runner. Its failure shows safe
-/// facts only: `exited 1 (detail withheld)`, never even the safe line.
 #[test]
 fn version_read_diagnostics_never_reach_the_output() {
     check_failing_read(FailingRead {
@@ -695,7 +671,7 @@ fn unexpected_stdout_never_reaches_the_output() {
 
     let planted_dir = Path::new(env!("CARGO_TARGET_TMPDIR")).join("p04b_planted_stdout");
     let _ = std::fs::remove_dir_all(&planted_dir);
-    std::fs::create_dir_all(&planted_dir).expect("planted dir");
+    crate::dirs::private_dir_all(&planted_dir).expect("planted dir");
     let mut found = Vec::new();
     for (i, (name, argv, stdout, read, kept)) in cases.into_iter().enumerate() {
         let file = planted_dir.join(format!("stdout-{i}"));
@@ -719,9 +695,6 @@ fn unexpected_stdout_never_reaches_the_output() {
     );
 }
 
-/// Not-found is still recognised from the raw line (it contains `HTTP 404:
-/// Thread not found`), so `show` of a missing session still exits 3, while only the
-/// safe line is shown.
 #[test]
 fn a_not_found_line_with_an_unsafe_suffix_is_still_not_found() {
     let planted = "Error: HTTP 404: Thread not found at /Users/synthetic-owner/.syn-room (token=synthetic-secret-value)";
@@ -788,9 +761,80 @@ fn a_not_found_line_with_an_unsafe_suffix_is_still_not_found() {
     );
 }
 
-/// The sanitizer's version grammar is `N.N.N` (1 to 4 digits each) or `v<N>`
-/// (1 to 6 digits), the same as the core's. A version in it is shown as it is;
-/// anything else is withheld, and the run goes on.
+#[test]
+fn tell_keeps_its_exact_documented_rejections() {
+    use openwiz_core::messaging::Mode;
+    use openwiz_core::messaging::send::{Messenger, Rejection, TellReply, UncertainReason};
+    use openwiz_core::model::SessionId;
+
+    let suffix = " at /Users/synthetic-owner/.syn-room (token=synthetic-secret-value)";
+    let markers = [
+        "/Users/",
+        "synthetic-owner",
+        "token=",
+        "synthetic-secret-value",
+    ];
+    let cases: Vec<(String, Option<Rejection>)> = vec![
+        (
+            "Error: HTTP 404: Thread not found".to_owned(),
+            Some(Rejection::NotFound),
+        ),
+        (format!("Error: HTTP 404: Thread not found{suffix}"), None),
+        (
+            "Error: HTTP 400: Invalid input".to_owned(),
+            Some(Rejection::InvalidInput),
+        ),
+        (format!("Error: HTTP 400: Invalid input{suffix}"), None),
+    ];
+    let mut found = Vec::new();
+    for (i, (stderr, wanted)) in cases.into_iter().enumerate() {
+        let response = json!({
+            "argv": ["thread", "tell", "thr_syn_0001", "--mode", "queue", "--json", "--"],
+            "any_text": true,
+            "exit": 1,
+            "stderr": stderr,
+        });
+        let fake = fake_with(&format!("p04b_tell_exact_{i}"), "normal", |doc| {
+            doc["responses"]
+                .as_array_mut()
+                .expect("responses")
+                .insert(0, response);
+        });
+        let reply = fake.source().tell(
+            &SessionId("thr_syn_0001".to_owned()),
+            Mode::Queue,
+            "Synthetic message",
+            std::time::Instant::now() + std::time::Duration::from_secs(10),
+        );
+        let ok = match (&reply, wanted) {
+            (TellReply::Rejected(got), Some(wanted)) => *got == wanted,
+            (
+                TellReply::Unclear {
+                    reason: UncertainReason::UndocumentedError,
+                    ..
+                },
+                None,
+            ) => true,
+            _ => false,
+        };
+        if !ok {
+            found.push(format!("{stderr:?}: expected {wanted:?}, got {reply:?}"));
+        }
+        let shown = format!("{reply:?}");
+        for marker in markers {
+            if shown.contains(marker) {
+                found.push(format!("{stderr:?}: the reply shows {marker:?}: {shown}"));
+            }
+        }
+    }
+    assert!(
+        found.is_empty(),
+        "{} problem(s):\n{}",
+        found.len(),
+        found.join("\n")
+    );
+}
+
 #[test]
 fn the_version_grammar_is_n_n_n_or_v_n() {
     let cases: &[(&str, bool)] = &[

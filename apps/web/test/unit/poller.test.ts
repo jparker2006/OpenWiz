@@ -102,7 +102,7 @@ test('a read that never answers: the page is told at its timeout, the read keeps
   assert.equal(h.max(), 1);
 });
 
-test('an answer after the page\'s timeout still ends the read, is delivered, and frees the lane', async () => {
+test('an answer after the page\'s timeout still ends the read, is delivered, and frees the lane ', async () => {
   const h = harness({ timeoutMs: 45_000, holdMs: 70_000 });
   h.poller.start();
   await settle();
@@ -114,7 +114,7 @@ test('an answer after the page\'s timeout still ends the read, is delivered, and
   assert.deepEqual(h.started, [0, 60_000]);
 });
 
-test('a failure the server did not confirm holds the lane until the bound since the read was sent', async () => {
+test('a failure the server did not confirm holds the lane until the bound since the read was sent ', async () => {
   const h = harness({ holdMs: 70_000 });
   h.poller.start();
   await settle();
@@ -182,7 +182,7 @@ test('Retry-After is honoured as the shortest wait', async () => {
   assert.equal(h.started.length, 2);
 });
 
-test('a server\'s retry hint never waits past the backoff cap', async () => {
+test('a server\'s retry hint never waits past the backoff cap ', async () => {
   const h = harness({ backoffMs: [2_000, 4_000, 8_000, 16_000, 30_000] });
   h.poller.start();
   await settle();

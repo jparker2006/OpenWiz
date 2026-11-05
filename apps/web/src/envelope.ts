@@ -106,41 +106,51 @@ export type Envelope<D = Inventory | SessionView> = {
 export type ApiError = { error: { kind: string; message: string } };
 
 // Runtime checks, exact to the schema: every required key, no other key, the
-// right types and enums. A response that fails is not shown as data.
+// right types and enums. A response that fails is not shown as data. The
+// helpers are shared with src/messaging.ts.
 
-type Check = (v: unknown) => boolean;
+export type Check = (v: unknown) => boolean;
 
 const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 
-const exact =
+export const exact =
   (shape: Record<string, Check>): Check =>
   (v) =>
     isObject(v) &&
     Object.keys(v).length === Object.keys(shape).length &&
     Object.entries(shape).every(([key, check]) => Object.hasOwn(v, key) && check(v[key]));
 
+
+export const exactWith =
+  (shape: Record<string, Check>, optional: Record<string, Check>): Check =>
+  (v) =>
+    isObject(v) &&
+    Object.keys(v).every((key) => Object.hasOwn(shape, key) || Object.hasOwn(optional, key)) &&
+    Object.entries(shape).every(([key, check]) => Object.hasOwn(v, key) && check(v[key])) &&
+    Object.entries(optional).every(([key, check]) => !Object.hasOwn(v, key) || check(v[key]));
+
 /** JSON Schema's oneOf: exactly one matches. */
-const oneOf =
+export const oneOf =
   (...checks: Check[]): Check =>
   (v) =>
     checks.filter((check) => check(v)).length === 1;
 
-const str: Check = (v) => typeof v === 'string';
-const bool: Check = (v) => typeof v === 'boolean';
-const int: Check = (v) => typeof v === 'number' && Number.isSafeInteger(v);
-const count: Check = (v) => int(v) && (v as number) >= 0;
-const isNull: Check = (v) => v === null;
-const is =
+export const str: Check = (v) => typeof v === 'string';
+export const bool: Check = (v) => typeof v === 'boolean';
+export const int: Check = (v) => typeof v === 'number' && Number.isSafeInteger(v);
+export const count: Check = (v) => int(v) && (v as number) >= 0;
+export const isNull: Check = (v) => v === null;
+export const is =
   (...values: readonly unknown[]): Check =>
   (v) =>
     values.includes(v);
-const list =
+export const list =
   (check: Check): Check =>
   (v) =>
     Array.isArray(v) && v.every(check);
 
 const unknownCheck = exact({ unknown: (v) => str(v) && (v as string).length >= 1 });
-const fact = (check: Check): Check => oneOf(exact({ known: check }), unknownCheck);
+export const fact = (check: Check): Check => oneOf(exact({ known: check }), unknownCheck);
 
 const sourceCheck = exact({ name: str, version: fact(str), tested_version: str, version_tested: bool });
 const countsCheck = exact({

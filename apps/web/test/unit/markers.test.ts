@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import { statusMarker } from '../../src/markers.ts';
 import { HOSTILE } from '../support/synthetic.ts';
 
-test('the decided words have their tiers', () => {
+test('the decided words (G3 default) have their tiers', () => {
   assert.deepEqual(statusMarker({ known: 'error' }), { tier: 't1', glyph: '[x]', word: 'error' });
   assert.deepEqual(statusMarker({ known: 'active' }), { tier: 't3', glyph: '[~]', word: 'active' });
   assert.deepEqual(statusMarker({ known: 'idle' }), { tier: 't4', glyph: '[-]', word: 'idle' });

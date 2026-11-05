@@ -1,0 +1,20 @@
+{
+  "scenario": "new-thread",
+  "description": "OpenWiz 0.0.4 (the implementation): cloud status, thread spawn, a new thread's thread show and thread list, read by the new-thread proofs directly (A1 phase 1) and served by the fake through scenarios the A1 phase 2 tests write, which name these files by absolute path. Observed in spike run 3 (room-cli v131, 2026-10-30, structure only): cloud status's keys, types and nesting; the 9 harness ids; the effort labels; models present on codex (10) and claude-code (9), null on cursor and absent on the other 6; provider a string on 1 harness and null on 8; the thread show and thread list shapes (capture C).",
+  "synthetic_assumptions": [
+    "Every value is invented: model names, plan and access labels, counts, ids, titles and times. Only keys, types, nesting, harness ids, effort labels and the model counts were observed.",
+    "Which harness carries the one non-null provider (pi here) was not recorded.",
+    "The attachments booleans, the capability booleans and each harness's own reasoning_levels values were not recorded per harness; every harness here uses the harness-level labels observed across the catalogue.",
+    "Every codex model lists low to max plus ultra, and every claude-code model low to max. Only the union per harness was observed.",
+    "localLogins has one key; its name was not recorded (synthetic-login).",
+    "cloud-status-not-ready and cloud-status-harnesses-null are source-read : ready was true and harnesses a list in run 3.",
+    "Every cloud-status-drift file is invented drift.",
+    "The spawn receipt is source-read, not observed: --json prints the new thread's row, written with status pending. Its keys here are the thread list row's (capture C). Every spawn-receipt-drift file and spawn-receipt-not-json.txt is invented.",
+    "The spawn error lines (Error: Failed to create thread: HTTP <status>: <message>) are source-read, not observed; they live in the adapter's DOCUMENTED_REFUSALS, not here.",
+    "thread show's pending and starting statuses and thread.lastError are source-read, not observed (capture C saw idle, active and error, and no lastError key).",
+    "thread-show-differs and thread-show-drift are invented.",
+    "thread-list.json has the 0.43.1 thread list row shape (capture C) for observations after an uncertain create; its pending status is source-read, and the row without createdAt is invented drift.",
+    "The project list with GitHub remotes is written by the tests, not committed here: the fixture scan accepts no URL outside example.invalid. Only gitRemoteUrl being null or not was observed (spike run 3), never a host."
+  ],
+  "responses": []
+}

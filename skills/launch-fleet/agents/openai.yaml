@@ -1,0 +1,3 @@
+interface:
+  display_name: "Launch Fleet"
+  short_description: "Start every ready ticket at once and keep a fleet moving"

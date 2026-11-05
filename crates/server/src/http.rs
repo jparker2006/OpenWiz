@@ -1,8 +1,9 @@
 //! A strict, bounded HTTP/1.1 request head reader and a response writer.
 //!
 //! Only what the API needs: an origin-form request target, `HTTP/1.1` or
-//! `HTTP/1.0`, CRLF line endings, no folded headers, no body. Anything else
-//! is refused before it reaches a route.
+//! `HTTP/1.0`, CRLF line endings, no folded headers. Anything else is
+//! refused before it reaches a route. Only the send route reads a body
+//! (`send.rs`); the bytes read past the head are kept for it.
 
 use std::io::{self, Read, Write};
 use std::net::{Shutdown, TcpStream};
@@ -19,6 +20,8 @@ pub(crate) struct Head {
     pub method: String,
     pub target: String,
     pub headers: Vec<(String, String)>,
+    /// Bytes read after the head's blank line: the start of a body.
+    pub rest: Vec<u8>,
 }
 
 impl Head {
@@ -61,8 +64,8 @@ pub(crate) fn may_be_head(bytes: &[u8]) -> bool {
     !bytes.is_empty() && (bytes.starts_with(b"HEAD ") || b"HEAD ".starts_with(bytes))
 }
 
-/// Reads one request head within `limits`. Bytes after the head are left
-/// unread (a body is refused later).
+/// Reads one request head within `limits`. Bytes read after the head are
+/// kept in [`Head::rest`]; a body is refused later, except the send's.
 pub(crate) fn read_head(stream: &mut TcpStream, limits: &Limits) -> Result<Head, Refusal> {
     let mut buf: Vec<u8> = Vec::with_capacity(1024);
     read_head_into(stream, limits, &mut buf).map_err(|error| Refusal {
@@ -87,7 +90,9 @@ fn read_head_into(
             if end + 4 > limits.max_head_bytes {
                 return Err(HeadError::TooLarge);
             }
-            return parse(&buf[..end], limits);
+            let mut head = parse(&buf[..end], limits)?;
+            head.rest = buf[end + 4..].to_vec();
+            return Ok(head);
         }
         if has_bare_lf(buf) {
             return Err(HeadError::Malformed);
@@ -206,6 +211,7 @@ fn parse(head: &[u8], limits: &Limits) -> Result<Head, HeadError> {
         method: String::from_utf8_lossy(method).into_owned(),
         target: String::from_utf8_lossy(target).into_owned(),
         headers,
+        rest: Vec::new(),
     })
 }
 
@@ -223,9 +229,13 @@ fn reason(status: u16) -> &'static str {
     match status {
         200 => "OK",
         400 => "Bad Request",
+        403 => "Forbidden",
         404 => "Not Found",
         405 => "Method Not Allowed",
         408 => "Request Timeout",
+        411 => "Length Required",
+        413 => "Content Too Large",
+        415 => "Unsupported Media Type",
         414 => "URI Too Long",
         421 => "Misdirected Request",
         431 => "Request Header Fields Too Large",

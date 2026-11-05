@@ -30,7 +30,9 @@ after(async () => {
   await browser.close();
 });
 
-const SAME_ORIGIN_PATHS = /^\/($|_next\/static\/[A-Za-z0-9._/-]+$|fonts\/[A-Za-z0-9._-]+\.woff2$|api\/v1\/inventory$|api\/v1\/sessions\/[A-Za-z0-9_-]+$)/;
+
+const SAME_ORIGIN_PATHS =
+  /^\/($|_next\/static\/[A-Za-z0-9._/-]+$|fonts\/[A-Za-z0-9._-]+\.woff2$|api\/v1\/inventory$|api\/v1\/sessions\/[A-Za-z0-9_-]+$|api\/v1\/sessions\/[A-Za-z0-9_-]+\/preview$)/;
 
 test('every request the page makes is same-origin, to the API or its own files', async () => {
   const p = await openPage(browser, fx.site.origin, { viewport: DESKTOP });
@@ -61,7 +63,7 @@ function files(dir) {
 /**
  * Absolute URLs that appear as inert text inside React's and Next's own
  * bundles (error-message links, XML namespaces). None is ever requested: the
- * request test above proves it. Each is listed here.
+ * request test above proves it. Each is recorded in the evidence.
  */
 export const INERT_URLS = [
   /^https:\/\/react\.dev\/errors\/$/,

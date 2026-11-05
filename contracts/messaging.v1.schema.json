@@ -1,0 +1,1157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openwiz:schema:messaging:v1",
+  "title": "openwiz.messaging.v1",
+  "description": "OpenWiz send reports, requests, previews, lookups and records. Unknown values carry reasons. Attachments are staged ids, Queue only. Fixture-tested; full live acceptance pending live test. Receipt parsers cover documented shapes and synthetic copies of individually observed sent and Cloud queued receipts; those observations do not establish complete delivery acceptance.",
+  "$ref": "#/$defs/report",
+  "$defs": {
+    "report": {
+      "description": "What openwiz send --json prints: one send's report. The requested mode and the reported delivery are separate fields. summary is '<Mode> requested \u00b7 <reported delivery>' in the core's words.",
+      "type": "object",
+      "required": [
+        "schema",
+        "op_id",
+        "target",
+        "source",
+        "requested_mode",
+        "status",
+        "summary",
+        "result",
+        "effects",
+        "text_sha256",
+        "text_bytes",
+        "gaps",
+        "claimed_at",
+        "dispatching_at",
+        "finished_at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "openwiz.messaging.v1"
+        },
+        "op_id": {
+          "$ref": "#/$defs/op_id"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "source": {
+          "description": "Null when no version was read for this op id: a refusal before the read, or a record written before .",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/source"
+            }
+          ]
+        },
+        "requested_mode": {
+          "$ref": "#/$defs/mode"
+        },
+        "status": {
+          "enum": [
+            "queued",
+            "accepted",
+            "failed",
+            "uncertain",
+            "in_progress",
+            "conflicting_reuse",
+            "possible_duplicate_refused"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "$ref": "#/$defs/result"
+        },
+        "effects": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/effects"
+            }
+          ]
+        },
+        "text_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "text_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "attachments_digest": {
+          "$ref": "#/$defs/sha256",
+          "description": "B2: the attachments' digest, as the op id binds it. Absent when there are no attachments."
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/prompt_attachment"
+          },
+          "description": "B2: the attachments, in the owner's order (files go to room-cli first, then images). Absent when there are none, never empty."
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gap"
+          }
+        },
+        "claimed_at": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "dispatching_at": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "finished_at": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      }
+    },
+    "request": {
+      "description": "One send request, as the core's SendRequest takes it. Exactly one target. The web route's body  is {op_id, mode, text, resume_paused_queue, accept_possible_duplicate}: its target comes only from the path, never the body, and each flag is set only by its own explicit button.",
+      "type": "object",
+      "required": [
+        "target",
+        "mode",
+        "text",
+        "op_id"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "mode": {
+          "$ref": "#/$defs/mode"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16384,
+          "description": "Text only: not empty, not only whitespace, no NUL, at most 16384 bytes of UTF-8 (the core counts bytes; maxLength here counts characters, so it is only an outer bound)."
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attachment_id"
+          },
+          "description": "B2: staged attachment ids, each at most once, in the owner's order; queue only. Absent or empty means none. The web route takes none until B3."
+        },
+        "op_id": {
+          "$ref": "#/$defs/op_id"
+        },
+        "resume_paused_queue": {
+          "type": "boolean"
+        },
+        "accept_possible_duplicate": {
+          "type": "boolean"
+        }
+      }
+    },
+    "record": {
+      "description": "One send record, as openwiz-store writes it (one file per op id, owner-only). Synced before the dispatch.",
+      "type": "object",
+      "required": [
+        "schema",
+        "op_id",
+        "binding",
+        "text",
+        "text_bytes",
+        "state",
+        "target_title",
+        "effects",
+        "delivery",
+        "gaps",
+        "observations",
+        "recovered",
+        "claimed_at",
+        "dispatching_at",
+        "finished_at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "openwiz.send-record.v1"
+        },
+        "op_id": {
+          "$ref": "#/$defs/op_id"
+        },
+        "binding": {
+          "$ref": "#/$defs/binding"
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Kept while the outcome is not known yet, uncertain or failed; null once queued or accepted."
+        },
+        "text_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/prompt_attachment"
+          },
+          "description": "B2: the attachments the send carries, in the owner's order: ids, hashes, sizes, kinds and staged names, never bytes. Absent means none (every 0.0.3 record); the store checks them against the binding's digest."
+        },
+        "state": {
+          "$ref": "#/$defs/record_state"
+        },
+        "target_title": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/fact_string"
+            }
+          ]
+        },
+        "source": {
+          "description": "Absent from records written before .",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/source"
+            }
+          ]
+        },
+        "effects": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/effects"
+            }
+          ]
+        },
+        "delivery": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/delivery"
+            }
+          ]
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gap"
+          }
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observation"
+          }
+        },
+        "recovered": {
+          "type": "boolean"
+        },
+        "claimed_at": {
+          "type": "integer"
+        },
+        "dispatching_at": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "finished_at": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      }
+    },
+    "preview": {
+      "description": "What openwiz send <id> --preview --json prints: what a send to this target in this mode would do, read before any text is written. No claim and no call. effects equals what send would show for the same read: null when the target was not read or is refused, and kept when the budget ran out after it. refusal says why a send would be refused before its call (status refused), or that it needs the paused-queue acknowledgement (status needs_acknowledgement).",
+      "type": "object",
+      "required": [
+        "schema",
+        "target",
+        "requested_mode",
+        "status",
+        "summary",
+        "effects",
+        "refusal",
+        "read_at",
+        "gaps"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "openwiz.send-preview.v1"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "requested_mode": {
+          "$ref": "#/$defs/mode"
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "needs_acknowledgement",
+            "refused"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effects": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/effects"
+            }
+          ]
+        },
+        "refusal": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/refusal"
+            }
+          ]
+        },
+        "read_at": {
+          "type": "integer"
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gap"
+          }
+        }
+      }
+    },
+    "refusal": {
+      "description": "Why a send would be refused before its call, in the core's words: the fail reason a send would record.",
+      "type": "object",
+      "required": [
+        "reason",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "$ref": "#/$defs/fail_reason"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "lookup": {
+      "description": "What openwiz send <id> --op-id <op id> --check --json prints: that op id's send record for this target, read only (nothing is created or written), with no claim and no call. no_record: no send with this op id was claimed in this send record (or there is no send record yet). other_target: the op id is bound to another target. recorded: the record's report (its outcome, replayed, or in progress); a record whose sender stopped is shown as recovery would finish it, without recording that.",
+      "type": "object",
+      "required": [
+        "schema",
+        "op_id",
+        "target",
+        "summary",
+        "result"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "openwiz.send-lookup.v1"
+        },
+        "op_id": {
+          "$ref": "#/$defs/op_id"
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "no_record"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "other_target"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "kind",
+                "report"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "recorded"
+                },
+                "report": {
+                  "$ref": "#/$defs/report"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "required": [
+        "target",
+        "mode",
+        "text_sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mode": {
+          "$ref": "#/$defs/mode"
+        },
+        "text_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "attachments_digest": {
+          "$ref": "#/$defs/sha256",
+          "description": "B2: the attachments' digest (contracts/prompt.v1.schema.json's encoding). Absent means none, so every 0.0.3 binding is unchanged."
+        }
+      }
+    },
+    "record_state": {
+      "enum": [
+        "claimed",
+        "dispatching",
+        "finished"
+      ]
+    },
+    "op_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "1 to 64 ASCII letters, digits, _ or -, starting with a letter or digit."
+    },
+    "mode": {
+      "enum": [
+        "queue",
+        "steer"
+      ],
+      "description": "The requested mode. Never auto."
+    },
+    "sha256": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "description": "Lowercase hex SHA-256 of the text's UTF-8 bytes."
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "id",
+        "title"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "$ref": "#/$defs/fact_string"
+        }
+      }
+    },
+    "source": {
+      "description": "The provider and the version this send read, as the reads report it in openwiz.inventory.v1 . tested_version is the version last live-tested: evidence, not a requirement.",
+      "type": "object",
+      "required": [
+        "name",
+        "version",
+        "tested_version",
+        "version_tested"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "$ref": "#/$defs/fact_string"
+        },
+        "tested_version": {
+          "type": "string"
+        },
+        "version_tested": {
+          "type": "boolean"
+        }
+      }
+    },
+    "gap": {
+      "description": "OpenWiz's own words; never room-cli's raw output.",
+      "type": "object",
+      "required": [
+        "subject",
+        "detail"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "fact_string": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "known"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "known": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "unknown"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unknown": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "fact_bool": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "known"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "known": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "unknown"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unknown": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "fact_count": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "known"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "known": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "unknown"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unknown": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "effects": {
+      "description": "Expected effects, worked out before sending from one read of the target, with that read's age. Expectations, not observations.",
+      "type": "object",
+      "required": [
+        "read_at",
+        "read_age_ms",
+        "effect",
+        "paused_queue",
+        "needs_acknowledgement"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "read_at": {
+          "type": "integer"
+        },
+        "read_age_ms": {
+          "type": "integer"
+        },
+        "effect": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "known"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "known": {
+                  "$ref": "#/$defs/effect"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "unknown"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "unknown": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          ]
+        },
+        "paused_queue": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "known"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "known": {
+                  "$ref": "#/$defs/paused_queue"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "unknown"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "unknown": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          ]
+        },
+        "needs_acknowledgement": {
+          "type": "boolean"
+        }
+      }
+    },
+    "effect": {
+      "type": "object",
+      "required": [
+        "kind",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "starts_turn",
+            "queues_behind_turn",
+            "asks_to_steer",
+            "waits_for_interaction",
+            "waits_for_host"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "paused_queue": {
+      "type": "object",
+      "required": [
+        "appears_paused",
+        "queued_messages",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "appears_paused": {
+          "type": "boolean"
+        },
+        "queued_messages": {
+          "$ref": "#/$defs/fact_count"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "result": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "delivery",
+            "replayed",
+            "recovered"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "outcome"
+            },
+            "delivery": {
+              "$ref": "#/$defs/delivery"
+            },
+            "replayed": {
+              "type": "boolean"
+            },
+            "recovered": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "state"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "in_progress"
+            },
+            "state": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/$defs/record_state"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "differs"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "conflicting_reuse"
+            },
+            "differs": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "target",
+                  "mode",
+                  "text",
+                  "attachments"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "earlier"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "possible_duplicate_refused"
+            },
+            "earlier": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/earlier_send"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "earlier_send": {
+      "type": "object",
+      "required": [
+        "op_id",
+        "mode",
+        "claimed_at",
+        "in_flight",
+        "reconciliation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "op_id": {
+          "$ref": "#/$defs/op_id"
+        },
+        "mode": {
+          "$ref": "#/$defs/mode"
+        },
+        "claimed_at": {
+          "type": "integer"
+        },
+        "in_flight": {
+          "type": "boolean",
+          "description": "True while the earlier send is still claimed or dispatching (same target, mode and text); false when its outcome is uncertain."
+        },
+        "reconciliation": {
+          "$ref": "#/$defs/reconciliation"
+        }
+      }
+    },
+    "delivery": {
+      "description": "The reported delivery: what the provider said. accepted means the provider accepted the message (shown as 'sent'), never that the work completed.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "waiting_on",
+            "queued_message_id",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "queued"
+            },
+            "waiting_on": {
+              "enum": [
+                "not_reported",
+                "time",
+                "thread_busy",
+                "turn_starting",
+                "provisioning",
+                "host_offline",
+                "interaction",
+                "plugin"
+              ]
+            },
+            "queued_message_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "joined_running_turn",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "accepted"
+            },
+            "joined_running_turn": {
+              "$ref": "#/$defs/fact_bool"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "reason",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "failed"
+            },
+            "reason": {
+              "$ref": "#/$defs/fail_reason"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "reason",
+            "text",
+            "reconciliation",
+            "attribution"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "uncertain"
+            },
+            "reason": {
+              "enum": [
+                "timed_out",
+                "ended_without_exit_code",
+                "not_json",
+                "unexpected_receipt",
+                "undocumented_error",
+                "call_not_confirmed",
+                "interrupted_after_dispatch_mark"
+              ]
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reconciliation": {
+              "$ref": "#/$defs/reconciliation"
+            },
+            "attribution": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "reconciliation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "not_read"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "matching",
+            "total"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "observed"
+            },
+            "matching": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "attributed"
+            }
+          }
+        }
+      ]
+    },
+    "observation": {
+      "type": "object",
+      "required": [
+        "source",
+        "same_text",
+        "observed_at",
+        "attributed"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "enum": [
+            "queue_list",
+            "thread_log"
+          ]
+        },
+        "same_text": {
+          "type": "boolean"
+        },
+        "observed_at": {
+          "type": "integer"
+        },
+        "attributed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "fail_reason": {
+      "description": "Why a send failed, or would be refused before its call. Nothing was delivered.",
+      "enum": [
+        "not_found",
+        "invalid_input",
+        "unsupported_mode",
+        "interrupted_before_dispatch",
+        "untested_version",
+        "target_not_read",
+        "target_archived",
+        "target_hidden",
+        "target_visibility_unknown",
+        "paused_queue_not_acknowledged",
+        "record_not_written",
+        "budget_exhausted",
+        "call_not_started"
+      ]
+    },
+    "attachment_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "A staged attachment's id (B1, the implementation): 1 to 64 ASCII letters, digits, _ or -, starting with a letter or digit (the core checks the characters)."
+    },
+    "prompt_attachment": {
+      "description": "One attachment of a send, as the op id binds it and the record keeps it (B2): never its bytes, never the owner's original file name.",
+      "type": "object",
+      "required": [
+        "id",
+        "sha256",
+        "size_bytes",
+        "kind",
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/attachment_id"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "enum": [
+            "image",
+            "file"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 179,
+          "description": "The staged (safe) name CloudRoom is given: ASCII letters, digits, ., _ or -, not starting with . or - (the core checks the characters)."
+        }
+      }
+    }
+  }
+}

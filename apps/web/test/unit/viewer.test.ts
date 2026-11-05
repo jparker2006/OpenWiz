@@ -56,7 +56,7 @@ test('a failure keeps the last good snapshot, and the next success clears it (V6
   assert.deepEqual(list.last?.envelope, page);
   assert.deepEqual(list.failure, { kind: 'disconnected', cause: 'network', status: null });
   assert.equal(connection(list, at(h.clock.now), TIMING.staleAfterMs), 'disconnected');
-  // A network failure is not the server's answer: the retry waits out its bound since the read was sent.
+  // A network failure is not the server's answer: the retry waits out its bound since the read was sent .
   await h.clock.advance(TIMING.laneHoldMs);
   h.f.reply(json(200, page));
   await settle();
@@ -115,7 +115,7 @@ test('the selection survives refreshes; when its row leaves the page it is kept 
   h.viewer.stop();
 });
 
-test('the list and the detail each have at most one read in flight, also across a change of session (V4)', async () => {
+test('the list and the detail each have at most one read in flight, also across a change of session (V4, F1)', async () => {
   const h = harness();
   h.viewer.start();
   await settle();
@@ -159,7 +159,7 @@ test('closing the detail starts no more detail reads', async () => {
   h.viewer.stop();
 });
 
-test('another page waits for the list read in flight, then reads its offset; the open detail stays, marked (V4, V8)', async () => {
+test('another page waits for the list read in flight, then reads its offset; the open detail stays, marked (V4, V8, F1, F7)', async () => {
   const h = harness();
   h.viewer.start();
   await settle();
@@ -192,7 +192,7 @@ test('another page waits for the list read in flight, then reads its offset; the
   h.viewer.stop();
 });
 
-test('at the request timeout the page says the read is late, while the read goes on; its answer still counts', async () => {
+test('at the request timeout the page says the read is late, while the read goes on; its answer still counts ', async () => {
   const h = harness();
   h.viewer.start();
   await settle();
@@ -211,7 +211,7 @@ test('at the request timeout the page says the read is late, while the read goes
   h.viewer.stop();
 });
 
-test('another page keeps the count of the page it came from, so a change between the two can be shown', async () => {
+test('another page keeps the count of the page it came from, so a change between the two can be shown ', async () => {
   const h = harness();
   h.viewer.start();
   await settle();

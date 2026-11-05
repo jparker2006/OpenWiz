@@ -1,0 +1,35 @@
+{
+  "threadId": "thr_syn_0001",
+  "ok": true,
+  "delivery": "queued",
+  "mode": "queue",
+  "queuedMessage": {
+    "id": "qmsg_syn_0001",
+    "initiator": "agent",
+    "senderThreadId": "thr_syn_0003",
+    "threadId": "thr_syn_0001",
+    "content": [
+      {
+        "type": "Synthetic content type",
+        "text": "Synthetic queued prompt",
+        "mentions": []
+      }
+    ],
+    "model": "Synthetic model",
+    "reasoningLevel": "Synthetic effort",
+    "permissionMode": "Synthetic permission",
+    "serviceTier": "Synthetic tier",
+    "hardQueue": false,
+    "sendAt": null,
+    "waitingOn": {
+      "kind": "thread-busy"
+    },
+    "failureReason": null,
+    "payload": {
+      "kind": "inline"
+    },
+    "editable": true,
+    "createdAt": 1700000600000,
+    "updatedAt": 1700000600000
+  }
+}

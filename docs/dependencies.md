@@ -1,4 +1,8 @@
-# Dependencies of OpenWiz 0.0.2
+# Dependencies of OpenWiz 0.0.5
+
+*Updated for 0.0.5:* the send, store, new-thread and attachment code adds no third-party Rust crate or npm dependency. The eight skills additionally use shell, Python 3, jq, git, gh and room-cli; no cross-harness compatibility is claimed. zsh is required by the new-thread shell proofs. The current export is checked on Linux; historical macOS observations below belong to earlier versions.
+
+*Updated for 0.0.5:* historical public reports now link to the published public tree.
 
 **Status: Current** for the code in this repository. *Updated for 0.0.2:* the server adds no crate, and the web page's npm packages are [below](#the-web-pages-packages). Every third-party crate in `Cargo.lock` is listed here with its exact version, licence and checksum. `cargo test -p openwiz-tests --test checks` fails if a locked crate is missing from this table or its version or checksum differs.
 
@@ -56,7 +60,7 @@ The licences are as each package declares them in the lockfile. The repository i
 | --- | --- | --- |
 | Rust (`rustc`, `cargo`) | 1.99.1, the `rust-version` in `Cargo.toml` | Required to build. Older versions are not supported |
 | `rustfmt`, `clippy` | as shipped with Rust 1.99.1 | Needed only for the formatting and lint checks |
-| `room-cli` | v127 tested; any version runs | Needed at run time. Other versions run and are shown as untested. See [what was tested](evidence/0.0.1-live-check.md) |
+| `room-cli` | v127 tested; any version runs | Needed at run time. Other versions run and are shown as untested. See [what was tested](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/evidence/0.0.1-live-check.md) |
 | Node.js, npm | 24.22.1 (the `engines` in `apps/web/package.json`), with npm 11.19.1 | *New in 0.0.2.* Needed only to build and test the web page; the server does not run Node.js |
 | Chromium | 156 | *New in 0.0.2.* Needed only for the page's browser tests (`/usr/bin/chromium`, or `OPENWIZ_CHROMIUM`) |
 | `cloudflared` | any current version | *New in 0.0.2.* Needed only to reach the page from outside your Mac ([setup](web-access.md)). Cloudflare Zero Trust, with Access, is needed for the same |
@@ -65,7 +69,7 @@ The licences are as each package declares them in the lockfile. The repository i
 
 | What | Status |
 | --- | --- |
-| macOS | Built natively and live-checked once (Apple Silicon). *Updated for 0.0.2:* the server too, behind Cloudflare Tunnel and Access ([evidence](evidence/0.0.2-live-check.md)) |
+| macOS | Built natively and live-checked once (Apple Silicon). *Updated for 0.0.2:* the server too, behind Cloudflare Tunnel and Access ([evidence](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/evidence/0.0.2-live-check.md)) |
 | Linux | Fixture tests pass, the web page's included |
 | Windows | Untested |
 | Browsers | *New in 0.0.2.* Chromium, in the automated tests. The owner has opened the page on their own phone (an observation, no browser details recorded). No Safari test is recorded; other browsers are untested |

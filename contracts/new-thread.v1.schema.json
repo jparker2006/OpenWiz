@@ -1,0 +1,1569 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openwiz:schema:new-thread:v1",
+  "title": "openwiz.new-thread.v1",
+  "description": "OpenWiz 0.0.4 new threads (the implementation): the report of a create (the root), and in $defs the request, the record, the preview, the status read, the start view and the Cloud options. Creation and start are reported apart, and the requested configuration apart from the reported one. Unknown values are {\"unknown\": reason}. Times are integer milliseconds since the Unix epoch. maxUtf8Bytes is OpenWiz's companion keyword for a byte cap: a standard validator ignores it, and OpenWiz enforces it. A1 phase 2: openwiz new, new --status and models print these; no route does until A2. The spawn receipt and error lines behind them are source-read, not observed. B2 : the first prompt may carry staged attachments; the report, the preview and the record name them only when there are some (absent means none, so every A1 shape is unchanged). The attachment shapes are the help's (room-cli v131), never observed.",
+  "$ref": "#/$defs/report",
+  "$defs": {
+    "op_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+      "description": "1 to 64 ASCII letters, digits, _ or -, starting with a letter or digit."
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 44,
+      "maxLength": 44,
+      "pattern": "^ow1-[0-9a-f]*$",
+      "description": "ow1- and the first 40 hex digits of SHA-256(\"openwiz.new-thread.request-id.v1:\" + op id). Always matches ^[a-zA-Z0-9_-]{1,64}$."
+    },
+    "sha256": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[0-9a-f]*$",
+      "description": "Lowercase hex SHA-256."
+    },
+    "setting": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[!-,.-~][!-~]*$",
+      "description": "Printable ASCII, no space, not starting with -. Never defaulted."
+    },
+    "fact_string": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "known"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "known": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "unknown"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unknown": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "fact_bool": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "known"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "known": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "unknown"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unknown": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "fact_time": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "known"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "known": {
+              "type": "integer"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "unknown"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unknown": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "gap": {
+      "description": "OpenWiz's own words; never room-cli's raw output.",
+      "type": "object",
+      "required": [
+        "subject",
+        "detail"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "source": {
+      "description": "The provider and the version this create read .",
+      "type": "object",
+      "required": [
+        "name",
+        "version",
+        "tested_version",
+        "version_tested"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "$ref": "#/$defs/fact_string"
+        },
+        "tested_version": {
+          "type": "string"
+        },
+        "version_tested": {
+          "type": "boolean"
+        }
+      }
+    },
+    "project_ref": {
+      "description": "The project as the owner named it: its id, or the inventory's display name (name, or name~<last 6 of the id>).",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "value"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "id"
+            },
+            "value": {
+              "$ref": "#/$defs/project_ref_value"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "value"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "name"
+            },
+            "value": {
+              "$ref": "#/$defs/project_ref_value"
+            }
+          }
+        }
+      ]
+    },
+    "project_ref_value": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^\\u0000]*[^\\u0000\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000][^\\u0000]*$",
+      "description": "Not only whitespace, no NUL."
+    },
+    "project_view": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "$ref": "#/$defs/fact_string"
+        }
+      }
+    },
+    "settings": {
+      "description": "The requested configuration: what the owner chose. Never what CloudRoom reports.",
+      "type": "object",
+      "required": [
+        "harness",
+        "model",
+        "effort"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "harness": {
+          "$ref": "#/$defs/setting"
+        },
+        "model": {
+          "$ref": "#/$defs/setting"
+        },
+        "effort": {
+          "$ref": "#/$defs/setting"
+        }
+      }
+    },
+    "attachment_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+      "description": "1 to 64 ASCII letters, digits, _ or -, starting with a letter or digit."
+    },
+    "prompt_attachment": {
+      "description": "One attachment of the first prompt, as the op id binds it and the record keeps it (B2): never its bytes, never the owner's original file name.",
+      "type": "object",
+      "required": [
+        "id",
+        "sha256",
+        "size_bytes",
+        "kind",
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/attachment_id"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "enum": [
+            "image",
+            "file"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 179,
+          "pattern": "^[A-Za-z0-9_][A-Za-z0-9._-]*$",
+          "description": "The staged (safe) name CloudRoom is given: ASCII letters, digits, ., _ or -, not starting with . or -."
+        }
+      }
+    },
+    "prompt": {
+      "description": "As contracts/prompt.v1.schema.json: staged attachment ids, each at most once (B2).",
+      "type": "object",
+      "required": [
+        "text",
+        "attachments"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16384,
+          "maxUtf8Bytes": 16384,
+          "pattern": "^[^\\u0000]*[^\\u0000\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000][^\\u0000]*$",
+          "description": "Not empty, not only whitespace (Unicode White_Space), no NUL, at most 16 KiB of UTF-8. maxUtf8Bytes is OpenWiz's companion keyword for the byte cap: a standard validator ignores it, and OpenWiz enforces it."
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attachment_id"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "request": {
+      "description": "One create, as phase 2's CLI and route take it. Exactly one project; all three settings; nothing defaulted.",
+      "type": "object",
+      "required": [
+        "project",
+        "harness",
+        "model",
+        "effort",
+        "prompt",
+        "op_id"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "project": {
+          "$ref": "#/$defs/project_ref"
+        },
+        "harness": {
+          "$ref": "#/$defs/setting"
+        },
+        "model": {
+          "$ref": "#/$defs/setting"
+        },
+        "effort": {
+          "$ref": "#/$defs/setting"
+        },
+        "prompt": {
+          "$ref": "#/$defs/prompt"
+        },
+        "op_id": {
+          "$ref": "#/$defs/op_id"
+        }
+      }
+    },
+    "binding": {
+      "description": "What an op id is bound to. Reusing the op id for anything else is refused.",
+      "type": "object",
+      "required": [
+        "project",
+        "harness",
+        "model",
+        "effort",
+        "text_sha256",
+        "attachments_digest"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "project": {
+          "$ref": "#/$defs/project_ref"
+        },
+        "harness": {
+          "$ref": "#/$defs/setting"
+        },
+        "model": {
+          "$ref": "#/$defs/setting"
+        },
+        "effort": {
+          "$ref": "#/$defs/setting"
+        },
+        "text_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "attachments_digest": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "binding_field": {
+      "type": "string",
+      "enum": [
+        "project",
+        "harness",
+        "model",
+        "effort",
+        "text",
+        "attachments"
+      ]
+    },
+    "record_state": {
+      "type": "string",
+      "enum": [
+        "claimed",
+        "dispatching",
+        "finished"
+      ]
+    },
+    "effect": {
+      "type": "object",
+      "required": [
+        "kind",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "creates_and_starts",
+            "starts_from_github",
+            "copies_env_files",
+            "full_permissions",
+            "uses_cloud_agent",
+            "mac_stays_awake",
+            "cloud_room_names_it"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "effects": {
+      "description": "What a create does, worked out before creating. Documented effects, not observations.",
+      "type": "object",
+      "required": [
+        "read_at",
+        "project",
+        "effects"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "read_at": {
+          "type": "integer"
+        },
+        "project": {
+          "$ref": "#/$defs/project_view"
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          }
+        }
+      }
+    },
+    "uncertain_reason": {
+      "type": "string",
+      "enum": [
+        "timed_out",
+        "ended_without_exit_code",
+        "not_json",
+        "unexpected_receipt",
+        "undocumented_error",
+        "call_not_confirmed",
+        "interrupted_after_dispatch_mark"
+      ]
+    },
+    "refusal_reason": {
+      "type": "string",
+      "enum": [
+        "no_options",
+        "harness_not_offered",
+        "model_not_offered",
+        "effort_not_offered",
+        "project_not_found",
+        "project_ambiguous",
+        "project_personal",
+        "project_not_standard",
+        "project_no_github_remote",
+        "project_remote_not_confirmed",
+        "provider_unsupported",
+        "provider_model_unavailable",
+        "provider_effort_unavailable",
+        "provider_message_too_long",
+        "provider_message_empty",
+        "provider_project_not_found",
+        "provider_request_id_conflict",
+        "provider_discovery_unavailable"
+      ]
+    },
+    "fail_reason": {
+      "type": "string",
+      "enum": [
+        "interrupted_before_dispatch",
+        "projects_not_read",
+        "record_not_written",
+        "budget_exhausted",
+        "call_not_started"
+      ]
+    },
+    "outcome": {
+      "description": "created means CloudRoom recorded the thread and its first prompt, never that it started.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "thread_id",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "created"
+            },
+            "thread_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "reason",
+            "offered",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "refused"
+            },
+            "reason": {
+              "$ref": "#/$defs/refusal_reason"
+            },
+            "offered": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "reason",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "failed"
+            },
+            "reason": {
+              "$ref": "#/$defs/fail_reason"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "reason",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "uncertain"
+            },
+            "reason": {
+              "$ref": "#/$defs/uncertain_reason"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "created",
+        "refused",
+        "failed",
+        "uncertain",
+        "in_progress",
+        "conflicting_reuse"
+      ]
+    },
+    "result": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "outcome",
+            "replayed",
+            "recovered"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "outcome"
+            },
+            "outcome": {
+              "$ref": "#/$defs/outcome"
+            },
+            "replayed": {
+              "type": "boolean"
+            },
+            "recovered": {
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "state"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "in_progress"
+            },
+            "state": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/$defs/record_state"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "differs"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "conflicting_reuse"
+            },
+            "differs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/binding_field"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "report": {
+      "description": "The report of a create. start is the created thread's start, as openwiz new followed it (A1 phase 2, sheet the check); null when nothing was created, and always null inside a status read, whose own start is beside it.",
+      "type": "object",
+      "required": [
+        "schema",
+        "op_id",
+        "request_id",
+        "project_ref",
+        "project",
+        "source",
+        "requested",
+        "provider",
+        "status",
+        "summary",
+        "result",
+        "effects",
+        "text_sha256",
+        "attachments_digest",
+        "text_bytes",
+        "gaps",
+        "claimed_at",
+        "dispatching_at",
+        "finished_at",
+        "start"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "openwiz.new-thread.v1"
+        },
+        "op_id": {
+          "$ref": "#/$defs/op_id"
+        },
+        "request_id": {
+          "$ref": "#/$defs/request_id"
+        },
+        "project_ref": {
+          "$ref": "#/$defs/project_ref"
+        },
+        "project": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/project_view"
+            }
+          ]
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/source"
+            }
+          ]
+        },
+        "requested": {
+          "$ref": "#/$defs/settings"
+        },
+        "provider": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "$ref": "#/$defs/result"
+        },
+        "effects": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/effects"
+            }
+          ]
+        },
+        "text_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "attachments_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "attachments": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/prompt_attachment"
+          },
+          "description": "B2: the attachments, in the owner's order (files go to room-cli first, then images). Absent when there are none, never empty."
+        },
+        "text_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gap"
+          }
+        },
+        "claimed_at": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "dispatching_at": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "finished_at": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "start": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/start_view"
+            }
+          ]
+        }
+      }
+    },
+    "record": {
+      "description": "One create, as stored. The text is kept until the outcome is created.",
+      "type": "object",
+      "required": [
+        "schema",
+        "op_id",
+        "binding",
+        "request_id",
+        "requested",
+        "provider",
+        "text",
+        "text_bytes",
+        "state",
+        "project",
+        "source",
+        "effects",
+        "outcome",
+        "gaps",
+        "recovered",
+        "claimed_at",
+        "dispatching_at",
+        "finished_at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "openwiz.new-thread-record.v1"
+        },
+        "op_id": {
+          "$ref": "#/$defs/op_id"
+        },
+        "binding": {
+          "$ref": "#/$defs/binding"
+        },
+        "request_id": {
+          "$ref": "#/$defs/request_id"
+        },
+        "requested": {
+          "$ref": "#/$defs/settings"
+        },
+        "provider": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "text_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "attachments": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/prompt_attachment"
+          },
+          "description": "B2: the attachments of the first prompt, in the owner's order: ids, hashes, sizes, kinds and staged names, never bytes. Absent means none (every A1 record); the reader checks them against the binding's digest."
+        },
+        "state": {
+          "$ref": "#/$defs/record_state"
+        },
+        "project": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/project_view"
+            }
+          ]
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/source"
+            }
+          ]
+        },
+        "effects": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/effects"
+            }
+          ]
+        },
+        "outcome": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/outcome"
+            }
+          ]
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gap"
+          }
+        },
+        "recovered": {
+          "type": "boolean"
+        },
+        "claimed_at": {
+          "type": "integer"
+        },
+        "dispatching_at": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "finished_at": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      }
+    },
+    "preview": {
+      "description": "What a create would do, shown before anything is created: no claim, no call.",
+      "type": "object",
+      "required": [
+        "schema",
+        "op_id",
+        "request_id",
+        "project_ref",
+        "project",
+        "source",
+        "requested",
+        "verdict",
+        "effects",
+        "text_sha256",
+        "attachments_digest",
+        "text_bytes",
+        "gaps"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "openwiz.new-thread-preview.v1"
+        },
+        "op_id": {
+          "$ref": "#/$defs/op_id"
+        },
+        "request_id": {
+          "$ref": "#/$defs/request_id"
+        },
+        "project_ref": {
+          "$ref": "#/$defs/project_ref"
+        },
+        "project": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/project_view"
+            }
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "requested": {
+          "$ref": "#/$defs/settings"
+        },
+        "verdict": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "kind",
+                "provider"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "ready"
+                },
+                "provider": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "kind",
+                "outcome"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "stopped"
+                },
+                "outcome": {
+                  "$ref": "#/$defs/outcome"
+                }
+              }
+            }
+          ]
+        },
+        "effects": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/effects"
+            }
+          ]
+        },
+        "text_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "attachments_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "attachments": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/prompt_attachment"
+          },
+          "description": "B2: the attachments a create would carry, each through the gate (its copy read again whole), in the owner's order. Absent when there are none."
+        },
+        "text_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gap"
+          }
+        }
+      }
+    },
+    "start_stage": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "waiting_to_start"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "started"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "idle_as_reported"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "last_error",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "start_failed"
+            },
+            "last_error": {
+              "$ref": "#/$defs/fact_string"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "reason",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "unknown"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "reported_setting": {
+      "type": "object",
+      "required": [
+        "requested",
+        "reported",
+        "differs_from_requested",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "requested": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reported": {
+          "$ref": "#/$defs/fact_string"
+        },
+        "differs_from_requested": {
+          "$ref": "#/$defs/fact_bool"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "reported_configuration": {
+      "type": "object",
+      "required": [
+        "label",
+        "provider",
+        "model",
+        "effort"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "const": "reported configuration: what CloudRoom reports, never the serving model"
+        },
+        "provider": {
+          "$ref": "#/$defs/reported_setting"
+        },
+        "model": {
+          "$ref": "#/$defs/reported_setting"
+        },
+        "effort": {
+          "$ref": "#/$defs/reported_setting"
+        }
+      }
+    },
+    "start_view": {
+      "description": "The start of a created thread, from one thread show read. Separate from creation.",
+      "type": "object",
+      "required": [
+        "thread_id",
+        "read_at",
+        "stage",
+        "reported",
+        "gaps"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "thread_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "read_at": {
+          "type": "integer"
+        },
+        "stage": {
+          "$ref": "#/$defs/start_stage"
+        },
+        "reported": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/reported_configuration"
+            }
+          ]
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gap"
+          }
+        }
+      }
+    },
+    "observed_thread": {
+      "type": "object",
+      "required": [
+        "id",
+        "created_at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "created_at": {
+          "$ref": "#/$defs/fact_time"
+        }
+      }
+    },
+    "observations": {
+      "type": "object",
+      "required": [
+        "read_at",
+        "threads",
+        "text",
+        "gaps"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "read_at": {
+          "type": "integer"
+        },
+        "threads": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observed_thread"
+          }
+        },
+        "text": {
+          "const": "observations only: no documented field ties a listed thread to this request, so the outcome stays uncertain"
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gap"
+          }
+        }
+      }
+    },
+    "status_read": {
+      "description": "One op id's record and start stage. Read-only: never creates, claims or writes anything.",
+      "type": "object",
+      "required": [
+        "schema",
+        "op_id",
+        "result"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "openwiz.new-thread-status.v1"
+        },
+        "op_id": {
+          "$ref": "#/$defs/op_id"
+        },
+        "result": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "no_record"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "kind",
+                "report",
+                "start",
+                "observations"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "recorded"
+                },
+                "report": {
+                  "$ref": "#/$defs/report"
+                },
+                "start": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "$ref": "#/$defs/start_view"
+                    }
+                  ]
+                },
+                "observations": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "$ref": "#/$defs/observations"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "attachment_support": {
+      "type": "object",
+      "required": [
+        "files",
+        "images"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "type": "boolean"
+        },
+        "images": {
+          "type": "boolean"
+        }
+      }
+    },
+    "model_option": {
+      "type": "object",
+      "required": [
+        "model",
+        "efforts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "efforts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "harness_option": {
+      "type": "object",
+      "required": [
+        "harness",
+        "provider",
+        "models",
+        "attachments",
+        "steer"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "harness": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "models": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/model_option"
+          }
+        },
+        "attachments": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/attachment_support"
+            }
+          ]
+        },
+        "steer": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    },
+    "unavailable_harness": {
+      "type": "object",
+      "required": [
+        "harness",
+        "reason",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "harness": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "catalogue_not_reported",
+            "id_mapping_not_verified",
+            "no_offered_effort"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "options": {
+      "description": "The Cloud options from one cloud status read. No option is marked default.",
+      "type": "object",
+      "required": [
+        "schema",
+        "read_at",
+        "label",
+        "state",
+        "harnesses",
+        "unavailable"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "openwiz.cloud-options.v1"
+        },
+        "read_at": {
+          "type": "integer"
+        },
+        "label": {
+          "const": "as reported by CloudRoom; it may answer from a saved copy"
+        },
+        "state": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "offered"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "kind",
+                "reason",
+                "text"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "const": "no_options"
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "not_ready",
+                    "harnesses_not_reported",
+                    "read_failed",
+                    "unexpected_shape"
+                  ]
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          ]
+        },
+        "harnesses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/harness_option"
+          }
+        },
+        "unavailable": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/unavailable_harness"
+          }
+        }
+      }
+    }
+  }
+}

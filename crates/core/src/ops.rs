@@ -1,8 +1,8 @@
 //! Operations: `list` (for `ls` and `ls -l`) and `show`.
 //!
-//! Every run reads the source's version first and reports it; the version
-//! is never a gate. Then `list` reads the session, project and machine lists, and
-//! `show` reads one session, the project and machine lists, and its final
+//! Every run reads the source's version first and goes on whatever it is
+//! . Then `list` reads the session,
+//! project and machine lists, and `show` reads one session, the project and machine lists, and its final
 //! output. Grouping and location use only the lists read in the same run.
 //!
 //! The order is the sort key: most recently updated first, then by session
@@ -96,9 +96,6 @@ pub enum OpError {
     InvalidRequest(String),
 }
 
-/// What the run read as the source's version. Never a gate:
-/// any version runs; one other than the live-tested version is marked
-/// untested, and text that is not a recognised version is unknown, with a gap.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct VersionRead {
     version: Fact<String>,
@@ -107,8 +104,9 @@ struct VersionRead {
 }
 
 /// A recognised version: `N.N.N` (1 to 4 digits each), as `room-cli` 0.43.1
-/// printed, or `v<N>` (1 to 6 digits), as `room-cli` v127 prints. The only
-/// version text ever shown: the adapter's stderr sanitizer uses it too.
+/// printed, or `v<N>` (1 to 6 digits), as `room-cli` v127 prints . The
+/// only version text ever shown: the adapter's sanitizer  and `send` use
+/// it too.
 pub fn is_version_text(text: &str) -> bool {
     let digits = |s: &str, max: usize| {
         !s.is_empty() && s.len() <= max && s.bytes().all(|b| b.is_ascii_digit())
@@ -120,10 +118,10 @@ pub fn is_version_text(text: &str) -> bool {
     parts.len() == 3 && parts.iter().all(|p| digits(p, 4))
 }
 
-/// The version a run reports, and whether it is `tested`. Never a gate.
-/// `read` names the version read, such as `room-cli --version`. A recognised
-/// version is known; anything else is unknown with OpenWiz's reason, and its
-/// text is never echoed.
+/// The version a run reports, and whether it is `tested`. Never a gate :
+/// the reads and `send` both use it. `read` names the version read, such as
+/// `room-cli --version`. A recognised version is known; anything else is
+/// unknown with OpenWiz's reason, and its text is never echoed.
 pub fn version_fact(
     read: &str,
     tested: &str,
@@ -153,10 +151,6 @@ pub fn version_fact(
 pub const VERSION_NOT_RECOGNISED: &str =
     "printed a version that is not N.N.N or v<N> (detail withheld)";
 
-/// A failed version read, described by safe facts only: the exit code or the
-/// timeout, never the source's own text, which could hold private detail.
-/// Even a line the stderr sanitizer would show is withheld: the version
-/// read's failure reaches every envelope.
 fn version_failure(error: &SourceError) -> String {
     match error {
         SourceError::CommandFailed {
@@ -168,8 +162,8 @@ fn version_failure(error: &SourceError) -> String {
         } => "ended without an exit code (detail withheld)".to_owned(),
         SourceError::TimedOut { after_ms } => format!("timed out after {after_ms} ms"),
         // The one malformed detail that is shown: OpenWiz's own fixed words
-        // for a version outside the grammar. Allowlisted, so any other detail
-        // is withheld.
+        // for a version outside the grammar . Allowlisted, so any
+        // other detail is withheld.
         SourceError::Malformed { detail } if detail == VERSION_NOT_RECOGNISED => detail.clone(),
         SourceError::Malformed { .. } => "returned malformed output (detail withheld)".to_owned(),
         SourceError::Unavailable { .. } => "could not be run (detail withheld)".to_owned(),
@@ -429,7 +423,7 @@ impl<'a> Run<'a> {
         format!("{} {error}", self.name(read))
     }
 
-    /// The source's version, read once. Never a gate: the run goes on
+    /// The source's version, read once. Never a gate : the run goes on
     /// whatever it is. Only a recognised version text is shown; anything else
     /// is unknown with a reason and a gap, and is never echoed.
     fn read_version(&self) -> VersionRead {

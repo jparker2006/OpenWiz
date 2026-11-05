@@ -1,0 +1,3 @@
+interface:
+  display_name: "Build ticket"
+  short_description: "Build one ticket and hand back a green pull request"

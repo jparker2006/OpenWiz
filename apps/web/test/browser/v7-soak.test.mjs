@@ -1,13 +1,24 @@
 // V7: bounded over time. A recorded soak run on the fake clock: two simulated
 // hours of refreshes with changing rows, then failures (backoff is capped),
 // then a hidden hour (no reads; one on return). The JS heap must not grow.
+//
+// The retry gaps are measured exactly : the page's clock
+// is paused, so it moves only by `runFor`, and each list read is stamped by
+// the page's own clock when it calls `fetch`. Before, a read was dated by the
+// 1-second step in which the fake API happened to see it, so a read that was
+// merely slow to arrive moved to the next step and an on-time gap could read
+// 69 000 ms (CI's failure; reproduced with a CPU-throttled Chromium, on main
+// as well). Now an on-time retry is exactly the bound, and an early one can't
+// hide in the step. Every clock step waits until the page has read every
+// answer (`pageIdle`), so the test never moves the paused clock ahead of the
+// page, however slow the runner.
 
 import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { after, before, test } from 'node:test';
 
 import { TIMING } from '../../src/timing.ts';
-import { launchBrowser, openPage, readDetail, readView, settleReal, waitFor } from '../support/browser.mjs';
+import { launchBrowser, openPage, pageIdle, readDetail, readView, settleReal, waitFor } from '../support/browser.mjs';
 import { apiError, bare, html, json } from '../support/fake-api.mjs';
 import { fakeSite } from '../support/harness.mjs';
 import { RESULTS_DIR } from '../support/paths.mjs';
@@ -48,8 +59,11 @@ test(`soak: ${HOURS} simulated hours, then failures, then a hidden hour`, { time
     return json(200, inventory(manyRows(100, first), { matched: 400 }));
   });
   fx.api.setDetail((id) => json(200, sessionView(session(Number(id.slice(-4))))));
-  const p = await openPage(browser, fx.site.origin, { clock: START });
+  const p = await openPage(browser, fx.site.origin, { clock: START, paused: true, stampReads: true });
   const cdp = await p.context.newCDPSession(p.page);
+  // The page's own clock when it called fetch for each list read, from `from` on.
+  const listStamps = async (from) => (await p.page.evaluate(() => window.__reads.filter((r) => r.path.startsWith('/api/v1/inventory')).map((r) => r.at))).slice(from);
+  const listCount = async () => (await listStamps(0)).length;
   const record = { timing: TIMING, hours: HOURS, samples: [] };
   try {
     await waitFor(async () => (await readView(p.page)).groups.length > 0, { what: 'rows' });
@@ -64,6 +78,7 @@ test(`soak: ${HOURS} simulated hours, then failures, then a hidden hour`, { time
       const before = fx.api.reads('list').length;
       await p.page.clock.runFor(TIMING.listIntervalMs);
       await waitFor(() => fx.api.reads('list').length > before && fx.api.reads('list').at(-1).endedAt !== null, { what: `refresh ${i}` });
+      await waitFor(() => pageIdle(p.page), { what: `the page read refresh ${i}` });
       if (i === 60) baseline = await heap(cdp);
       if (i % 120 === 0) record.samples.push({ refresh: i, usedSize: await heap(cdp) });
     }
@@ -77,13 +92,12 @@ test(`soak: ${HOURS} simulated hours, then failures, then a hidden hour`, { time
     // Phase 2: 30 simulated minutes of failures the server confirms; the backoff is capped.
     failing = 'server';
     const failStart = fx.api.reads('list').length;
-    const stamps = [];
+    const failFrom = await listCount();
     for (let t = 0; t < 30 * 60_000; t += 1_000) {
-      const before = fx.api.reads('list').length;
       await p.page.clock.runFor(1_000);
-      await settleReal(5);
-      if (fx.api.reads('list').length > before) stamps.push(t + 1_000);
+      await waitFor(() => pageIdle(p.page), { what: 'the page read every answer' });
     }
+    const stamps = await listStamps(failFrom);
     const gaps = stamps.slice(1).map((t, i) => t - (stamps[i] ?? 0));
     const cap = TIMING.backoffMs.at(-1);
     record.backoffGaps = gaps;
@@ -93,15 +107,14 @@ test(`soak: ${HOURS} simulated hours, then failures, then a hidden hour`, { time
     assert.ok(fx.api.reads('list').length - failStart <= (30 * 60_000) / cap + 10);
 
     // Phase 2b: 20 simulated minutes of the network's error page. The server is not
-    // known to be done with those reads, so each holds the lane for its bound.
+    // known to be done with those reads, so each holds the lane for its bound .
     failing = 'network';
-    const netStamps = [];
+    const netFrom = await listCount();
     for (let t = 0; t < 20 * 60_000; t += 1_000) {
-      const before = fx.api.reads('list').length;
       await p.page.clock.runFor(1_000);
-      await settleReal(5);
-      if (fx.api.reads('list').length > before) netStamps.push(t + 1_000);
+      await waitFor(() => pageIdle(p.page), { what: 'the page read every answer' });
     }
+    const netStamps = await listStamps(netFrom);
     const netGaps = netStamps.slice(1).map((t, i) => t - (netStamps[i] ?? 0));
     record.networkGaps = netGaps;
     assert.ok(netGaps.length >= 10, 'retried');
@@ -110,15 +123,15 @@ test(`soak: ${HOURS} simulated hours, then failures, then a hidden hour`, { time
     // Phase 3: hidden for an hour: no reads. One read on return.
     failing = null;
     await p.page.clock.runFor(TIMING.laneHoldMs + cap);
-    await settleReal(100);
+    await waitFor(() => pageIdle(p.page), { what: 'the page read every answer' });
     await setHidden(p.page, true);
     await settleReal(100);
     const hiddenStart = { list: fx.api.reads('list').length, detail: fx.api.reads('detail').length };
     for (let t = 0; t < 60; t++) {
       await p.page.clock.runFor(60_000);
-      await settleReal(5);
+      await waitFor(() => pageIdle(p.page), { what: 'the page read every answer' });
     }
-    // A read already in flight when the page was hidden may finish; none starts.
+    // A read already in flight when the page was hidden may finish; none starts (F8).
     assert.equal(fx.api.reads('list').length, hiddenStart.list, 'no list read starts while hidden');
     assert.equal(fx.api.reads('detail').length, hiddenStart.detail, 'no detail read starts while hidden');
     const beforeReturn = fx.api.reads('list').length;
@@ -135,7 +148,7 @@ test(`soak: ${HOURS} simulated hours, then failures, then a hidden hour`, { time
   }
 });
 
-test('a server retry hint far in the future is capped at the backoff cap', async () => {
+test('a server retry hint far in the future is capped at the backoff cap ', async () => {
   const fx = await fakeSite();
   let n = 0;
   fx.api.setList(() => (n++ === 0 ? json(200, inventory(manyRows(3))) : n === 2 ? bare(503, { 'Retry-After': '999999' }) : json(200, inventory(manyRows(3)))));

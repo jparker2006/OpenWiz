@@ -1,7 +1,10 @@
 //! Output and run limits.
 //!
-//! The first six values are fixed for 0.0.1. `MAX_LIMIT` and
-//! `FIELD_MAX_CHARS` are provisional row and field caps.
+//! The first six values are decided for 0.0.1: four approved in the common
+//! rules, and `READ_TIMEOUT` and `DEFAULT_LIMIT`, which  sets at
+//! 15 seconds and 100. `MAX_LIMIT` and `FIELD_MAX_CHARS` are the builder's
+//! provisional values for the "row and field caps" and still need the maintainer
+//! confirmation.
 
 use std::time::Duration;
 
@@ -18,10 +21,10 @@ pub const MAX_CONCURRENT_DETAIL_READS: usize = 4;
 pub const RUN_BUDGET: Duration = Duration::from_secs(30);
 
 /// Each single read gives up after this long, inside the run budget, and is
-/// never retried. The adapter applies it to every read.
+/// never retried. Decided in ; the adapter applies it to every read.
 pub const READ_TIMEOUT: Duration = Duration::from_secs(15);
 
-/// Rows per page when `--limit` is not given.
+/// Rows per page when `--limit` is not given. Decided in .
 pub const DEFAULT_LIMIT: usize = 100;
 
 /// The largest page `--limit` may ask for. Provisional.

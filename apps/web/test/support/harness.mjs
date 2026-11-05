@@ -16,7 +16,7 @@ export async function fakeSite() {
 }
 
 /**
- * axe-core's violations on the page. Injected through the
+ * axe-core's violations on the page (approved: W-6). Injected through the
  * DevTools protocol, which the page's CSP does not govern, and never shipped.
  */
 export async function axe(page, runOnly = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']) {

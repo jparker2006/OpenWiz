@@ -1,7 +1,7 @@
-// V11, synthetic half: measurements on fixtures. There are no performance
-// targets yet (no baseline on a real account), so these record numbers; the
-// only assertions are fixed ones: no layout shift on refresh, and at most one
-// list and one detail read in flight.
+// V11, synthetic half: measurements in Cloud for performance-targets.md. The
+// targets are PENDING (no A9 baseline), so these record numbers; the only
+// assertions are the issue's fixed ones: no layout shift on refresh, and at
+// most one list and one detail read in flight.
 
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';

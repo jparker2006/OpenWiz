@@ -1,17 +1,21 @@
 //! The OpenWiz 0.0.1 proof cases, P1 to P12, written before the behaviour.
 //!
 //! Fixture tests show that the logic is right for synthetic inputs. They
-//! never prove live behaviour; that needs live evidence.
+//! never prove live behaviour; that needs live evidence (ticket 3).
 //!
-//! A case for behaviour not built yet is marked
-//! `#[ignore = "pending: ticket 2"]`, and `tests/checks` keeps that list
-//! exact. In 0.0.1 none is pending: every case runs.
+//! Only P8(a), the static allowlist, passes in ticket 1. Every other case is
+//! marked `#[ignore = "pending: ticket 2"]`, and `tests/checks` keeps that
+//! list exact. Run them with `cargo test -p openwiz-tests --test proof -- --ignored`.
 
 mod support;
 
 #[allow(dead_code)]
 #[path = "../support/schema.rs"]
 mod schema;
+
+#[allow(dead_code)]
+#[path = "../support/dirs.rs"]
+mod dirs;
 
 mod p01_coverage;
 mod p02_freshness;

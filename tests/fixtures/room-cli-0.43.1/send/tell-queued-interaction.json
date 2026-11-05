@@ -1,0 +1,12 @@
+{
+  "delivery": "queued",
+  "queuedMessage": {
+    "id": "syn-queued-0001",
+    "waitingOn": {
+      "kind": "interaction"
+    },
+    "sendAt": null,
+    "initiator": "syn-initiator",
+    "senderThreadId": null
+  }
+}

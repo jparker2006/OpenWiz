@@ -1,5 +1,7 @@
 # Contributing
 
+*Updated for 0.0.5:* build the web export before running the Rust suite; the new-thread proofs also require zsh. The tests cover send, creation, attachments and skill structure with synthetic inputs.
+
 OpenWiz is a **design preview**. *Updated for 0.0.1:* 0.0.1 adds one small, read-only command, `openwiz`; everything else is still a proposal, with no code. *Updated for 0.0.2:* 0.0.2 adds a read-only server and web page for the same inventory. The most useful contribution right now is critical feedback.
 
 ## What helps

@@ -70,7 +70,7 @@ test('signed out: a redirect to the sign-in page, or a 401, is never a network e
   });
 });
 
-test('a 403 page is not "signed out": signing in again would not fix a block', async () => {
+test('a 403 page is not "signed out": signing in again would not fix a block (F6)', async () => {
   assert.deepEqual(await outcome({ status: 403, headers: { 'Content-Type': 'text/html' }, body: 'Synthetic: access denied' }), {
     kind: 'error',
     status: 403,
@@ -136,7 +136,7 @@ test('a read the page aborts is a timeout, or nothing at all when the page stopp
   }
 });
 
-test('which answers prove the server is done with a read, so the next one may start', async () => {
+test('which answers prove the server is done with a read, so the next one may start ', async () => {
   const done = async (reply: FakeReply | 'network') => {
     const o = await outcome(reply);
     assert.notEqual(o, 'stopped');
@@ -162,7 +162,7 @@ test('which answers prove the server is done with a read, so the next one may st
   assert.equal(await done({ status: 200, headers: { 'Content-Type': 'text/html' }, body: 'x' }), false);
 });
 
-test('Retry-After: whole seconds only; anything else is ignored', async () => {
+test('Retry-After: whole seconds only; anything else is ignored ', async () => {
   for (const [value, ms] of [
     ['5', 5_000],
     ['999999', 999_999_000],

@@ -190,6 +190,9 @@ fn the_overload_answers_have_the_same_headers() {
                 head_timeout: Duration::from_secs(2),
                 ..Limits::default()
             },
+            sending: None,
+            creating: None,
+            attaching: None,
         },
     );
     let mut idle = std::net::TcpStream::connect(s.addr).unwrap();
@@ -296,7 +299,7 @@ fn the_binary_logs_no_content_and_its_errors_name_no_path() {
     let fake = Fake::new("web_a7_binary", "normal");
     // No room-cli on PATH: the production wiring's error must name no path.
     let empty = fake.dir.join("empty-path");
-    std::fs::create_dir_all(&empty).unwrap();
+    crate::dirs::private_dir_all(&empty).unwrap();
     let mut child = Command::new(&program)
         .args(["--port", "0"])
         .env("PATH", &empty)
@@ -316,8 +319,7 @@ fn the_binary_logs_no_content_and_its_errors_name_no_path() {
         .and_then(|a| a.parse().ok());
     let result = std::panic::catch_unwind(|| {
         let addr = addr.unwrap_or_else(|| panic!("unexpected first line {first:?}"));
-        // An unreadable version is never a gate; the run goes on to
-        // the session list, which fails too.
+
         let r = http::get(addr, "/api/v1/inventory?detail=2");
         assert_eq!(r.status, 502, "{}", r.text());
         let (kind, message) = r.error();

@@ -1,0 +1,27 @@
+[
+  {
+    "id": "syn-event-0001",
+    "scope": {
+      "kind": "syn-thread"
+    },
+    "threadId": "thr_syn_0001",
+    "seq": 41,
+    "createdAt": 1700000600500,
+    "type": "syn-user-message",
+    "data": {
+      "requestId": "syn-request-0001",
+      "source": "syn-source",
+      "initiator": "syn-initiator",
+      "input": "Synthetic message for the lost acknowledgement case.",
+      "target": "syn-target",
+      "request": "syn-request",
+      "execution": {
+        "model": "synthetic-model-a",
+        "serviceTier": "syn-tier",
+        "reasoningLevel": "high",
+        "permissionMode": "syn-mode",
+        "source": "syn-source"
+      }
+    }
+  }
+]

@@ -149,7 +149,7 @@ fn rows_are_capped() {
     }
 }
 
-/// The cut is shown
+/// Changed in ticket 1's correction round 1 : the cut must be shown
 /// (text contract 7 in `support.rs`), for the final output and the purpose.
 #[test]
 fn printed_final_output_and_purpose_show_their_cut() {
@@ -327,7 +327,8 @@ fn assert_every_string_is_capped(label: &str, json: &Value) {
     }
 }
 
-/// Every string field in the result is capped; plain text fields keep
+/// Changed in ticket 1's correction round 1 , from a title-only
+/// check. Every string field in the result is capped; plain text fields keep
 /// their first `FIELD_MAX_CHARS - 1` characters and end with `…`, and
 /// bounded texts set `truncated`.
 #[test]
@@ -422,10 +423,6 @@ fn every_field_is_capped() {
     }
 }
 
-/// Every cut value is shown as cut in the printed output (text contract 7),
-/// and nothing past a cap is printed, in `ls -l`, `show`, `--json` and on
-/// stderr. That includes the ungrouped reason with the long project id in
-/// `ls -l`, and the cut project name in `show`.
 #[test]
 fn printed_output_shows_every_cut() {
     let (source, o) = oversized_source();
@@ -509,7 +506,7 @@ fn printed_output_shows_every_cut() {
     let wanted = format!("unknown ({})", capped(&o.reasons[0]));
     assert!(text.contains(&wanted), "show shows {wanted:?}:\n{text}");
 
-    // An oversized version (never a gate): not a recognised version, so
+    // An oversized version : not a recognised version, so
     // it is unknown with a reason and never echoed; the run goes on.
     let version = oversized("version");
     let source = ScriptedSource::new(1).with_version(&version);
@@ -520,10 +517,6 @@ fn printed_output_shows_every_cut() {
     assert!(header.contains("room-cli unknown ("), "{header}");
 }
 
-/// The text never
-/// prints characters that drive or reorder the terminal (escape, bidi
-/// controls, line and paragraph separators, zero-width marks). The JSON
-/// keeps the reported value.
 #[test]
 fn the_text_never_prints_terminal_control_or_bidi_characters() {
     const UNSAFE: [char; 9] = [
@@ -559,8 +552,6 @@ fn the_text_never_prints_terminal_control_or_bidi_characters() {
     assert_eq!(json["data"]["session"]["title"]["known"], mixed.as_str());
 }
 
-/// Replacing unsafe characters
-/// never makes the printed final output longer than the 4 KiB it was cut to.
 #[test]
 fn the_printed_final_output_stays_within_4_kib() {
     for (label, unit) in [

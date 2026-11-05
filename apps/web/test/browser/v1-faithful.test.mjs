@@ -1,4 +1,4 @@
-// V1: faithful to the envelope. The real openwiz-server runs over every
+// V1: faithful to the envelope. Ticket 1's openwiz-server runs over every
 // 0.0.1 fixture scenario; the page must show every row once, under the group
 // the envelope gives it, and every word, unknown and truncation word for word.
 
@@ -18,7 +18,7 @@ after(() => browser.close());
 
 const listResponse = (p) => p.responses.find((r) => r.path === '/api/v1/inventory' && r.body !== null);
 
-describe('V1 over every 0.0.1 fixture scenario, through the real server', { concurrency: 6 }, () => {
+describe('V1 over every 0.0.1 fixture scenario, through ticket 1\'s server', { concurrency: 6 }, () => {
   for (const name of scenarios()) {
     test(name, { timeout: 180_000 }, async () => {
       const server = await startFixtureServer(name);

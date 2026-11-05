@@ -1,0 +1,275 @@
+{
+  "scenario": "send",
+  "description": "Send receipts observed in the PC probe the observed receipt : sent in either requested mode, 17-key busy Queue and 16-key Cloud queued receipts for Steer and Queue. All fixture values and caller states are synthetic; legacy guide-only receipts remain negative cases.",
+  "extends": "normal",
+  "synthetic_assumptions": [
+    "Observed at PC probe the observed receipt : sent has exactly threadId, ok, delivery, mode; ok true, delivery sent, mode queue or steer matching the request. The initial queue/sent shape was also observed at the observed receipt.",
+    "Observed busy Queue row: exactly 17 queuedMessage keys, hardQueue false, editable true, waitingOn exactly kind thread-busy, sendAt and failureReason null, inline payload, integer timestamps. The probe had initiator agent and a sender thread id; its note permits user with null sender when OpenWiz scrubs the caller environment.",
+    "Observed Claude Code queued Steer row: exactly 16 queuedMessage keys (hardQueue absent), initiator user, senderThreadId null, waitingOn null, with a UUID queued id. This is queued, never a claim of steering. The UUID fixture value is the reserved synthetic v4-form literal ending in 1, never a live identifier.",
+    "Observed on the PC with room-cli v141 : a busy Cloud Queue has the same 16 queuedMessage keys as queued Steer, mode queue, a UUID id, initiator user, null senderThreadId and waitingOn, no hardQueue. tell-cloud-queue-observed.json substitutes only synthetic values; unrecorded field values follow the earlier queued Steer fixture, not a new live observation.",
+    "Every id, queued id, content type, prompt text, model, effort, permission, tier, timestamp and caller state is synthetic. Target variants change only synthetic ids. All default receipts now match the requested mode; these shape observations do not claim the synthetic caller-state combinations were observed.",
+    "Guide-only five-key queued rows and historical minimal sent receipts remain unobserved negative inputs. Other deliveries, waiting reasons, populated mentions, payload kinds or key sets are not proven by this probe.",
+    "Documented argument shape: thread tell <id> --mode queue|steer --json -- <text>; the owner rechecks it on the intended endpoint before any new live send.",
+    "Synthetic: the thread tell not-found line is the one capture C observed for thread show and thread output.",
+    "Synthetic placeholders: 'Error: HTTP 400: Invalid input' and 'Error: HTTP 400: Unsupported mode'. The guide documents that these rejections exist, not their wording.",
+    "Synthetic: queuedWork 'waiting' (only 'none' was observed) on idle thr_syn_0011 with queuedMessageCount 2 stands for a queue that appears paused; no paused flag is documented.",
+    "Synthetic: thr_syn_0012 is active with hasPendingInteraction true; thr_syn_0014 has the unobserved status 'syn-starting'; thr_syn_0015 exists for thread show (queuedMessageCount 1) but is missing from thread list, so a paused queue cannot be ruled out.",
+    "Not read by OpenWiz: thread-log-one-match.json is a thread log event in the outside-observer shape of capture A, kept only to show that one message matching on text and time does not prove delivery. thread log is not on the allowlist."
+  ],
+  "responses": [
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0011",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0011.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0012",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0012.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0014",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0014.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "show",
+        "thr_syn_0015",
+        "--json"
+      ],
+      "stdout_file": "thread-show-0015.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "list",
+        "--json"
+      ],
+      "stdout_file": "thread-list.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0001",
+        "--mode",
+        "queue",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-sent.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0001",
+        "--mode",
+        "steer",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-steer-sent-observed.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0002",
+        "--mode",
+        "queue",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-queue-observed-0002.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0002",
+        "--mode",
+        "steer",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-steer-observed-0002.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0003",
+        "--mode",
+        "queue",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-sent-0003.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0004",
+        "--mode",
+        "queue",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-sent-0004.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0005",
+        "--mode",
+        "queue",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "exit": 1,
+      "stderr": "Error: HTTP 400: Invalid input"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0006",
+        "--mode",
+        "queue",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-queue-observed-0006.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0006",
+        "--mode",
+        "steer",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-steer-observed-0006.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0011",
+        "--mode",
+        "queue",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-sent-0011.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0011",
+        "--mode",
+        "steer",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-steer-sent-observed-0011.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0012",
+        "--mode",
+        "queue",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-queued-interaction.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0012",
+        "--mode",
+        "steer",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-queued-interaction.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0014",
+        "--mode",
+        "queue",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-sent-0014.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_0015",
+        "--mode",
+        "queue",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "stdout_file": "tell-sent-0015.json"
+    },
+    {
+      "argv": [
+        "thread",
+        "tell",
+        "thr_syn_9999",
+        "--mode",
+        "queue",
+        "--json",
+        "--"
+      ],
+      "any_text": true,
+      "exit": 1,
+      "stderr": "Error: HTTP 404: Thread not found"
+    }
+  ]
+}

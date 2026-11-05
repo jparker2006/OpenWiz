@@ -188,8 +188,6 @@ fn assert_stops_at_not_found(label: &str, calls: &[Vec<String>], id: &str) {
     );
 }
 
-/// No further read is made after not-found, so the invocation log is
-/// checked. `--json` prints nothing, or a JSON value with no `data`.
 #[test]
 fn show_of_a_nonexistent_session_is_not_found() {
     let fake = Fake::new("p04_show_nonexistent", "normal");
@@ -297,7 +295,7 @@ fn final_output_read_timeout_gives_a_partial_show_within_the_budget() {
     );
 }
 
-/// Each read has a 15-second timeout, and there
+/// New in ticket 2. : each read has a 15-second timeout, and there
 /// are no retries; a timeout becomes a gap. With the default 30-second
 /// budget, a read that never answers is stopped after 15 seconds, once.
 #[test]
@@ -366,11 +364,6 @@ fn a_read_that_never_answers_is_stopped_after_15_seconds_and_not_retried() {
     );
 }
 
-/// The exit codes `openwiz --help` documents: 0 a result
-/// (complete or partial), 1 a failed read, 2 a usage error or out-of-bounds
-/// request, 3 not found. An untested `room-cli` version is never an
-/// error (exit 0, marked untested). On an error stdout is
-/// empty and stderr has one `openwiz: ` message; a usage error reads nothing.
 #[test]
 fn exit_codes_are_documented_and_errors_go_to_stderr() {
     let cases: &[(&str, &[&str], i32)] = &[
@@ -422,7 +415,7 @@ fn exit_codes_are_documented_and_errors_go_to_stderr() {
     }
 }
 
-/// `openwiz --help` documents the commands, the sort key
+/// New in ticket 2. `openwiz --help` documents the commands, the sort key
 /// and the exit codes, and reads nothing.
 #[test]
 fn help_documents_the_commands_the_order_and_the_exit_codes() {
@@ -446,47 +439,15 @@ fn help_documents_the_commands_the_order_and_the_exit_codes() {
                 "{flag}: help should contain {wanted:?}:\n{out}"
             );
         }
+
         assert!(
             !out.lines().any(|l| l.starts_with("  4  ")),
-            "{flag}: no exit code 4, the version is never a gate:\n{out}"
+            "{flag}: no exit code 4 the version is never a gate:\n{out}"
         );
         assert!(fake.invocations().is_empty(), "help reads nothing");
     }
 }
 
-/// OpenWiz 0.0.2 is read-only: there is no `send`. The real `openwiz`
-/// program treats it as an unknown command, reads and writes nothing, and
-/// its help never mentions it.
-#[test]
-fn send_is_an_unknown_command_and_help_never_mentions_it() {
-    let fake = Fake::new("p04_no_send", "normal");
-    for args in [&["send", "thr_syn_0001", "hello"][..], &["send"][..]] {
-        let (code, out, err) = fake.program_cli(args);
-        assert_eq!(code, 2, "openwiz {args:?}: {out}{err}");
-        assert!(out.is_empty(), "openwiz {args:?}: stdout: {out}");
-        assert_eq!(
-            err, "openwiz: unknown command send (see openwiz --help)\n",
-            "openwiz {args:?}"
-        );
-    }
-    assert!(
-        fake.invocations().is_empty(),
-        "an unknown command runs no room-cli: {:?}",
-        fake.invocations()
-    );
-    for flag in ["--help", "-h"] {
-        let (code, out, err) = fake.program_cli(&[flag]);
-        assert_eq!(code, 0, "{err}");
-        assert!(
-            !out.to_lowercase().contains("send"),
-            "{flag}: help mentions send:\n{out}"
-        );
-        assert!(out.contains("read-only"), "{flag}:\n{out}");
-    }
-}
-
-/// A switch takes
-/// no value, so `--hidden=no` is a usage error, not `--hidden`.
 #[test]
 fn switches_take_no_value() {
     for (i, args) in [
@@ -506,16 +467,12 @@ fn switches_take_no_value() {
     }
 }
 
-/// A response over
-/// the size bound fails as malformed, also when the program stops with an
-/// error once its output is no longer read. The program here is a shell
-/// script, not the fake: it prints 40 MB through `head`.
 #[test]
 fn an_oversized_response_fails_as_malformed() {
     use std::os::unix::fs::PermissionsExt;
     let dir = std::path::Path::new(env!("CARGO_TARGET_TMPDIR")).join("p04_oversized_response");
     let _ = std::fs::remove_dir_all(&dir);
-    std::fs::create_dir_all(&dir).expect("dir");
+    crate::dirs::private_dir_all(&dir).expect("dir");
     let program = dir.join("room-cli");
     std::fs::write(
         &program,

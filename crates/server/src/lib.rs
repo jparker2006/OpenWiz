@@ -1,15 +1,8 @@
-//! `openwiz-server`: the read-only OpenWiz HTTP API, a thin client of the
-//! core like the `openwiz` CLI. See `contracts/web-api.v1.md`.
-//!
-//! The server calls the core's `list_report` and `show_report` with the
-//! CLI's options and prints the CLI's `--json`. It listens on loopback
-//! only, answers `GET` on three routes, and bounds everything else: heads,
-//! connections, core runs and time. With `--web-root`, it also serves the
-//! web page's static export on the same origin (`web.rs`). HTTP is the
-//! standard library's `TcpListener` and threads: no HTTP crate is approved.
-
 mod api;
+mod attachments;
 mod http;
+mod new_thread;
+mod send;
 mod web;
 
 use std::io;
@@ -19,9 +12,15 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
+use openwiz_core::messaging::record::{SendStore, StoreError};
+use openwiz_core::messaging::send::Messenger;
 use openwiz_core::model::Timestamp;
+use openwiz_core::new_thread::operation::NewThreadClient;
+use openwiz_core::new_thread::record::NewThreadStore;
 use openwiz_core::ops::Clock;
 use openwiz_core::source::SessionSource;
+use openwiz_store::AttachmentStore;
+use openwiz_store::attachments::FreeSpace;
 
 use crate::api::{Route as Matched, Runs};
 use crate::http::{Head, HeadError, Refusal, Reply};
@@ -51,6 +50,39 @@ pub const SLOT_WAIT: Duration = Duration::from_secs(5);
 /// `Retry-After` on a `503`, in seconds.
 pub const RETRY_AFTER_SECS: u64 = 5;
 
+/// Sends (the core's `send`) at once, apart from the core runs.
+pub const MAX_SENDS: usize = 2;
+
+/// Creates (the core's `new_thread`) at once, apart from the sends and the
+/// core runs: one (sheet the check).
+pub const MAX_CREATES: usize = 1;
+
+/// The largest send body: the core's text cap fully JSON-escaped (6 bytes
+/// per byte), plus 1 KiB for the other keys. The core still checks the text.
+pub const MAX_SEND_BODY_BYTES: usize = 6 * openwiz_core::messaging::MAX_TEXT_BYTES + 1024;
+
+/// Uploads (staging one file) at once, apart from the sends, creates and
+/// core runs (sheet the check).
+pub const MAX_UPLOADS: usize = 2;
+
+/// The largest upload body: the core's per-file limit, the largest
+/// provider limit (sheet the check). The store still checks the core's rules.
+pub const MAX_UPLOAD_BYTES: u64 = openwiz_core::attachment::FILE_MAX_BYTES;
+
+/// From the end of an upload's head to its answer, for the whole body and
+/// its verification: under Cloudflare's 125-second proxy read timeout
+/// (sheet the check; documented, not observed).
+pub const UPLOAD_DEADLINE: Duration = Duration::from_secs(110);
+
+/// The header that carries an upload's file name, percent-encoded UTF-8.
+pub const NAME_HEADER: &str = "X-OpenWiz-Name";
+
+/// The longest file name an upload may carry, in bytes, decoded.
+pub const MAX_NAME_BYTES: usize = 1024;
+
+/// A send's body must arrive within this time of the end of the head.
+pub const BODY_TIMEOUT: Duration = Duration::from_secs(10);
+
 /// From the end of the request head to the response: above the core's
 /// 30-second run budget plus [`SLOT_WAIT`].
 pub const REQUEST_DEADLINE: Duration = Duration::from_secs(40);
@@ -77,7 +109,11 @@ pub struct Route {
     pub path: &'static str,
 }
 
-/// Every route the server answers. Anything else is `404` or `405`.
+/// Every route the server answers. Anything else is `404` or `405`. Of the
+/// four `POST`s, the send and the create are the only writes to CloudRoom;
+/// the new-thread preview only reads; the upload, like the `DELETE`,
+/// changes only the attachment store . There is no retry route (sheet
+/// the check), and no route returns an attachment's bytes.
 pub const ROUTES: &[Route] = &[
     Route {
         method: "GET",
@@ -89,7 +125,47 @@ pub const ROUTES: &[Route] = &[
     },
     Route {
         method: "GET",
+        path: api::PREVIEW_ROUTE,
+    },
+    Route {
+        method: "GET",
+        path: api::LOOKUP_ROUTE,
+    },
+    Route {
+        method: "GET",
         path: api::HEALTH,
+    },
+    Route {
+        method: "POST",
+        path: api::SEND_ROUTE,
+    },
+    Route {
+        method: "GET",
+        path: api::CLOUD_OPTIONS,
+    },
+    Route {
+        method: "GET",
+        path: api::NEW_THREAD_STATUS_ROUTE,
+    },
+    Route {
+        method: "POST",
+        path: api::THREADS_PREVIEW_ROUTE,
+    },
+    Route {
+        method: "POST",
+        path: api::THREADS_ROUTE,
+    },
+    Route {
+        method: "GET",
+        path: api::ATTACHMENTS_ROUTE,
+    },
+    Route {
+        method: "POST",
+        path: api::ATTACHMENTS_ROUTE,
+    },
+    Route {
+        method: "DELETE",
+        path: api::ATTACHMENT_ROUTE,
     },
 ];
 
@@ -115,6 +191,13 @@ pub struct Limits {
     pub max_target_bytes: usize,
     pub max_head_bytes: usize,
     pub max_header_lines: usize,
+    pub max_sends: usize,
+    pub max_send_body_bytes: usize,
+    pub body_timeout: Duration,
+    pub max_creates: usize,
+    pub max_uploads: usize,
+    pub max_upload_bytes: u64,
+    pub upload_deadline: Duration,
 }
 
 impl Default for Limits {
@@ -130,12 +213,142 @@ impl Default for Limits {
             max_target_bytes: MAX_TARGET_BYTES,
             max_head_bytes: MAX_HEAD_BYTES,
             max_header_lines: MAX_HEADER_LINES,
+            max_sends: MAX_SENDS,
+            max_send_body_bytes: MAX_SEND_BODY_BYTES,
+            body_timeout: BODY_TIMEOUT,
+            max_creates: MAX_CREATES,
+            max_uploads: MAX_UPLOADS,
+            max_upload_bytes: MAX_UPLOAD_BYTES,
+            upload_deadline: UPLOAD_DEADLINE,
         }
     }
 }
 
+/// Opens the send record for a send (creating it if needed).
+pub type OpenStore = Arc<dyn Fn() -> Result<Box<dyn SendStore>, StoreError> + Send + Sync>;
+
+/// Opens the send record for reading only: creates nothing, and `None`
+/// when it does not exist yet.
+pub type OpenStoreReadOnly =
+    Arc<dyn Fn() -> Result<Option<Box<dyn SendStore>>, StoreError> + Send + Sync>;
+
+/// The one public host name a send may come to (the check). It can never be a
+/// loopback name or an IP address : [`SendHost::new`]
+/// is the only way to make one, so no configuration can serve a send to a
+/// loopback `Host`, whatever the allowed host is.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SendHost(String);
+
+/// Names that mean this machine.
+const LOOPBACK_NAMES: &[&str] = &[
+    "localhost",
+    "localhost.localdomain",
+    "ip6-localhost",
+    "ip6-loopback",
+];
+
+impl SendHost {
+    /// A DNS name ([`valid_host_name`]) that is not a loopback name
+    /// (`localhost`, `*.localhost` and [`LOOPBACK_NAMES`]) and not an IP
+    /// address: its last label is not all digits (every form a resolver may
+    /// read as IPv4, such as `127.1` or `2130706433`) nor hex (`0x…`); IPv6
+    /// literals are not DNS names.
+    pub fn new(name: &str) -> Result<Self, &'static str> {
+        const WHY: &str =
+            "the allowed host must be a public DNS name: not a loopback name, not an IP address";
+        if !valid_host_name(name) {
+            return Err(WHY);
+        }
+        let lower = name.to_ascii_lowercase();
+        let loopback = LOOPBACK_NAMES.contains(&lower.as_str()) || lower.ends_with(".localhost");
+        let last = lower.rsplit('.').next().unwrap_or_default();
+        let numeric = last.bytes().all(|b| b.is_ascii_digit()) || last.starts_with("0x");
+        if loopback || numeric || lower.parse::<std::net::IpAddr>().is_ok() {
+            return Err(WHY);
+        }
+        Ok(Self(name.to_owned()))
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+/// What the send routes need: the provider for the one write, and the send
+/// record, opened as `openwiz send` opens it, when each request needs it.
+#[derive(Clone)]
+pub struct Sending {
+    pub messenger: Arc<dyn Messenger>,
+    pub open_store: OpenStore,
+    pub open_store_read_only: OpenStoreReadOnly,
+    /// The host name sends are served on; `None`: every send is `421`.
+    pub host: Option<SendHost>,
+}
+
+impl std::fmt::Debug for Sending {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("Sending")
+    }
+}
+
+/// Opens the new-thread record for a create (creating it if needed).
+pub type OpenNewThreadStore =
+    Arc<dyn Fn() -> Result<Box<dyn NewThreadStore>, StoreError> + Send + Sync>;
+
+/// Opens the new-thread record for reading only: creates nothing, and
+/// `None` when it does not exist yet.
+pub type OpenNewThreadStoreReadOnly =
+    Arc<dyn Fn() -> Result<Option<Box<dyn NewThreadStore>>, StoreError> + Send + Sync>;
+
+/// What the new-thread routes need : the provider's reads and its one
+/// create, and the new-thread record, opened as `openwiz new` opens it,
+/// when each request needs it.
+#[derive(Clone)]
+pub struct Creating {
+    pub client: Arc<dyn NewThreadClient>,
+    pub open_store: OpenNewThreadStore,
+    pub open_store_read_only: OpenNewThreadStoreReadOnly,
+    /// The host name creates and new-thread previews are served on; `None`:
+    /// every one is `421`.
+    pub host: Option<SendHost>,
+}
+
+impl std::fmt::Debug for Creating {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("Creating")
+    }
+}
+
+/// Opens the attachment store (creating it if needed), as `openwiz
+/// attachment add` and `rm` open it.
+pub type OpenAttachmentStore = Arc<dyn Fn() -> Result<AttachmentStore, StoreError> + Send + Sync>;
+
+/// Opens the attachment store only if it exists, as `openwiz attachment
+/// ls` does: `None` creates nothing.
+pub type OpenAttachmentStoreReadOnly =
+    Arc<dyn Fn() -> Result<Option<AttachmentStore>, StoreError> + Send + Sync>;
+
+/// What the attachment routes need : the attachment store, opened as
+/// `openwiz attachment` opens it, when each request needs it, and the
+/// free-space measure staging checks the floor with (sheet the check).
+#[derive(Clone)]
+pub struct Attaching {
+    pub open_store: OpenAttachmentStore,
+    pub open_store_read_only: OpenAttachmentStoreReadOnly,
+    pub free_space: Arc<dyn FreeSpace + Send + Sync>,
+    /// The host name uploads and removals are served on; `None`: every one
+    /// is `421`.
+    pub host: Option<SendHost>,
+}
+
+impl std::fmt::Debug for Attaching {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("Attaching")
+    }
+}
+
 /// The server's configuration. Nothing in it is ever committed.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default)]
 pub struct Config {
     /// The one public host name served besides loopback, from local
     /// configuration (`--allowed-host` or [`ALLOWED_HOST_ENV`]).
@@ -144,6 +357,17 @@ pub struct Config {
     /// non-API path is `404`.
     pub web_root: Option<WebRoot>,
     pub limits: Limits,
+    /// The send routes' provider and send record. `openwiz-server` always
+    /// sets it; without it (an in-process server in a test), the send,
+    /// preview and lookup routes are `404`.
+    pub sending: Option<Sending>,
+    /// The new-thread routes' provider and record. `openwiz-server` always
+    /// sets it; without it, the four new-thread routes are `404`.
+    pub creating: Option<Creating>,
+    /// The attachment routes' store . `openwiz-server` always sets it;
+    /// without it, the three attachment routes are `404`, and a send or a
+    /// create with attachments is refused by the core's gate.
+    pub attaching: Option<Attaching>,
 }
 
 /// Receives one request log line at a time, without a newline: the method,
@@ -159,6 +383,8 @@ pub struct Stats {
     pub core_runs: usize,
     /// Requests waiting for a core run's result, their own or a shared one.
     pub attached: usize,
+    /// Uploads holding an upload slot .
+    pub uploads: usize,
 }
 
 /// The wall clock and monotonic clock of this machine.
@@ -207,6 +433,9 @@ struct Shared {
     connections: AtomicUsize,
     refusing: AtomicUsize,
     runs: Arc<Runs>,
+    sends: Arc<send::Slots>,
+    creates: Arc<send::Slots>,
+    uploads: Arc<send::Slots>,
 }
 
 /// A running server.
@@ -227,6 +456,7 @@ impl Server {
             connections: self.shared.connections.load(Ordering::SeqCst),
             core_runs,
             attached,
+            uploads: self.shared.uploads.used(),
         }
     }
 
@@ -254,6 +484,9 @@ pub fn start(
         connections: AtomicUsize::new(0),
         refusing: AtomicUsize::new(0),
         runs: Arc::new(Runs::default()),
+        sends: Arc::new(send::Slots::default()),
+        creates: Arc::new(send::Slots::default()),
+        uploads: Arc::new(send::Slots::default()),
     });
     let serving = shared.clone();
     let accept = thread::Builder::new()
@@ -357,7 +590,12 @@ fn connection(mut stream: TcpStream, shared: &Shared, accepted: Instant, over_ca
                     None => Matched::of(path).map_or("-", |r| r.template()),
                 };
                 let head_method = head.method == "HEAD";
-                (method, route, respond(&head, shared), head_method)
+                (
+                    method,
+                    route,
+                    respond(&head, &mut stream, shared),
+                    head_method,
+                )
             }
         }
     };
@@ -430,8 +668,10 @@ fn web_route<'c>(path: &str, config: &'c Config) -> Option<(&'c WebRoot, &'stati
 }
 
 /// The checks, in order: `Host`, method, body, route, query; then the call
-/// (or the web file).
-fn respond(head: &Head, shared: &Shared) -> Reply {
+/// (or the web file). The send, create and new-thread preview routes have
+/// their own order after the method (`send.rs`, `new_thread.rs`; the
+/// contract's "Sending" and "Creating").
+fn respond(head: &Head, stream: &mut TcpStream, shared: &Shared) -> Reply {
     let limits = &shared.config.limits;
     let deadline = Instant::now() + limits.request_deadline;
     let hosts = head.values("Host");
@@ -453,6 +693,77 @@ fn respond(head: &Head, shared: &Shared) -> Reply {
         None => (head.target.as_str(), None),
     };
     let web = web_route(path, &shared.config);
+    let matched = Matched::of(path);
+    let sending = shared.config.sending.as_ref();
+    // Without a send configuration these routes do not exist, for every
+    // method .
+    if sending.is_none()
+        && matches!(
+            matched,
+            Some(Matched::Send(_) | Matched::Preview(_) | Matched::Lookup(..))
+        )
+    {
+        return api::error(404, "no_route", "no such route");
+    }
+    // The same for the new-thread routes without a new-thread configuration.
+    let creating = shared.config.creating.as_ref();
+    if creating.is_none()
+        && matches!(
+            matched,
+            Some(
+                Matched::CloudOptions
+                    | Matched::Threads(_)
+                    | Matched::ThreadsPreview(_)
+                    | Matched::NewThreadStatus(_)
+            )
+        )
+    {
+        return api::error(404, "no_route", "no such route");
+    }
+    // The same for the attachment routes without an attachment configuration
+    // .
+    let attaching = shared.config.attaching.as_ref();
+    if attaching.is_none() && matches!(matched, Some(Matched::Attachments | Matched::Attachment(_)))
+    {
+        return api::error(404, "no_route", "no such route");
+    }
+    if let Some(Matched::Send(_) | Matched::Threads(_) | Matched::ThreadsPreview(_)) = &matched
+        && head.method != "POST"
+    {
+        let mut reply = api::error(405, "method_not_allowed", "only POST is allowed");
+        reply.extra.push(("Allow", "POST".to_owned()));
+        return reply;
+    }
+    if let Some(Matched::Attachments) = &matched
+        && head.method != "GET"
+        && head.method != "POST"
+    {
+        let mut reply = api::error(405, "method_not_allowed", "only GET and POST are allowed");
+        reply.extra.push(("Allow", "GET, POST".to_owned()));
+        return reply;
+    }
+    if let Some(Matched::Attachment(_)) = &matched
+        && head.method != "DELETE"
+    {
+        let mut reply = api::error(405, "method_not_allowed", "only DELETE is allowed");
+        reply.extra.push(("Allow", "DELETE".to_owned()));
+        return reply;
+    }
+    if let (Some(attaching), Some(route @ (Matched::Attachments | Matched::Attachment(_)))) =
+        (attaching, &matched)
+        && head.method != "GET"
+    {
+        return attachment_write(head, stream, shared, attaching, host, query, route);
+    }
+    match &matched {
+        Some(Matched::Send(id)) => {
+            return send_route(head, stream, shared, host, query, id, deadline);
+        }
+        Some(route @ (Matched::Threads(_) | Matched::ThreadsPreview(_))) => {
+            return create_route(head, stream, shared, host, query, route, deadline);
+        }
+        _ => {}
+    }
     if web.is_some() && head.method != "GET" && head.method != "HEAD" {
         let mut reply = api::error(405, "method_not_allowed", "only GET and HEAD are allowed");
         reply.extra.push(("Allow", "GET, HEAD".to_owned()));
@@ -479,21 +790,202 @@ fn respond(head: &Head, shared: &Shared) -> Reply {
         return web::serve(root, template, path)
             .unwrap_or_else(|| api::error(404, "no_route", "no such route"));
     }
-    let call = match Matched::of(path) {
+    let call = match matched {
         None => return api::error(404, "no_route", "no such route"),
+        Some(Matched::Preview(id)) => match api::preview_call(&id, query) {
+            Ok(call) => call,
+            Err(why) => return api::error(400, "invalid_request", why),
+        },
         Some(_) if query.is_some() && path != api::INVENTORY => {
             return api::error(400, "invalid_request", "this route takes no query");
         }
         Some(Matched::Health) => return api::health(shared.source.as_ref()),
+        Some(Matched::Lookup(id, op_id)) => {
+            let Some(sending) = sending else {
+                return api::error(404, "no_route", "no such route");
+            };
+            return send::lookup(sending, shared.clock.as_ref(), &id, &op_id);
+        }
         Some(Matched::Session(id)) => api::Call::Show(id),
         Some(Matched::Inventory) => match api::list_call(query) {
             Ok(call) => call,
             Err(why) => return api::error(400, "invalid_request", why),
         },
+        Some(Matched::CloudOptions) => api::Call::CloudOptions,
+        Some(Matched::Attachments) => {
+            let Some(attaching) = attaching else {
+                return api::error(404, "no_route", "no such route");
+            };
+            return attachments::list(attaching, shared.clock.as_ref());
+        }
+        Some(Matched::NewThreadStatus(op_id)) => {
+            if let Err(refusal) = new_thread::status_op_id(&op_id) {
+                return refusal;
+            }
+            api::Call::NewThreadStatus(op_id)
+        }
+        Some(
+            Matched::Send(_)
+            | Matched::Threads(_)
+            | Matched::ThreadsPreview(_)
+            | Matched::Attachment(_),
+        ) => {
+            unreachable!("answered above")
+        }
     };
-    shared
-        .runs
-        .call(call, deadline, limits, &shared.source, &shared.clock)
+    shared.runs.call(call, deadline, limits, &core(shared))
+}
+
+/// What a core run calls, from the server's configuration.
+fn core(shared: &Shared) -> api::Core {
+    api::Core {
+        source: shared.source.clone(),
+        messenger: shared.config.sending.as_ref().map(|s| s.messenger.clone()),
+        creating: shared.config.creating.clone(),
+        attaching: shared.config.attaching.clone(),
+        clock: shared.clock.clone(),
+    }
+}
+
+/// `POST /api/v1/attachments` and `DELETE /api/v1/attachments/{id}`, after
+/// the `Host` and the method: the route, the write `Host` (only the
+/// configured host name, never loopback: the check, unchanged by the check), the
+/// query, then `attachments.rs`.
+fn attachment_write(
+    head: &Head,
+    stream: &mut TcpStream,
+    shared: &Shared,
+    attaching: &Attaching,
+    host: &str,
+    query: Option<&str>,
+    route: &Matched,
+) -> Reply {
+    let Some(site) = attaching
+        .host
+        .as_ref()
+        .map(SendHost::as_str)
+        .filter(|site| site.eq_ignore_ascii_case(host))
+    else {
+        return api::error(
+            421,
+            "misdirected",
+            "uploads and removals are served only on the configured host name",
+        );
+    };
+    if query.is_some() {
+        return api::error(400, "invalid_request", "this route takes no query");
+    }
+    let context = attachments::Context {
+        attaching,
+        slots: &shared.uploads,
+        clock: &shared.clock,
+        limits: &shared.config.limits,
+    };
+    match route {
+        Matched::Attachment(id) => attachments::remove(head, site, id, &context),
+        _ => attachments::upload(head, stream, site, &context),
+    }
+}
+
+/// `POST /api/v1/projects/{id}/threads` and `…/threads/preview`, after the
+/// `Host` and the method: the route, the create `Host` (only the configured
+/// host name, never loopback: the check, unchanged by the check), the query, then
+/// `new_thread.rs`. The preview, which only reads, is a shared core run.
+fn create_route(
+    head: &Head,
+    stream: &mut TcpStream,
+    shared: &Shared,
+    host: &str,
+    query: Option<&str>,
+    route: &Matched,
+    deadline: Instant,
+) -> Reply {
+    let (project, preview) = match route {
+        Matched::Threads(project) => (project.as_str(), false),
+        Matched::ThreadsPreview(project) => (project.as_str(), true),
+        _ => return api::error(404, "no_route", "no such route"),
+    };
+    let Some(creating) = shared.config.creating.as_ref() else {
+        return api::error(404, "no_route", "no such route");
+    };
+    let Some(site) = creating
+        .host
+        .as_ref()
+        .map(SendHost::as_str)
+        .filter(|site| site.eq_ignore_ascii_case(host))
+    else {
+        return api::error(
+            421,
+            "misdirected",
+            "creates are served only on the configured host name",
+        );
+    };
+    if query.is_some() {
+        return api::error(400, "invalid_request", "this route takes no query");
+    }
+    let limits = &shared.config.limits;
+    if preview {
+        let asked = match new_thread::read_asked(head, stream, site, project, limits, "a preview") {
+            Ok(asked) => asked,
+            Err(refusal) => return refusal,
+        };
+        return shared.runs.call(
+            api::Call::NewThreadPreview(Box::new(asked)),
+            deadline,
+            limits,
+            &core(shared),
+        );
+    }
+    let context = new_thread::Context {
+        creating,
+        attaching: shared.config.attaching.as_ref(),
+        slots: &shared.creates,
+        clock: &shared.clock,
+        limits,
+        deadline,
+    };
+    new_thread::create(head, stream, site, project, &context)
+}
+
+/// `POST /api/v1/sessions/{id}/messages`, after the `Host` and the method:
+/// the route, the send `Host` (only the configured host name, never
+/// loopback: the check), the query, then `send.rs`.
+fn send_route(
+    head: &Head,
+    stream: &mut TcpStream,
+    shared: &Shared,
+    host: &str,
+    query: Option<&str>,
+    id: &str,
+    deadline: Instant,
+) -> Reply {
+    let Some(sending) = shared.config.sending.as_ref() else {
+        return api::error(404, "no_route", "no such route");
+    };
+    let Some(site) = sending
+        .host
+        .as_ref()
+        .map(SendHost::as_str)
+        .filter(|site| site.eq_ignore_ascii_case(host))
+    else {
+        return api::error(
+            421,
+            "misdirected",
+            "sends are served only on the configured host name",
+        );
+    };
+    if query.is_some() {
+        return api::error(400, "invalid_request", "this route takes no query");
+    }
+    let context = send::Context {
+        sending,
+        attaching: shared.config.attaching.as_ref(),
+        slots: &shared.sends,
+        clock: &shared.clock,
+        limits: &shared.config.limits,
+        deadline,
+    };
+    send::post(head, stream, site, id, &context)
 }
 
 /// Loopback with this server's port, or the configured public host name.
@@ -510,7 +1002,8 @@ fn host_allowed(host: &str, port: u16, allowed: Option<&str>) -> bool {
 /// `openwiz-server --help`.
 pub fn help() -> String {
     format!(
-        "{NAME}: the read-only OpenWiz HTTP API, on loopback only.
+        "{NAME}: the OpenWiz HTTP API, on loopback only, with two writes: send and
+create (a new Cloud thread); and attachments, staged on this machine only.
 
 Usage:
   {NAME} [--port N] [--allowed-host NAME] [--web-root DIR]
@@ -525,13 +1018,36 @@ Usage:
                        /, /_next/static/... and /fonts/... (default: none, and
                        every other path is 404)
 
-It always listens on 127.0.0.1 only. Routes (GET only):
+It always listens on 127.0.0.1 only. Routes (GET):
   /api/v1/inventory?detail=1|2&hidden=0|1&archived=0|1&limit=N&offset=N
   /api/v1/sessions/<id>
+  /api/v1/sessions/<id>/preview?mode=queue|steer
+  /api/v1/sessions/<id>/messages/<op id>
   /api/v1/health
-Each answer is what openwiz ls, ls -l or show prints with --json; see
-contracts/web-api.v1.md. One line per request goes to stderr: the method,
-route, status and time only.
+  /api/v1/cloud-options
+  /api/v1/new-threads/<op id>
+  /api/v1/attachments                (the staged attachments; never their bytes)
+and, only with --allowed-host and only on that host, four POSTs: the two
+writes, the new-thread preview, which only reads, and an upload (a raw body,
+at most 25 MiB, staged as openwiz attachment add stages a file), and one
+DELETE, of a staged attachment:
+  /api/v1/sessions/<id>/messages
+  /api/v1/projects/<project id>/threads
+  /api/v1/projects/<project id>/threads/preview
+  /api/v1/attachments
+  DELETE /api/v1/attachments/<attachment id>
+The send, preview and lookup answers are what openwiz send prints with
+--json; they use the same send record as openwiz send ($OPENWIZ_STATE_DIR,
+else the owner's default state directory). The create, new-thread preview,
+status and options answers are what openwiz new (with --yes, without it,
+with --status) and openwiz models print with --json; they use the same
+new-thread record as openwiz new. There is no retry. The attachment answers
+are what openwiz attachment add, ls and rm print with --json, from the same
+attachment store; no route returns an attachment's bytes.
+The inventory and session answers are what openwiz ls, ls -l or show prints
+with --json; health is the server's own metadata, with no CLI equivalent and
+no room-cli read. See contracts/web-api.v1.md. One line per request goes to
+stderr: the method, route, status and time only.
 "
     )
 }

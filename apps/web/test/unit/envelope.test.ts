@@ -45,7 +45,7 @@ type Mutation = [string, (e: any) => void];
 
 const listMutations: Mutation[] = [
   ['an extra top-level key', (e) => (e.revision = 3)],
-  ['an extra session key', (e) => (e.data.sessions[0].branch = 'syn/x')],
+  ['an extra session key', (e) => (e.data.sessions[0].branch = 'room/x')],
   ['an extra counts key', (e) => (e.coverage.counts.cursor = 'abc')],
   ['a missing session key', (e) => delete e.data.sessions[0].age_ms],
   ['a missing envelope key', (e) => delete e.gaps],
