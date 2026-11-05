@@ -1,72 +1,49 @@
 # Changelog
 
-All OpenWiz versions and revisions, newest first. Versioning is explained in [RELEASING.md](RELEASING.md). PACP has its own version history in [docs/pacp/v0.1.md](docs/pacp/v0.1.md#version-history).
+All OpenWiz versions, newest first. Versioning: [RELEASING.md](RELEASING.md). What's tested and what isn't: [docs/testing.md](docs/testing.md).
 
-## 0.0.3–0.0.5 · 2026-11-05
+## 0.0.5 · 2026-11-05
 
-*Updated for 0.0.5.*
+**Fleets of agents build for you**
 
-**Message, create and coordinate threads.**
+- Eight skills any agent can use: grill you on an idea, plan it into tickets, then build, review and merge each one.
+- Install them once as a plugin for Claude Code or Codex.
+- Every merge needs an independent review of the exact commit and green CI.
 
-1. **Fixture test — 0.0.3:** Queue and Steer messages from the CLI and web, with operation records and explicit uncertain outcomes. **Live observation — LIVE-0.0.3:** the PC test held the release-blocking claims, with recorded gaps; the combined export was not that test candidate.
-2. **Fixture test — 0.0.4:** preview and create a Cloud thread in an existing project; stage files and images locally, then attach them to Queue sends or creates. **Live observation — LIVE-0.0.4:** the PC run held the recorded creation/attachment checks; browser steps were emulated. Spawn-receipt fixture coverage and the other recorded gaps, including the owner’s UI acceptance, remain open.
-3. **Live observation, limited — 0.0.5:** eight fleet skills used in a development run, accepted with recorded gaps: fresh-child discovery and contract holds unobserved; five-ready-ticket launches and cross-version timing unproved; some running and cleanup required intervention. Exact-head reviews and matching merges were observed; helper checks are fixture tests.
+## 0.0.4 · 2026-11-05
 
-Export validation: Rust 1.99.1, Node.js 24.22.1, Linux and Chromium on synthetic tests, with the locked crates and packages in [dependencies](docs/dependencies.md). LIVE-0.0.3 is filled with the bounded PC result and gaps; LIVE-0.0.4 is filled with its held claims and gaps, including the missing observed spawn-receipt fixture. A quick Mac check, Safari/WebKit beyond the one recorded phone send, real-radio fault coverage and unattended fleet operation remain open; see [testing and gaps](docs/testing.md). No PACP conformance is claimed.
+**Start new threads, with files**
+
+- `openwiz new` starts a Cloud thread in one of your projects. It shows exactly what it will do, and only creates it with `--yes`.
+- Attach files and images to a new thread or a message, from the terminal or your phone.
+- One thread per create: if the result is unclear, it tells you instead of trying again.
+
+## 0.0.3 · 2026-11-05
+
+**Message your threads**
+
+- `openwiz send` sends one message to a running thread: Queue waits for its turn, Steer joins the current one.
+- Or send from the web page on your phone.
+- If a send's result is unclear, OpenWiz says so instead of sending twice.
 
 ## 0.0.2 · 2026-10-30
 
-**Your threads on your phone, privately**
+**Your threads on your phone**
 
-1. `openwiz-server` serves your threads as a private web page on your own Mac, listening on localhost only.
-2. The page shows your threads grouped by project, with status, age and a details sheet on tap; it refreshes itself while open.
-3. It says plainly when data is stale, partial or disconnected, or when you're signed out, and never shows stale data as fresh.
-4. Reach it from anywhere through a Cloudflare Tunnel and an Access login that lets in only the emails you allow; in a live check, requests without a login got only the login page ([setup guide](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/web-access.md)). *Updated for 0.0.5: historical guide link.*
-5. Read-only, like 0.0.1: it never starts, messages or changes a thread, and it makes the same reads as `openwiz`, which in a live check woke no idle thread and marked none read.
-6. Status is a word and a symbol, not just a colour, and the page passes automated keyboard and screen-reader checks in Chromium.
-
-What was tested, and what is not proven: [docs/evidence/0.0.2-live-check.md](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/evidence/0.0.2-live-check.md). Dependencies: [docs/dependencies.md](docs/dependencies.md). *Updated for 0.0.5: report link points to its published tree.*
+- A private web page served from your own computer: threads by project, with status and age; tap one for details.
+- Reach it from anywhere through a Cloudflare Tunnel and a login for your email only.
+- Read-only, and it tells you when data is stale or you're signed out.
 
 ## 0.0.1 · 2026-10-30
 
-**See your CloudRoom threads from the terminal**
+**Your CloudRoom threads in the terminal**
 
-1. `openwiz ls` lists your threads with their status, project and how fresh the data is; `-a` and `--hidden` add archived and hidden ones.
-2. `openwiz ls -l` adds a one-line recap and the reported model and effort.
-3. `openwiz show <id>` shows one thread's details and its final output.
-4. `--json` on `ls` and `show`, for scripts.
-5. Read-only: it never starts, messages or changes a thread, and in a live check on macOS with `room-cli` v127 no idle thread was woken or marked read.
-6. Runs with any `room-cli` version and never refuses an update; versions other than v127 are shown as untested.
+- `openwiz ls` lists your threads with status, project and age; `-l` adds a recap, model and effort.
+- `openwiz show <id>` shows one thread and its final output.
+- `--json` for scripts. Read-only: it never changes a thread.
 
-What was tested, and what is not proven: [docs/evidence/0.0.1-live-check.md](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/evidence/0.0.1-live-check.md). Dependencies: [docs/dependencies.md](docs/dependencies.md). *Updated for 0.0.5: report link points to its published tree.*
+## 0.0.0 · 2026-10-22
 
-## 0.0.0 — revision 1 (unreleased, under review)
+**The design**
 
-Still a design preview with no implementation. Four outcomes:
-
-1. **Renamed to OpenWiz, with its technology and layout decided.**
-   - The core, the CLI and all backend logic are Rust. The web client is Next.js and TypeScript. Desktop packaging is undecided.
-   - One monorepo, with dependencies pointing inward. Clients keep presentation state only; adapters keep integration bookkeeping only and never own policy.
-   - CLI-first and a polished UI are both goals.
-   - **The controller is the one Rust core that owns authoritative state, permissions, routing and coordination.** Each project orchestrator runs its factory workflow under it and is not a second authority.
-2. **How OpenWiz is used and how it works:**
-   - [docs/interface.md](docs/interface.md): commands, decision types, honest lists, screens and visual style.
-   - [docs/workflow.md](docs/workflow.md): who owns what, ticket states (with Define proof before Build), rework, pause and resume, approval, dependent unlock and a worked example. Correction rounds are counted per review finding: two failed rounds, a diagnosis that is not a round, one more round, then the user decides. Thresholds are configurable, with defaults 2 and 1.
-   - Service access that exists today is kept separate from OpenWiz adapters, none of which is implemented.
-3. **Two architecture images**, each with an editable SVG source and a 3840×2160 PNG. One shows the product architecture, the other the monorepo modules. Both are labelled as proposals, with dashed lines for unverified links.
-4. **Release rules:**
-   - proof-driven development (claims and their evidence are defined before building);
-   - version lines separated from real dependencies;
-   - at most five outcomes per version;
-   - this changelog;
-   - the planned scope of 0.0.1, recorded as not started: a read-only Rust inventory of real CloudRoom sessions.
-
-PACP gets an editorial note on the rename only. It stays v0.1 (draft).
-
-## 0.0.0 — 2026-10-22
-
-First publication, as OpenFleet: a design preview with no implementation.
-- Overview, architecture diagrams and decisions.
-- PACP v0.1 (draft).
-- Contribution and release rules.
-- Apache License 2.0.
+- Published first as OpenFleet: the design, architecture and release rules, no code yet. Renamed to OpenWiz before 0.0.1.
