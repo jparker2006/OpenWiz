@@ -115,7 +115,7 @@ export function newOpId(random: (bytes: Uint8Array) => void = (b) => crypto.getR
 }
 
 /**
- * the check: "not sent" only when the answer proves the request never reached the
+ * "not sent" only when the answer proves the request never reached the
  * core: Access's 401 or redirect, or OpenWiz's own refusal before the core
  * (its JSON error, or its bodyless 503). A `200` is the core's report.
  * Everything else is unknown: the send may have happened. A report for
@@ -249,12 +249,12 @@ export function edit(s: ThreadState, text: string, mint: () => string): ThreadSt
  * A press of a send button. It sends the mode's next attempt, whose op id
  * every tab derives the same way:
  * - with nothing unresolved: the draft (Send, Queue, Steer; Send anyway
- *   after a possible-duplicate refusal). An attempt refused before any claim
- *   is sent again under its own, unused, number;
+ * after a possible-duplicate refusal). An attempt refused before any claim
+ * is sent again under its own, unused, number;
  * - when that attempt is in the list with no answer: the same attempt again
- *   ("Try again"), so the core replays;
+ * ("Try again"), so the core replays;
  * - otherwise only as the owner's explicit duplicate ("Send again"), with
- *   the earlier attempts kept as they are.
+ * the earlier attempts kept as they are.
  * Null while a send or check is out, or without text and a root id.
  */
 export function press(s: ThreadState, pressed: Press, attachments: readonly string[] = []): { state: ThreadState; opId: string; body: SendBody } | null {
@@ -339,7 +339,7 @@ export function previewAnswer(a: Answer, id: string, mode: Mode): PreviewSaid {
   return { kind: 'failed', why: preview ? 'the answer was not this preview' : readFailure(a) };
 }
 
-// Storage: this tab's sessionStorage only, never localStorage, cookies, the URL or the title (the check).
+// Storage: this tab's sessionStorage only, never localStorage, cookies, the URL or the title.
 
 export interface StorageLike {
   getItem(key: string): string | null;
@@ -393,7 +393,7 @@ export type ComposerDeps = {
   storage: StorageLike | null;
   timers: Timers;
   newOpId(): string;
-  /** Each thread's attachment tray : its ready ids go with a send, and it is emptied once they are handed over. */
+  /** Each thread's attachment tray: its ready ids go with a send, and it is emptied once they are handed over. */
   uploads?: Uploads;
 };
 
@@ -515,7 +515,7 @@ export class Composers {
     }
   }
 
-  /** Stores the minimum : true when it is stored. */
+  /** Stores the minimum: true when it is stored. */
   private save(id: string, s: ThreadState): boolean {
     const storage = this.deps.storage;
     if (!storage) return false;

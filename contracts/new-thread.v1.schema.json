@@ -140,7 +140,7 @@
       }
     },
     "source": {
-      "description": "The provider and the version this create read .",
+      "description": "The provider and the version this create read.",
       "type": "object",
       "required": [
         "name",
@@ -285,7 +285,7 @@
           "minLength": 1,
           "maxLength": 179,
           "pattern": "^[A-Za-z0-9_][A-Za-z0-9._-]*$",
-          "description": "The staged (safe) name CloudRoom is given: ASCII letters, digits, ., _ or -, not starting with . or -."
+          "description": "The staged (safe) name CloudRoom is given: ASCII letters, digits,., _ or -, not starting with. or -."
         }
       }
     },
@@ -674,7 +674,7 @@
       ]
     },
     "report": {
-      "description": "The report of a create. start is the created thread's start, as openwiz new followed it (A1 phase 2, sheet the check); null when nothing was created, and always null inside a status read, whose own start is beside it.",
+      "description": "The report of a create. start is the created thread's start, as openwiz new followed it ; null when nothing was created, and always null inside a status read, whose own start is beside it.",
       "type": "object",
       "required": [
         "schema",

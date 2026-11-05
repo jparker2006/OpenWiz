@@ -1,10 +1,10 @@
-//! The attachment routes : the upload (`POST /api/v1/attachments`),
+//! The attachment routes: the upload (`POST /api/v1/attachments`),
 //! the list (`GET`) and the removal (`DELETE /api/v1/attachments/{id}`). See
-//! `contracts/web-api.v1.md`, "Attachments", and the upload addendum in
-//! `docs/web-access.md` (the check).
+//! `contracts/web-api.v1.md`, "Attachments", for route rules and
+//! `docs/web-access.md` for access boundaries.
 //!
 //! The server checks only the request's shape: the write `Host`, the send's
-//! cross-site checks (the check keeps them unchanged), a raw
+//! cross-site checks, a raw
 //! `application/octet-stream` body (never multipart), its framing and size,
 //! the name header, a cap of two uploads at a time and the upload deadline.
 //! Then it calls the attachment store (`openwiz-store`) and its reports
@@ -16,7 +16,7 @@
 //!
 //! The body streams straight into the store's staging
 //! ([`openwiz_store::attachments::AttachmentStore::stage_stream`]): no file
-//! is written beside the store .
+//! is written beside the store.
 
 use std::io::{self, Read};
 use std::net::TcpStream;

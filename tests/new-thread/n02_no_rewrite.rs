@@ -1,4 +1,4 @@
-//! N2 (sheet the check): no rewrite. Every `room-cli` call runs without
+//! N2: no rewrite. Every `room-cli` call runs without
 //! `ROOM_THREAD_ID`, `ROOM_PROJECT_ID` or any `BB_*` variable, and always
 //! keeps `ROOM_SERVER_URL`; `send`'s calls included. The model passed is the
 //! model chosen.
@@ -100,7 +100,7 @@ fn every_call_runs_without_the_thread_context() {
         .collect();
     assert_eq!(envs.len(), calls.len(), "one environment line per call");
     // What this test's own environment passes through (a CloudRoom sandbox
-    // sets `CLOUDROOM_*` names, which the sheet's list keeps), plus
+    // sets `CLOUDROOM_*` names, which the environment allowlist keeps), plus
     // `ROOM_SERVER_URL`; never a scrubbed name.
     let mut kept: Vec<String> = std::env::vars_os()
         .filter_map(|(name, _)| name.into_string().ok())

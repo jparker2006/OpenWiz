@@ -1,5 +1,5 @@
 //! The release `openwiz attachment add, ls, rm`, as processes: the real
-//! free-space measure (`/bin/df`, sheet the check), the real clock, the owner's
+//! free-space measure (`/bin/df`), the real clock, the owner's
 //! state directory from `OPENWIZ_STATE_DIR`. No other program runs: a `df`
 //! and a `room-cli` first on `PATH` are never run (AP7, AP10). Each run's
 //! stderr is clean (AP12), and the store is owner-only (AP9).

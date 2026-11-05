@@ -7,8 +7,8 @@
 | Inventory, send, new-thread, attachment and HTTP behaviour follows the encoded cases | Fixture test | Synthetic inputs and fake room-cli; not proof of real delivery or creation |
 | Web composer, launcher and attachment tray follow their encoded cases | Fixture test | Linux Chromium; not Safari/WebKit or physical mobile devices |
 | Sent and Cloud queued receipt parsing includes individually observed shapes | Fixture test plus limited live observation of upstream shape | Parser cases are synthetic reconstructions; receipt parsing does not establish full release acceptance |
-| 0.0.3 live delivery acceptance | **Live observation: release-blocking claims held; gaps recorded** | LIVE-0.0.3: PC sittings on earlier 0.0.3 candidates, ending on `d4b2a82`; see the bounded result below. Not a live run of the combined export |
-| 0.0.4 live create/attachment checks | **Live observation: held claims and recorded gaps** | LIVE-0.0.4: agent-run on `660c169`; browser/device steps emulated. Spawn-receipt fixture coverage and other gaps remain open; not a blanket acceptance or a live run of this combined export |
+| 0.0.3 live delivery acceptance | **Live observation: release-blocking claims held; gaps recorded** | LIVE-0.0.3: PC sittings on earlier private-beta 0.0.3 candidate builds; see the bounded result below. Not a live run of the combined export |
+| 0.0.4 live create/attachment checks | **Live observation: held claims and recorded gaps** | LIVE-0.0.4: agent-run on an earlier private-beta 0.0.4 candidate build; browser/device steps emulated. Spawn-receipt fixture coverage and other gaps remain open; not a blanket acceptance or a live run of this combined export |
 | Eight skills were used in a development run | Live observation, limited | Accepted with gaps; automatic discovery in fresh children unobserved, path-based briefs used |
 | Reviews named exact heads and merged matching heads | Live observation, limited | Eight review reports and four matching merges; no low-finding follow-up exercised |
 | Helper and structural checks exercise the skill rules | Fixture test | Historical helper results and the current export check are distinct; no claim that every helper was re-run for this export |
@@ -19,13 +19,13 @@ The skill run recorded ten starts, no duplicate builders started by the loop, an
 
 **Tested inputs:** fixtures use the historical room-cli 0.43.1 and v127 directories; catalogue shape observations were recorded with v131, and the Cloud queued receipt shape with v141. Folder names do not assert compatibility. The 0.0.3 PC test used room-cli 0.43.1 and v141 across sittings; the 0.0.4 PC run used room-cli v141 and v142, with Chrome 157 emulation for its browser/device steps.
 
-**Fresh-clone verification:** the private export record binds build, test, formatting and Clippy logs to an exact public-tree head. These checks read no real CloudRoom account. The Rust and web toolchains and locked dependency versions are listed in [dependencies](dependencies.md).
+**Automated verification:** a fresh-clone run, targeted corrections and a later code-delta check cover the tested source. Subsequent changes revised prose and comments only; they do not constitute a new full run on this commit. These automated checks used synthetic inputs, not a real CloudRoom account. The Rust and web toolchains and locked dependency versions are listed in [dependencies](dependencies.md).
 
 ## LIVE-0.0.3: recorded PC result
 
 **Live observation, with gaps (2026-11-05).** The delivery test finished with the release-blocking claims held: each intended text reached its target exactly once without changing the judged cold sessions; tested lost acknowledgements stayed uncertain without automatic resend; the tested crash paths did not redispatch; operation-id conflicts were refused and the races made exactly one call; six server owner/request probes were refused, the public probe redirected to login, and those probes made no tells. This is a bounded result, not a guarantee for every environment or failure.
 
-**Checked code and environment:** CLI sittings used `01edadf` and `86cda50`; the later web and phone steps used `d4b2a82`. These are the recorded 0.0.3 candidates, not this combined 0.0.5 export. The host was a Linux PC; room-cli was 0.43.1 initially and v141 later. One send ran on a real iPhone in Safari over cellular. The final agent-run steps used headless Chrome 157: an emulated iPhone for the phone steps and desktop Chromium for the dash-text send, through a local TLS pass-through rather than the tunnel/Access path.
+**Checked code and environment:** The CLI, web and phone sittings used earlier private-beta 0.0.3 candidate builds. Those candidates are not this combined 0.0.5 export. The host was a Linux PC; room-cli was 0.43.1 initially and v141 later. One send ran on a real iPhone in Safari over cellular. The final agent-run steps used headless Chrome 157: an emulated iPhone for the phone steps and desktop Chromium for the dash-text send, through a local TLS pass-through rather than the tunnel/Access path.
 
 **Counts and method:** the 23-send allowance was exhausted. Receipt inspection recorded 12 sent and two queued receipts with the observed key sets. Idle-send and Steer parity matched by comparing reports across sittings; busy-Queue parity was not comparable because the Local and Cloud targets/heads differed. The final read-safety check passed in a quiet window with 48 valid inventory, 48 session and 48 preview responses and zero tell attempts. Two earlier read-safety attempts failed because other fleet agents started threads during their windows; the quiet-window run is the passing result.
 
@@ -46,7 +46,7 @@ Remaining gaps:
 
 ## LIVE-0.0.4: recorded PC run
 
-**Live observation, agent-run (2026-11-05), with held claims and gaps.** The run used the 0.0.4 candidate `660c169` on the Linux PC, room-cli v141 initially and v142 after an application restart. The web export was built with Node 24.22.1 and its manifest checked on the PC. This was not a live run of the combined 0.0.5 export. Browser/device steps used headless Chrome 157; an iPhone user agent, viewport and touch were emulated where required.
+**Live observation, agent-run (2026-11-05), with held claims and gaps.** The run used an earlier private-beta 0.0.4 candidate build on the Linux PC, room-cli v141 initially and v142 after an application restart. The web export was built with Node 24.22.1 and its manifest checked on the PC. This was not a live run of the combined 0.0.5 export. Browser/device steps used headless Chrome 157; an iPhone user agent, viewport and touch were emulated where required.
 
 Held in the recorded cases:
 
@@ -73,4 +73,4 @@ Other recorded gaps:
 - The owner’s acceptance of the launcher and tray was not run. Runner dogfood notes are not the owner’s UI acceptance.
 - The live-tested build still said “your Mac must stay awake”. The current export carries the separately fixture-tested machine-neutral correction; this run did not live-validate that corrected wording.
 
-**Release slots:** LIVE-0.0.3 and LIVE-0.0.4 are filled with their recorded results and limits. Still open: the spawn-receipt fixture gap and the other live limits above; the quick read-only Mac check for this combined release; exact-head independent export review; maintainer approval of files, diff, date and commit email; and the owner’s UI acceptance. The recorded fleet gaps also remain. No blanket live acceptance or PACP conformance is claimed.
+**Release slots:** LIVE-0.0.3 and LIVE-0.0.4 are filled with their recorded results and limits. Still open: the spawn-receipt fixture gap and the other live limits above; the quick read-only Mac check for this combined release; and the owner’s UI acceptance. The recorded fleet gaps also remain. No blanket live acceptance or PACP conformance is claimed.

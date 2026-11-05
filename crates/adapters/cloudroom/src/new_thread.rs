@@ -25,7 +25,7 @@ pub const HARNESS_PROVIDERS: &[(&str, &str)] =
 
 pub const CLI_REASONING_LEVELS: &[&str] = &["low", "medium", "high", "xhigh", "max"];
 
-/// The only `cloud status` keys OpenWiz keeps (sheet the check). Everything else,
+/// The only `cloud status` keys OpenWiz keeps. Everything else,
 /// the account first, is discarded before anything reads the document.
 pub const CATALOGUE_KEYS: &[&str] = &["ready", "harnesses"];
 
@@ -79,7 +79,7 @@ fn drift(what: &str) -> SourceError {
     }
 }
 
-// The strict readers , on B1's pattern: each JSON object
+// The strict readers, on B1's pattern: each JSON object
 // is read by its own visitor straight from the text, so a key given twice is
 // seen (`serde_json::Value` would keep only the last), each kept key must
 // have its type, and nothing `room-cli` printed reaches an error message.
@@ -98,7 +98,7 @@ fn required<T, E: de::Error>(slot: Option<T>, key: &'static str) -> Result<T, E>
 }
 
 /// `cloud status --json`'s top level: `ready` and `harnesses`, typed. Every
-/// other key, the account first, is dropped unread (sheet the check).
+/// other key, the account first, is dropped unread.
 struct CatalogueDocument(Catalogue);
 
 impl<'de> Deserialize<'de> for CatalogueDocument {
@@ -273,7 +273,7 @@ impl<'de> Visitor<'de> for AttachmentsVisitor {
 /// The catalogue in `cloud status --json`'s stdout, read strictly: only
 /// [`CATALOGUE_KEYS`] (and on each row [`HARNESS_KEYS`], [`MODEL_KEYS`] and
 /// [`ATTACHMENT_KEYS`]) are read, each with its type; the account and every
-/// other field are dropped unread (sheet the check). A key given twice at any level
+/// other field are dropped unread. A key given twice at any level
 /// read, a kept key missing or of another type, or anything but an object is
 /// drift, and gives [`SourceError::Malformed`]: no options, and nothing is
 /// dispatched (N17).
@@ -289,7 +289,7 @@ pub fn parse_catalogue(stdout: &[u8]) -> Result<Catalogue, SourceError> {
 }
 
 /// The start of `room-cli`'s error line for a refused create
-/// (source-read, the implementation; not observed).
+/// (source-read; not observed).
 pub const SPAWN_ERROR_PREFIX: &str = "Error: Failed to create thread: HTTP ";
 
 /// The documented refusals: status, the start of the message, and what it

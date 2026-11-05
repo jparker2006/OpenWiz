@@ -1,4 +1,4 @@
-//! N3 Existing projects only (sheet the check): the project is read with `project
+//! N3 Existing projects only: the project is read with `project
 //! list` in the same run, and only a `standard` project with a GitHub remote
 //! is accepted. Unknown, hidden, personal, no-remote, other-host and
 //! ambiguous projects are refused with zero `spawn` calls, through the

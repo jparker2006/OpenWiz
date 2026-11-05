@@ -1,10 +1,10 @@
-// The launcher's state : U7, nothing preselected and only offered
+// The launcher's state: U7, nothing preselected and only offered
 // settings, a switch that empties what the new harness doesn't offer and
-// never substitutes; the check's answer table, as the check keeps it; U11, everything
+// never substitutes; the delivery answer table, as keeps it; U11, everything
 // kept on a refusal or an uncertain create, across a reload, and a status read
 // that never creates; U12, one op id per attempt, derived, stored before the
 // create leaves, so repeats, retries, reloads and copied tabs create at most
-// once; and no automatic retry (the check). Synthetic values only.
+// once; and no automatic retry. Synthetic values only.
 
 import assert from 'node:assert/strict';
 import { test } from 'node:test';

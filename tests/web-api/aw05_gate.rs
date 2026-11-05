@@ -1,4 +1,4 @@
-//! AW5 , the server's half: **the gate is the core's, and the
+//! AW5, the server's half: **the gate is the core's, and the
 //! server's is the real one.** A request that skips the page (forged, or
 //! from an old tab) with an attachment that is not ready (never staged,
 //! still uploading, failed, removed, expired or in use by another
@@ -237,7 +237,7 @@ fn a_forged_send_with_an_attachment_that_is_not_ready_is_refused_with_zero_calls
 #[test]
 fn an_attachment_in_use_by_another_send_is_refused_with_zero_calls() {
     // The first send's tell answers with no receipt: uncertain, so its
-    // attachment stays claimed (the check).
+    // attachment stays claimed.
     let lost = crate::msg::tell_response(
         TARGET,
         "queue",

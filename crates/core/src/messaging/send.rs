@@ -19,8 +19,8 @@ use super::record::{Claim, RecordState, SendRecord, SendStore, StoreError};
 use super::{Binding, BindingField, InvalidRequest, MESSAGING_SCHEMA_ID, Mode, OpId, SEND_BUDGET};
 
 /// Why Steer with attachments is refused, before anything is claimed, read
-/// or sent (the check, decided in planning): a Cloud steer drops them in source
-/// , and Local is unverified. Steer is never turned into Queue.
+/// or sent (, decided in planning): a Cloud steer drops them in source
+///, and Local is unverified. Steer is never turned into Queue.
 pub const STEER_WITH_ATTACHMENTS: &str = "Steer can't carry attachments. Use Queue, or remove them";
 
 /// The adapter side of `send`: the version, the target read and the one
@@ -316,7 +316,7 @@ impl Delivery {
 
     /// The same delivery, saying that `count` attachments went with it when
     /// it was queued or accepted, and that their delivery to the agent's
-    /// machine is not reported . Unchanged for no attachment, or for a
+    /// machine is not reported. Unchanged for no attachment, or for a
     /// failed or uncertain delivery.
     pub fn with_attachments(self, count: usize) -> Self {
         if count == 0 {
@@ -560,7 +560,7 @@ pub fn send_with(
     // The binding: the attachments' content, in the owner's order (other
     // copies of the same bytes, kinds and names are the same payload). For
     // an op id already recorded, each attachment as its record holds it
-    // when it has that id (an accepted send's copies are gone, the check), else
+    // when it has that id (an accepted send's copies are gone), else
     // its copy now. For a new op id, every attachment passes the gate
     // first, so a refusal claims nothing.
     let known = store.load(&request.op_id).map_err(SendError::Store)?;
@@ -776,7 +776,7 @@ struct Dispatch<'a> {
 impl Dispatch<'_> {
     fn run(&self, mut record: SendRecord) -> Result<SendReport, SendError> {
         // The version is reported as the reads report it, and never stops
-        // the send . Every other safeguard follows.
+        // the send. Every other safeguard follows.
         let name = self.messenger.name();
         let tested = self.messenger.tested_version();
         let read = format!("{name} --version");
@@ -871,7 +871,7 @@ impl Dispatch<'_> {
     /// the report says so: the record stays as it was, and recovers as
     /// failed (before the dispatching mark) or uncertain (after it). Only
     /// once the outcome is recorded are the attachments settled: an
-    /// accepted send's copies are deleted then, never before (the check).
+    /// accepted send's copies are deleted then, never before.
     fn finish(&self, record: SendRecord, delivery: Delivery) -> Result<SendReport, SendError> {
         let finished = record.finished(delivery, self.clock.now());
         let mut gaps = vec![];

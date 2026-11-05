@@ -2,8 +2,7 @@
 //! no invocation, no process and no attachment flag. P8(a) and M12 run in
 //! `cargo test --workspace`.
 //!
-//! **Updated for B2 (the implementation)**, with this recorded reason: sheet the check
-//!  adds `--file` and `--image` to `tell`
+//! Attachments add `--file` and `--image` to `tell`
 //! and `spawn`, with staged absolute paths only. So the allowlist now names
 //! each flag exactly once, inside its one `attachment_args`, and uses the
 //! model's `StagedAttachment` and `Kind` for it; the adapter's `send` and
@@ -120,7 +119,7 @@ fn only_the_store_and_the_cli_use_the_model_and_neither_dispatches() {
         }
     }
     // The CLI's module starts no process. The store's starts one program,
-    // `/bin/df`, for the free space : P8(a) checks
+    // `/bin/df`, for the free space: P8(a) checks
     // that call word for word, and `program` that nothing on `PATH` runs.
     let cli = read("crates/cli/src/attachment.rs");
     assert!(!cli.contains("Command::new") && !cli.contains("process::Command"));

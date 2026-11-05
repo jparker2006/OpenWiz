@@ -158,7 +158,7 @@ fn the_fake_refuses_every_other_write_and_every_other_tell_shape() {
     assert_eq!(fake.tell_count(), 0, "a refused call is not counted");
 }
 
-/// B2 (sheet the check): the fake takes `--file` and `--image` only after
+/// B2: the fake takes `--file` and `--image` only after
 /// `--json` and before `--`, in queue mode, each with a staged copy's
 /// absolute path; every other form is refused before anything is counted.
 #[test]
@@ -241,7 +241,7 @@ fn no_product_source_spells_an_excluded_flag_or_another_write() {
         .join("crates/adapters/cloudroom/src/allowlist.rs")
         .canonicalize()
         .unwrap();
-    // OpenWiz 0.0.4 (the implementation, A1 phase 2): the catalogue key `steer`,
+    // OpenWiz 0.0.4 (A1 phase 2): the catalogue key `steer`,
     // only in the adapter's `cloud status` reader; and `openwiz new`'s own
     // `--model` option, only in the CLI's `new` (not a room-cli argument
     // there).

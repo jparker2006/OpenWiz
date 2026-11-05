@@ -19,7 +19,7 @@ use crate::messaging::send::{SendGap, UncertainReason};
 pub type Gap = SendGap;
 
 /// A refusal `thread spawn` documents, before anything is recorded
-/// (source-read, the implementation; not observed).
+/// (source-read; not observed).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ProviderRefusal {
@@ -75,7 +75,7 @@ pub enum RefusalReason {
     ProjectPersonal,
     /// Not a `standard` project, or its kind could not be read.
     ProjectNotStandard,
-    /// A standard project without a GitHub remote (sheet the check).
+    /// A standard project without a GitHub remote.
     ProjectNoGithubRemote,
     /// Whether the project has a GitHub remote could not be read.
     ProjectRemoteNotConfirmed,
@@ -223,7 +223,7 @@ impl Outcome {
 
     /// The same outcome, saying that `count` attachments went with it when
     /// the thread was created, and that their delivery to the agent's
-    /// machine is not reported . Unchanged for no attachment, or any other
+    /// machine is not reported. Unchanged for no attachment, or any other
     /// outcome.
     pub fn with_attachments(self, count: usize) -> Self {
         match self {

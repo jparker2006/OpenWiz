@@ -66,7 +66,7 @@
       "minLength": 1,
       "maxLength": 179,
       "pattern": "^[A-Za-z0-9_][A-Za-z0-9._-]*$",
-      "description": "The staged name: the original's basename reduced to ASCII letters, digits, ., _ and -, never starting with . or -. At most 179 bytes, so CloudRoom's stored name (this stem, '-<time>-<random>', this extension: up to 21 more bytes) fits the Cloud core's 200. The agent sees that stored name, not this one (source-read, not observed)."
+      "description": "The staged name: the original's basename reduced to ASCII letters, digits,., _ and -, never starting with. or -. At most 179 bytes, so CloudRoom's stored name (this stem, '-<time>-<random>', this extension: up to 21 more bytes) fits the Cloud core's 200. The agent sees that stored name, not this one (source-read, not observed)."
     },
     "readiness": {
       "description": "One attachment's readiness. selected and uploading exist only in clients and in an upload in flight; only ready claims a verified copy on the controller.",
@@ -155,7 +155,7 @@
             "integer",
             "null"
           ],
-          "description": "When it expires, 24 hours after it became ready (sheet the check); null while its operation may still use it."
+          "description": "When it expires, 24 hours after it became ready; null while its operation may still use it."
         }
       }
     },

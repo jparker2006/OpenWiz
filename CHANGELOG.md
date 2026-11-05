@@ -4,7 +4,7 @@ All OpenWiz versions and revisions, newest first. Versioning is explained in [RE
 
 ## 0.0.3–0.0.5 · 2026-11-05
 
-*Updated for 0.0.5. Staged public update; maintainer approval pending.*
+*Updated for 0.0.5.*
 
 **Message, create and coordinate threads.**
 
@@ -12,7 +12,7 @@ All OpenWiz versions and revisions, newest first. Versioning is explained in [RE
 2. **Fixture test — 0.0.4:** preview and create a Cloud thread in an existing project; stage files and images locally, then attach them to Queue sends or creates. **Live observation — LIVE-0.0.4:** the PC run held the recorded creation/attachment checks; browser steps were emulated. Spawn-receipt fixture coverage and the other recorded gaps, including the owner’s UI acceptance, remain open.
 3. **Live observation, limited — 0.0.5:** eight fleet skills used in a development run, accepted with recorded gaps: fresh-child discovery and contract holds unobserved; five-ready-ticket launches and cross-version timing unproved; some running and cleanup required intervention. Exact-head reviews and matching merges were observed; helper checks are fixture tests.
 
-Export validation: Rust 1.99.1, Node.js 24.22.1, Linux and Chromium on synthetic tests, with the locked crates and packages in [dependencies](docs/dependencies.md). The fresh-clone log and its result belong to the private export record. LIVE-0.0.3 is filled with the bounded PC result and gaps; LIVE-0.0.4 is filled with its held claims and gaps, including the missing observed spawn-receipt fixture. A quick Mac check, Safari/WebKit beyond the one recorded phone send, real-radio fault coverage and unattended fleet operation remain open; see [testing and gaps](docs/testing.md). No PACP conformance is claimed.
+Export validation: Rust 1.99.1, Node.js 24.22.1, Linux and Chromium on synthetic tests, with the locked crates and packages in [dependencies](docs/dependencies.md). LIVE-0.0.3 is filled with the bounded PC result and gaps; LIVE-0.0.4 is filled with its held claims and gaps, including the missing observed spawn-receipt fixture. A quick Mac check, Safari/WebKit beyond the one recorded phone send, real-radio fault coverage and unattended fleet operation remain open; see [testing and gaps](docs/testing.md). No PACP conformance is claimed.
 
 ## 0.0.2 · 2026-10-30
 
@@ -21,7 +21,7 @@ Export validation: Rust 1.99.1, Node.js 24.22.1, Linux and Chromium on synthetic
 1. `openwiz-server` serves your threads as a private web page on your own Mac, listening on localhost only.
 2. The page shows your threads grouped by project, with status, age and a details sheet on tap; it refreshes itself while open.
 3. It says plainly when data is stale, partial or disconnected, or when you're signed out, and never shows stale data as fresh.
-4. Reach it from anywhere through a Cloudflare Tunnel and an Access login that lets in only the emails you allow; in a live check, requests without a login got only the login page ([setup guide](docs/web-access.md)).
+4. Reach it from anywhere through a Cloudflare Tunnel and an Access login that lets in only the emails you allow; in a live check, requests without a login got only the login page ([setup guide](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/web-access.md)). *Updated for 0.0.5: historical guide link.*
 5. Read-only, like 0.0.1: it never starts, messages or changes a thread, and it makes the same reads as `openwiz`, which in a live check woke no idle thread and marked none read.
 6. Status is a word and a symbol, not just a colour, and the page passes automated keyboard and screen-reader checks in Chromium.
 

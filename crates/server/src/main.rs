@@ -3,8 +3,8 @@
 //! 127.0.0.1; and for the send routes, the same send record as `openwiz
 //! send`: `$OPENWIZ_STATE_DIR`, else the owner's default state directory,
 //! opened when each request needs it (U9); and for the new-thread routes
-//! , the same new-thread record as `openwiz new`, beside it; and for
-//! the attachment routes , the same attachment store and free-space
+//!, the same new-thread record as `openwiz new`, beside it; and for
+//! the attachment routes, the same attachment store and free-space
 //! measure as `openwiz attachment`, beside them.
 
 use std::path::PathBuf;
@@ -156,7 +156,7 @@ fn main() -> ExitCode {
         Ok(store.map(|s| Box::new(s) as Box<dyn NewThreadStore>))
     });
     // `openwiz attachment`'s own openers and free-space measure
-    // (`crates/cli/src/main.rs`), the same way .
+    // (`crates/cli/src/main.rs`), the same way.
     let open_attachments: OpenAttachmentStore = Arc::new(|| {
         let dir = default_state_dir(&|name| std::env::var_os(name))?;
         AttachmentStore::open(&dir)
@@ -166,7 +166,7 @@ fn main() -> ExitCode {
         AttachmentStore::open_read_only(&dir)
     });
     // Sends and creates are served only on the allowed host, and only if it
-    // can be a send host (the check, unchanged by the check); otherwise the server
+    // can be a send host; otherwise the server
     // does not start.
     let send_host = match args.allowed_host.as_deref().map(SendHost::new).transpose() {
         Ok(host) => host,

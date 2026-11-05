@@ -1,4 +1,4 @@
-//! U4 : the create is bounded (the check, as the check): one project, from
+//! U4: the create is bounded: one project, from
 //! the path; the send's body cap, with `Content-Length`, within its time;
 //! exactly one JSON shape, with `attachments` empty; one create at a time.
 //! Every refusal is before any read: zero `room-cli` calls and no record.

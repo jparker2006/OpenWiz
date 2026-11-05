@@ -1,7 +1,7 @@
 //! AP1 Kind from bytes. PNG, JPEG, GIF and WebP are images; HEIC and HEIF
 //! are refused with the stated reason; everything else is a file. A wrong
 //! extension never changes the kind: when the name and the bytes disagree
-//! the file is refused (the check), and a declared MIME type can't reach the
+//! the file is refused, and a declared MIME type can't reach the
 //! decision at all.
 
 use openwiz_core::attachment::{FailReason, Kind, SafeName, classify};
@@ -60,7 +60,7 @@ fn everything_else_is_a_file() {
         ("synthetic.bmp", BMP.to_vec()),
         ("synthetic.tiff", TIFF.to_vec()),
         ("synthetic.pdf", PDF.to_vec()),
-        // the check: a ZIP is attached unchanged, as a file, never unpacked.
+        // a ZIP is attached unchanged, as a file, never unpacked.
         ("synthetic.zip", ZIP.to_vec()),
         ("synthetic.txt", TEXT.to_vec()),
         ("synthetic", TEXT.to_vec()),

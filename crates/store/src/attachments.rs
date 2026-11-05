@@ -82,7 +82,7 @@ compile_error!(
     "O_NONBLOCK's value isn't recorded for this target (crates/store/src/attachments.rs)"
 );
 
-/// The free space on the volume that holds `dir`, in bytes (sheet the check).
+/// The free space on the volume that holds `dir`, in bytes.
 pub trait FreeSpace {
     /// The bytes free, or why they couldn't be measured. Staging never goes
     /// ahead without a measure.
@@ -137,7 +137,7 @@ const DF_HEADER: [&str; 7] = [
 /// fields: its name, size, used and available (whole numbers), capacity (a
 /// whole percentage) and mount point (absolute), last. A name or a mount
 /// point with spaces makes the fields ambiguous, so it is refused, as is
-/// anything else : nothing is guessed.
+/// anything else: nothing is guessed.
 pub fn parse_df(out: &[u8]) -> Result<u64, String> {
     let refused = || "df's output isn't the POSIX form".to_owned();
     let text = std::str::from_utf8(out).map_err(|_| refused())?;
@@ -165,7 +165,7 @@ pub fn parse_df(out: &[u8]) -> Result<u64, String> {
     blocks.checked_mul(1024).ok_or_else(refused)
 }
 
-/// Which operation, if any, has claimed each attachment (sheet the check). B2
+/// Which operation, if any, has claimed each attachment. B2
 /// records the claims; until then nothing can claim one ([`NoClaims`]).
 pub trait Claims {
     fn claim(&self, id: &AttachmentId) -> Result<Claim, StoreError>;
@@ -255,10 +255,10 @@ pub enum Staged {
 pub struct Swept {
     /// Unfinished copies, left by a staging that stopped.
     pub unfinished: usize,
-    /// Ready attachments past their time-to-live (sheet the check).
+    /// Ready attachments past their time-to-live.
     pub expired: Vec<ReadyAttachment>,
     /// Ready attachments whose operation's accepted outcome is recorded
-    /// (sheet the check; none before B2).
+    /// (none before B2).
     pub released: usize,
 }
 
@@ -368,7 +368,7 @@ impl Store<Attachments> {
         staged
     }
 
-    /// Stages an upload : `len` bytes read from `source`, under the
+    /// Stages an upload: `len` bytes read from `source`, under the
     /// owner's `display_name` (untrusted; the core makes the staged name),
     /// verified as [`stage`](Self::stage) verifies a file. The kind, the
     /// limits and the free-disk floor are checked on the first bytes and
@@ -433,9 +433,9 @@ impl Store<Attachments> {
     /// Measures the free space and reserves `len` bytes of it for a new
     /// attachment, as one step under the claims lock, so stagings at once,
     /// in this process or another, file or stream, never spend the same
-    /// room twice : the room every other staging in
+    /// room twice: the room every other staging in
     /// progress still needs is counted as used, and the free-disk floor
-    /// (the check) is checked against what is left. The new attachment's
+    /// is checked against what is left. The new attachment's
     /// directory comes with its reservation held; or the reason it can't
     /// fit, with nothing made.
     fn reserve(
@@ -449,7 +449,7 @@ impl Store<Attachments> {
         // the staging lock, so the two never wait on each other.
         let _claims = self.claims_lock()?;
         // What the other stagings still need, first; the free space after
-        // . Copies run without this lock, so one
+        //. Copies run without this lock, so one
         // can move on, or finish, between the two looks: then its bytes are
         // counted twice (still needed, and already used), never not at all.
         // Measured the other way round, a copy moving on in between would be
@@ -635,7 +635,7 @@ impl Store<Attachments> {
             Meta::Unreadable => None,
             Meta::Ready(attachment) => Some(attachment),
         };
-        // No claim can be made between the check and the deletion (B2).
+        // No claim can be made between final validation and deletion (B2).
         let _claims = self.claims_lock()?;
         if let Err(RemoveRefused(claim)) = can_remove(claims.claim(id)?) {
             return Ok(Removal::Refused(claim));
@@ -819,12 +819,12 @@ impl Store<Attachments> {
 /// the operation's own record, never written here:
 ///
 /// - no record (the operation was withdrawn: nothing was read or sent for
-///   it), or no claim file: unclaimed;
+/// it), or no claim file: unclaimed;
 /// - claimed or dispatching by a live process: dispatching;
 /// - a record whose process stopped: as recovery would finish it (claimed
-///   becomes failed, dispatching uncertain), read only;
+/// becomes failed, dispatching uncertain), read only;
 /// - finished: queued or sent, or created, is accepted; failed or refused
-///   is failed; uncertain is uncertain.
+/// is failed; uncertain is uncertain.
 ///
 /// The send and new-thread records are opened for reading only, at each
 /// look, so a record kind made after this was built is still seen.
@@ -1099,10 +1099,10 @@ struct Copy<'a> {
 /// What a staging copies from.
 enum Source<'s> {
     /// A file, as it was opened: after its copy it is checked unchanged
-    /// against `opened` . A read error is `unreadable`; a
+    /// against `opened`. A read error is `unreadable`; a
     /// size that changes, `size_mismatch`.
     File { file: File, opened: Fingerprint },
-    /// An upload's body , read once and never past its length: a read
+    /// An upload's body, read once and never past its length: a read
     /// error, or an end before its length, is the connection lost.
     Stream(&'s mut dyn Read),
 }
@@ -1282,7 +1282,7 @@ fn regular(meta: &fs::Metadata) -> Result<(), FailReason> {
 
 /// What is known of the source: the file it is (device and inode) and,
 /// from its open handle, its size and times. Staging refuses the source if
-/// any of them changes .
+/// any of them changes.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct Fingerprint {
     dev: u64,
@@ -1329,7 +1329,7 @@ fn open_source(source: &Path, looked: Fingerprint) -> Result<(File, Fingerprint)
 }
 
 /// Whether the open source is still as it was opened, after its copy
-/// hashed to `copied` : the same file, size and times,
+/// hashed to `copied`: the same file, size and times,
 /// then the same bytes, read again from the start through the same handle,
 /// then the same file, size and times again. The bytes are read again
 /// because a file's times can miss a rewrite within one tick of the clock.
@@ -1425,7 +1425,7 @@ fn age(now: Timestamp, at: Timestamp) -> Duration {
 }
 
 /// The reports of `openwiz attachment add, ls, rm` (B1 phase 2), and of the
-/// web server's attachment routes, which answer with the same JSON :
+/// web server's attachment routes, which answer with the same JSON:
 /// **one implementation for both clients**, in the shapes of
 /// `contracts/attachment.v1.schema.json`. The rules a report applies are
 /// here once: when an attachment expires, the words for a broken copy, and
@@ -1482,7 +1482,7 @@ pub mod report {
     }
 
     /// Sweeps the store as each command opens it (unfinished copies go;
-    /// attachments past their time-to-live, the check, go too) and reports what
+    /// attachments past their time-to-live, go too) and reports what
     /// expired.
     pub fn sweep(
         store: &AttachmentStore,

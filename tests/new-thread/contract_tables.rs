@@ -1,4 +1,4 @@
-//! One table of good and bad JSON per contract .
+//! One table of good and bad JSON per contract.
 //!
 //! **Readers:** no new-thread or prompt type has a serde reader, so
 //! `serde_json::from_str` and `from_value` can't be called on them at all:
@@ -83,8 +83,8 @@ fn the_prompt_contract() {
         (false, json!({"prompt": good})),
         (false, with(&good, "/text", json!(["Synthetic"]))),
         (false, with(&good, "/attachments", json!({}))),
-        // B2 (the implementation), with this recorded reason: B2 relaxes A1's
-        // empty list (sheet the check to the check). Ids are taken, each at most once,
+        // B2, with this recorded reason: B2 relaxes A1's
+        // empty list. Ids are taken, each at most once,
         // each by its own rule.
         (true, with(&good, "/attachments", json!(["att-syn-0001"]))),
         (

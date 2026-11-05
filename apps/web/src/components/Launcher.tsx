@@ -79,7 +79,7 @@ function attemptShown(s: LaunchState): Shown | null {
     : p
       ? { shape: p.state === 'in-progress' ? 'moving' : 'uncertain', word: p.state === 'in-progress' ? 'in progress' : 'uncertain', lines: ['not settled when this page loaded; Refresh status reads its record', 'it may or may not have been created; the prompt, settings and op id stay'] }
       : null;
-  // A refused Try again: the earlier answer stays as it was, and the refusal is a line of its own (the check).
+  // A refused Try again: the earlier answer stays as it was, and the refusal is a line of its own.
   if (shown && s.retry) return { ...shown, lines: [...shown.lines, `this Try again was refused (${s.retry}); the earlier create is still uncertain`] };
   return shown;
 }
@@ -210,7 +210,7 @@ function Pick({
 }) {
   const id = `launch-${field}`;
   const placeholder = disabledWhy ?? `choose ${field === 'effort' ? 'an' : 'a'} ${field}`;
-  // A chosen value stays visible in its control even when the current options don't list it :
+  // A chosen value stays visible in its control even when the current options don't list it:
   // an unresolved attempt's settings are fixed, and what is sent is always what is shown.
   const extra = value !== '' && !values.includes(value) ? value : null;
   return (
@@ -329,7 +329,7 @@ export function Launcher({
   }, [launchers, project.id, previewKey, previewFailed ? s.draft : null]);
 
   // 0.0.2's refresh: each list snapshot may read the record of an unresolved attempt, or the created thread's
-  // start, at most the check's ten times. Reads only: never a create.
+  // start, at most ten times. Reads only: never a create.
   const first = useRef(true);
   useEffect(() => {
     if (first.current) {

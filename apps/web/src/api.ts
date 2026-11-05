@@ -1,6 +1,6 @@
 // The only module that makes requests: same origin, `/api/v1/...`; GET, and
 // the POSTs (below): the send, the create, the new-thread preview, which only
-// reads, and the upload ; and one DELETE, the removal of a staged copy.
+// reads, and the upload; and one DELETE, the removal of a staged copy.
 // It turns every response into one outcome, so the page can tell signed out,
 // disconnected, busy and the core's own errors apart (V6).
 
@@ -34,7 +34,7 @@ export type AbortReason = 'timeout' | 'stop';
 export const REQUEST_HEADERS: Readonly<Record<string, string>> = {
   Accept: 'application/json',
   // Cloudflare Access answers an expired sub-request with 401 when it carries
-  // this header (approval sheet the check), instead of redirecting it.
+  // this header, instead of redirecting it.
   'X-Requested-With': 'XMLHttpRequest',
 };
 
@@ -81,7 +81,7 @@ function classify<D>(res: ResponseLike, body: string, parse: (json: unknown) => 
   // Access redirects an expired session to its sign-in page; `redirect: 'manual'` makes that opaque.
   if (res.type === 'opaqueredirect') return { kind: 'signed-out', status: null };
   const status = res.status;
-  // Access answers an expired sub-request with 401 (approval sheet the check). A 403
+  // Access answers an expired sub-request with 401. A 403
   // is a refusal that signing in again would not fix, so it is not "signed out".
   if (status === 401) return { kind: 'signed-out', status };
   const json = (res.headers.get('Content-Type') ?? '').toLowerCase().startsWith('application/json') ? parseJson(body) : undefined;
@@ -139,7 +139,7 @@ function retryAfterMs(value: string | null): number | null {
 
 // ── Sending (contracts/web-api.v1.md, "Sending (the one write)") ──
 // The one write and its two reads. Each answer is handed back as it came;
-// src/composer.ts says what it means (the check). Nothing here retries.
+// src/composer.ts says what it means. Nothing here retries.
 
 export type SendBody = {
   op_id: string;
@@ -147,7 +147,7 @@ export type SendBody = {
   text: string;
   resume_paused_queue: boolean;
   accept_possible_duplicate: boolean;
-  /** The ready ids, in the owner's order ; absent when there are none, as 0.0.3 sent it. */
+  /** The ready ids, in the owner's order; absent when there are none, as 0.0.3 sent it. */
   attachments?: string[];
 };
 
@@ -163,7 +163,7 @@ export type Answer =
 export const SEND_HEADERS: Readonly<Record<string, string>> = {
   ...REQUEST_HEADERS,
   'Content-Type': 'application/json',
-  // the check's custom header: no cross-site form or simple request carries it.
+  // the custom request header: no cross-site form or simple request carries it.
   'X-OpenWiz-Send': '1',
 };
 
@@ -204,11 +204,11 @@ export function postMessage(fetchImpl: FetchLike, id: string, body: SendBody, si
 }
 
 // ── Creating (contracts/web-api.v1.md, "Creating (the second write)") ──
-// The create, its preview, and two reads. The same headers as the send (the check
-// keeps the check's checks unchanged). Each answer is handed back as it came;
+// The create, its preview, and two reads use the send request headers.
+// Each answer is handed back as it came;
 // src/launcher.ts says what it means. Nothing here retries.
 
-/** A create's body, and the preview's: `attachments` are the ready ids, in the owner's order . */
+/** A create's body, and the preview's: `attachments` are the ready ids, in the owner's order. */
 export type ThreadBody = { op_id: string; harness: string; model: string; effort: string; text: string; attachments: string[] };
 
 export function optionsUrl(): string {
@@ -239,7 +239,7 @@ export function getAnswer(fetchImpl: FetchLike, url: string, signal: AbortSignal
   return answer(fetchImpl, url, { method: 'GET', headers: REQUEST_HEADERS }, signal);
 }
 
-// ── Attachments  ──
+// ── Attachments ──
 // The upload, the list and the removal. Each answer is handed back as it came;
 // src/attachments.ts says what it means. Nothing here retries, and no route
 // returns a file's bytes: a thumbnail is the browser's own copy.
@@ -253,7 +253,7 @@ export function attachmentUrl(id: string): string {
   return `${attachmentsUrl()}/${encodeURIComponent(id)}`;
 }
 
-/** The upload's headers: the send's checks, a raw body (the check: never multipart), and the name in its own header. */
+/** The upload's headers: the send's checks, a raw body (never multipart), and the name in its own header. */
 export const UPLOAD_HEADERS: Readonly<Record<string, string>> = {
   ...REQUEST_HEADERS,
   'Content-Type': 'application/octet-stream',

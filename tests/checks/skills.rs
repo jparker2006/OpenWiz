@@ -1,26 +1,26 @@
-//! The skills folder (OpenWiz 0.0.5, the implementation): the eight fleet skills
+//! The skills folder (OpenWiz 0.0.5): the eight fleet skills
 //! install in one step, and any agent, in any harness, can invoke them.
 //!
 //! Rules, checked on the repository and on planted breaks:
 //! 1. **The eight, exactly.** `skills/` holds `README.md` and one real folder
-//!    for each name in [`SKILLS`], and no links anywhere (Codex drops links
-//!    when it installs a plugin).
+//! for each name in [`SKILLS`], and no links anywhere (Codex drops links
+//! when it installs a plugin).
 //! 2. **Frontmatter.** Each `SKILL.md` opens with `name` (its folder's name)
-//!    and `description`, one line each, and no other key. It is an allowlist,
-//!    so no harness's user-only flag (`disable-model-invocation`) gets in.
+//! and `description`, one line each, and no other key. It is an allowlist,
+//! so no harness's user-only flag (`disable-model-invocation`) gets in.
 //! 3. **Codex.** `agents/openai.yaml`, where present, holds only
-//!    `interface.display_name` and `interface.short_description`, never a
-//!    `policy` (Codex's user-only switch).
+//! `interface.display_name` and `interface.short_description`, never a
+//! `policy` (Codex's user-only switch).
 //! 4. **Matt's MIT notice.** All eight adapt Matt Pocock's skills, so a
-//!    written skill (any body but the exact [`STUB`]) carries his copyright
-//!    and MIT notice word for word, and has its `agents/openai.yaml`.
+//! written skill (any body but the exact [`STUB`]) carries his copyright
+//! and MIT notice word for word, and has its `agents/openai.yaml`.
 //! 5. **Links resolve.** `.agents/skills/<name>` and `.agents/skills/<name>`
-//!    are links to `../../skills/<name>`, every link in those two folders is
-//!    one of them, and every relative Markdown link under `skills/` resolves
-//!    inside the repository.
+//! are links to `../../skills/<name>`, every link in those two folders is
+//! one of them, and every relative Markdown link under `skills/` resolves
+//! inside the repository.
 //! 6. **Manifests.** `.claude-plugin/plugin.json` lists exactly
-//!    `./skills/<name>` for the eight, beside metadata only, and
-//!    `.claude-plugin/marketplace.json` offers that one plugin from `./`.
+//! `./skills/<name>` for the eight, beside metadata only, and
+//! `.claude-plugin/marketplace.json` offers that one plugin from `./`.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, FileType};
@@ -744,7 +744,7 @@ fn assert_clean(root: &Path) {
     );
 }
 
-/// The check reports a problem containing `expected` for `root`.
+/// The validator reports a problem containing `expected` for `root`.
 fn assert_catches(root: &Path, expected: &str) {
     let found = problems(root);
     assert!(

@@ -137,7 +137,7 @@ fn catalogue_text() -> String {
 fn the_catalogue_table() {
     let catalogue = fixture_json("cloud-status.json");
     let compact = catalogue.to_string();
-    // the check: everything outside the catalogue keys is dropped unread, at
+    // everything outside the catalogue keys is dropped unread, at
     // every level, whatever its type.
     let mut planted = catalogue.clone();
     planted["account"] = json!({"email": "synthetic-account-marker"});

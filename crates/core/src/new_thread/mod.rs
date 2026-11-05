@@ -11,20 +11,20 @@
 //! durable record through a [`record::NewThreadStore`], and time through a
 //! [`Clock`](crate::ops::Clock). Op ids are generated outside the core.
 //!
-//! A1 phase 2 (the implementation) makes it reachable from the CLI (`openwiz new`,
+//! A1 phase 2 makes it reachable from the CLI (`openwiz new`,
 //! `openwiz models`, `openwiz new --status`), with `thread spawn` and `cloud
 //! status` on the allowlist and the record in `openwiz-store`. No server
 //! route reaches it until A2.
 //!
 //! - [`options`]: the Cloud catalogue as the adapter reads it, and the
-//!   options offered from it;
+//! options offered from it;
 //! - [`operation`]: `new_thread` and its preview: validation, the op-id
-//!   claim, the project and options checks, the effects, the one call and
-//!   the outcome;
+//! claim, the project and options checks, the effects, the one call and
+//! the outcome;
 //! - [`outcome`]: what the provider's reply means;
 //! - [`effects`]: what a create does, worked out before creating;
 //! - [`start`]: the start stage and the reported configuration, after
-//!   creation;
+//! creation;
 //! - [`status`]: one op id's record and start stage, read-only;
 //! - [`record`]: the record, the store interface and the recovery rule;
 //! - [`read`]: the record read back from storage, strictly.
@@ -59,7 +59,7 @@ pub const STATUS_SCHEMA_ID: &str = "openwiz.new-thread-status.v1";
 pub const OPTIONS_SCHEMA_ID: &str = "openwiz.cloud-options.v1";
 
 /// One create, from the claim to the recorded outcome, finishes within this
-/// budget (sheet the check's 40 s deadline is the route's, around it). The
+/// budget (the HTTP 40 s deadline is the route's, around it). The
 /// adapter also stops each single call after
 /// [`READ_TIMEOUT`](crate::limits::READ_TIMEOUT).
 pub const NEW_THREAD_BUDGET: Duration = Duration::from_secs(30);
@@ -261,7 +261,7 @@ pub struct ProjectView {
     pub name: crate::model::Fact<String>,
 }
 
-/// Phase 1 reads no JSON : every type here and in
+/// Phase 1 reads no JSON: every type here and in
 /// [`prompt`](crate::prompt) (except B1's `AttachmentId`, whose strict
 /// string reader is B1's) is only ever written, so none has a reader, and
 /// no reader can accept a shape its contract forbids. A reader added later

@@ -1,7 +1,7 @@
-//! U1 : exactly the new routes. The route table is 0.0.3's plus
+//! U1: exactly the new routes. The route table is 0.0.3's plus
 //! the Cloud options and the status (`GET`), and the create and the
 //! new-thread preview (`POST`): the create is the only new write. There is
-//! no retry route (sheet the check). Every other method on a new route is `405`,
+//! no retry route. Every other method on a new route is `405`,
 //! and none of them reads, claims or creates anything.
 
 use openwiz_server::{ROUTES, Route};

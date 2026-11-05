@@ -1,7 +1,7 @@
 //! The CloudRoom side of `send`: the target read and the one write, `thread
 //! tell`, translated for the core's [`Messenger`].
 //!
-//! The PC probe c687079  observed sent (Queue or Steer), busy
+//! The PC probe c687079 observed sent (Queue or Steer), busy
 //! Queue, and Claude Code queued Steer receipts. Other forms are uncertain.
 //!
 //! Nothing `room-cli` prints reaches a reason, gap or message from here:
@@ -30,13 +30,13 @@ use crate::source::CloudRoomSource;
 /// uncertain, the safe direction.
 ///
 /// - The not-found line was observed for `thread show` and `thread output`
-///   in capture C. That `thread tell` prints the same line is **documented,
-///   not observed**.
+/// in capture C. That `thread tell` prints the same line is **documented,
+/// not observed**.
 /// - The guide documents that invalid input and unsupported modes are
-///   rejected ("Explicit unsupported modes fail; no fallback"), **not their
-///   wording**. These two lines are placeholders, labelled synthetic in the
-///   fixtures. At the pre-live recheck they are replaced by the real
-///   wording; until then a real rejection of either kind reports uncertain.
+/// rejected ("Explicit unsupported modes fail; no fallback"), **not their
+/// wording**. These two lines are placeholders, labelled synthetic in the
+/// fixtures. At the pre-live recheck they are replaced by the real
+/// wording; until then a real rejection of either kind reports uncertain.
 pub const DOCUMENTED_REJECTIONS: &[(&str, &str)] = &[
     ("Error: HTTP 404: Thread not found", "not_found"),
     ("Error: HTTP 400: Invalid input", "invalid_input"),
@@ -46,7 +46,7 @@ pub const DOCUMENTED_REJECTIONS: &[(&str, &str)] = &[
 /// How the runner describes a program that could not be started.
 const NOT_STARTED: &str = "could not be started";
 
-/// The exact keys observed for sent in either requested mode .
+/// The exact keys observed for sent in either requested mode.
 pub const RECEIPT_KEYS: &[&str] = &["threadId", "ok", "delivery", "mode"];
 
 impl Messenger for CloudRoomSource {
@@ -70,7 +70,7 @@ impl Messenger for CloudRoomSource {
     fn version(&self, deadline: Instant) -> Result<String, SourceError> {
         SessionSource::version(self, deadline).map_err(|e| match e {
             // The version read's own malformed details are OpenWiz's fixed
-            // words , such as "printed a version that is not N.N.N
+            // words, such as "printed a version that is not N.N.N
             // or v<N> (detail withheld)": kept, as the reads show them.
             SourceError::Malformed { .. } => e,
             other => withhold(other),
@@ -117,7 +117,7 @@ impl Messenger for CloudRoomSource {
         };
         if mode == Mode::Steer && !prompt.attachments.is_empty() {
             // Never reached: `send` refuses Steer with attachments first
-            // (the check; a Cloud steer drops them, F16). Nothing is run.
+            // (a Cloud steer drops them, F16). Nothing is run.
             return TellReply::NotStarted;
         }
         let invocation = Invocation::ThreadTell {

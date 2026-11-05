@@ -1,28 +1,27 @@
 // The launcher's presentation state, one per project id, and the one place a
-// thread is created . From the approval sheet's the check, the check and the check (0.0.3's
-// the check and the check, unchanged):
+// thread is created. Creation uses the same request guards as sending.
 //
-// - **Nothing is preselected** (the check). A setting is only ever one the core's
-//   options offer; switching the harness keeps the model and effort only if the
-//   new harness offers them, and otherwise empties them visibly. Nothing is
-//   substituted.
+// - **Nothing is preselected**. A setting is only ever one the core's
+// options offer; switching the harness keeps the model and effort only if the
+// new harness offers them, and otherwise empties them visibly. Nothing is
+// substituted.
 // - **Op ids are derived, never minted on events.** A draft gets one random
-//   root id (`web-` and 32 hex digits) with its first text, stored at once.
-//   Attempt n's op id is `<root>-c<n>`. A double press, a repeated keyboard
-//   press, Try again, a reload and a copied tab all derive the same id, so the
-//   core replays instead of creating twice.
+// root id (`web-` and 32 hex digits) with its first text, stored at once.
+// Attempt n's op id is `<root>-c<n>`. A double press, a repeated keyboard
+// press, Try again, a reload and a copied tab all derive the same id, so the
+// core replays instead of creating twice.
 // - **A new attempt only by the owner's word.** After a recorded refusal or
-//   failure the next press is attempt n + 1 (the old op id is bound to its
-//   outcome). While an attempt may have created a thread (no answer,
-//   uncertain, in progress) the prompt and settings are fixed; only "Start
-//   over" makes attempt n + 1, and it says that this may make a second thread.
+// failure the next press is attempt n + 1 (the old op id is bound to its
+// outcome). While an attempt may have created a thread (no answer,
+// uncertain, in progress) the prompt and settings are fixed; only "Start
+// over" makes attempt n + 1, and it says that this may make a second thread.
 // - **Store, then create.** No create leaves unless its attempt is stored in
-//   this tab's sessionStorage first.
-// - **"Not created" only with proof** (the check): Access's 401 or redirect, or
-//   OpenWiz's own refusal before the core. Everything else unanswered is
-//   unknown.
-// - **No retry** (the check): a status read never creates, and nothing here creates
-//   without a press.
+// this tab's sessionStorage first.
+// - **"Not created" only with proof**: Access's 401 or redirect, or
+// OpenWiz's own refusal before the core. Everything else unanswered is
+// unknown.
+// - **No retry**: a status read never creates, and nothing here creates
+// without a press.
 //
 // It computes no option, outcome, effect, stage or retry: the core's answers
 // say what happened.
@@ -39,10 +38,10 @@ import { parseOptions, parsePreview, parseReport, parseStatus } from './newthrea
 import type { Observations, Options, Preview, Report, StartView, StatusRead } from './newthread.ts';
 import type { Timers } from './poller.ts';
 
-/** the check: the launcher gives up waiting at 45 s, beyond the server's 40 s deadline, and shows uncertain. */
+/** the launcher gives up waiting at 45 s, beyond the server's 40 s deadline, and shows uncertain. */
 export const CREATE_TIMEOUT_MS = 45_000;
 
-/** the check's bound, for the web: at most this many automatic status reads per attempt or created thread; then only Refresh status. */
+/** The configured bound, for the web: at most this many automatic status reads per attempt or created thread; then only Refresh status. */
 export const AUTO_STATUS_READS = 10;
 
 export type Field = 'harness' | 'model' | 'effort';
@@ -56,13 +55,13 @@ export type Unsettled = 'unknown' | 'uncertain' | 'in-progress';
 /**
  * The draft's current attempt, while it may have created a thread:
  * - `creating`, `checking`: its create, or its status read, is out (`before`:
- *   the state to go back to when that request settles nothing);
+ * the state to go back to when that request settles nothing);
  * - `unknown`: no usable answer, so it may or may not have created one;
  * - `uncertain`, `in-progress`: its own record says so.
  */
 export type Pending = { n: number; state: 'creating' | 'checking' | Unsettled; before: Unsettled | null };
 
-/** What is stored, and nothing else (the check, the check): the draft, its settings, its root id, the attempt number, and the attempt that may have created a thread. */
+/** What is stored, and nothing else: the draft, its settings, its root id, the attempt number, and the attempt that may have created a thread. */
 export type Stored = { draft: string; choice: Choice; root: string | null; n: number; pending: Pending | null };
 
 /** What the latest answer said about the draft's attempt, in memory only. */
@@ -85,7 +84,7 @@ export type LaunchState = Stored & {
   checked: string | null;
   /**
    * A Try again refused before the core (OpenWiz's own refusal, or Access's), in words: shown apart from the
-   * earlier answer, which stays shown, since the refusal proves nothing about the earlier create (the check, the check).
+   * earlier answer, which stays shown, since the refusal proves nothing about the earlier create.
    */
   retry: string | null;
   /** Why a setting was emptied, or a file refused. */
@@ -209,7 +208,7 @@ export function press(s: LaunchState, attachments: readonly string[] = []): { st
 }
 
 /**
- * the check, as the check keeps it: "not created" only when the answer proves the
+ * "not created" only when the answer proves the
  * request never reached the core: Access's 401 or redirect, or OpenWiz's own
  * refusal before the core (its JSON error, or its bodyless 503). A 200 is the
  * core's report. Everything else is unknown: the create may have happened. A
@@ -250,7 +249,7 @@ function applyRecord(s: LaunchState, r: Report, start: StartView | null): Launch
   if (r.result.kind === 'conflicting_reuse') return { ...s, pending: null, n: n + 1 };
   switch (r.result.outcome.kind) {
     case 'created':
-      // The draft is done: its text, settings and root are gone (the check: nothing is remembered).
+      // The draft is done: its text, settings and root are gone (nothing is remembered).
       return { ...EMPTY, created: { report: r, start: start ?? r.start, reads: 0 } };
     case 'uncertain':
       return { ...s, pending: { n, state: 'uncertain', before: null } };
@@ -270,7 +269,7 @@ export function settle(s: LaunchState, opId: string, said: Said): LaunchState {
   // Refused before the core claimed it: a new attempt is refused, its number unused.
   const before = s.pending.before;
   if (before === null) return { ...t, pending: null };
-  // A Try again refused so proves nothing about the earlier create (the check): it stays as it was, its own answer
+  // A Try again refused so proves nothing about the earlier create: it stays as it was, its own answer
   // still shown, and this refusal is shown apart. Unknown stays unknown.
   return { ...s, retry: refusalWords(said), checked: null, pending: { ...s.pending, state: before, before: null } };
 }
@@ -355,7 +354,7 @@ export function previewAnswer(a: Answer, body: ThreadBody): PreviewSaid {
   return { kind: 'failed', why: preview ? 'the answer was not this preview' : readFailure(a) };
 }
 
-// Storage: this tab's sessionStorage only (the check), handed in by the page from src/composer.ts.
+// Storage: this tab's sessionStorage only, handed in by the page from src/composer.ts.
 
 const KEY = 'openwiz.launcher.';
 
@@ -391,7 +390,7 @@ export type LauncherDeps = {
   storage: StorageLike | null;
   timers: Timers;
   newOpId(): string;
-  /** Each project's attachment tray : its ready ids go with a create, and it is emptied once they are handed over. */
+  /** Each project's attachment tray: its ready ids go with a create, and it is emptied once they are handed over. */
   uploads?: Uploads;
 };
 

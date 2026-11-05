@@ -1,5 +1,5 @@
 //! AP7 Low disk. Staging is refused, with "low disk", when it would leave
-//! less than 1 GiB free on the state volume (sheet the check), before anything is
+//! less than 1 GiB free on the state volume, before anything is
 //! written: no `.partial` and no directory are left. Free space that can't
 //! be measured stages nothing either (fail closed).
 

@@ -1,4 +1,4 @@
-//! A8 : `openwiz-server` serves the web page, `apps/web`'s static
+//! A8: `openwiz-server` serves the web page, `apps/web`'s static
 //! export, from one configured directory (`--web-root`), on the same origin
 //! as the API. Claims W1-W10 in
 //! the release checks.
@@ -225,7 +225,7 @@ fn w2_the_web_root_is_a_directory_with_a_regular_index() {
 /// One trap planted in a clean tree: `(what, plant)`.
 type Trap = (&'static str, fn(&Path, &Path));
 
-/// Each trap, alone in a clean tree, stops the start .
+/// Each trap, alone in a clean tree, stops the start.
 const TRAPS: &[Trap] = &[
     ("a symlink out of the root", |root, _| {
         symlink("../../secret.txt", &root.join("fonts/escape.txt"));
@@ -598,7 +598,7 @@ fn w7_the_page_csp_is_6s_and_runs_no_inline_script() {
         theirs,
         "PAGE_CSP differs from apps/web's"
     );
-    // The builder's caching default (see the evidence README).
+    // Static assets use the documented cache policy.
     assert_eq!(STATIC_CACHE, "private, max-age=31536000, immutable");
 }
 
@@ -814,7 +814,7 @@ fn w9_the_real_export_has_no_inline_script() {
     assert!(pages >= 2, "{pages} pages");
 }
 
-// W11  ---------------------------------------------------------
+// W11 ---------------------------------------------------------
 
 /// `GET target`, or `None` without a whole response within `within`.
 fn get_within(addr: SocketAddr, target: &str, within: Duration) -> Option<Response> {
@@ -888,8 +888,8 @@ fn w11_the_root_replaced_changed_or_deleted_after_start_changes_nothing() {
 
 // W10 --------------------------------------------------------------------
 
-/// A web server whose log lets the API's lines land late . The server
-/// logs a request after it has closed the connection , so a line may
+/// A web server whose log lets the API's lines land late. The server
+/// logs a request after it has closed the connection, so a line may
 /// arrive after later requests have been answered. Here each `/api/` line
 /// is held back until the page's line (`GET / 200`) arrives, or for at most
 /// a second, and every other line waits for the held ones: so they land at
@@ -1008,7 +1008,7 @@ fn w10_the_api_is_unaffected_and_web_paths_obey_host() {
     assert_eq!(r.status, 200);
     assert_eq!(r.body, t.files["/fonts/OFL.txt"]);
     // The log names the route template only, never the file or query. The
-    // server logs a request after it has closed the connection : wait
+    // server logs a request after it has closed the connection: wait
     // for every earlier request's line first, then for each request's own.
     let mut log = logged(&web, sent);
     for (target, route) in [

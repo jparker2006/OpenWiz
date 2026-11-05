@@ -87,8 +87,8 @@ fn the_schema_uses_only_checked_keywords() {
         "op_id": "op-1",
     });
     valid("request", &request);
-    // B2 (the implementation), with this recorded reason: the request may carry
-    // staged attachment ids (the check to the check), each at most once.
+    // B2, with this recorded reason: the request may carry
+    // staged attachment ids, each at most once.
     let mut attached = request.clone();
     attached["prompt"]["attachments"] = serde_json::json!(["att-syn-0001"]);
     valid("request", &attached);

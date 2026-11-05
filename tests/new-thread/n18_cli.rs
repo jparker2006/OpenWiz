@@ -1,10 +1,10 @@
 //! N18, the CLI half (A1 phase 2), and N5's: `openwiz new` prints the
 //! effects and the exact command before anything is created, and creates
-//! only with `--yes` (sheet the check); the JSON matches the text; every exit code
+//! only with `--yes`; the JSON matches the text; every exit code
 //! is documented; the text comes from the argument or stdin, never a
 //! terminal; `openwiz models` shows the read time, the saved-copy label and
 //! every unavailable harness with its reason, and no default. The start is
-//! followed within its bound (sheet the check).
+//! followed within its bound.
 
 use std::time::Duration;
 
@@ -90,7 +90,7 @@ fn without_yes_the_effects_and_the_exact_command_are_printed_and_nothing_is_crea
     );
 
     // The printed command, run as printed, creates exactly what was
-    // previewed, under that op id .
+    // previewed, under that op id.
     let out = run_printed(&["sh"], &fake, &command);
     assert_eq!(
         out.status.code(),

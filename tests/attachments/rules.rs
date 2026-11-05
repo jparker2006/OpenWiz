@@ -1,4 +1,4 @@
-//! The readiness, retention and free-disk rules (the check, the check, the check) that phase
+//! The readiness, retention and free-disk rules that phase
 //! 2's store follows. Pure functions here; AP4, AP7 and AP8 prove the store
 //! applies them.
 
@@ -97,7 +97,7 @@ fn an_unsent_ready_attachment_expires_after_24_hours() {
 
 #[test]
 fn a_claimed_attachment_follows_its_operation() {
-    // the check: deleted once an accepted outcome is recorded; kept on a failure
+    // deleted once an accepted outcome is recorded; kept on a failure
     // until the TTL; kept while dispatching or uncertain, past the TTL too.
     for age in [Duration::ZERO, UNSENT_TTL, 30 * 24 * HOUR] {
         let at = |claim| retention(Stored::Ready { claim, age });

@@ -1,10 +1,10 @@
-//! M18 The in-flight guard : a new op id whose target, mode
+//! M18 The in-flight guard: a new op id whose target, mode
 //! and text match a send still claimed or dispatching is refused as a
 //! possible duplicate, with **no call**, unless the owner accepts a
 //! possible duplicate. Two tabs, or the CLI and the web, then can't send the
 //! same text twice under two op ids while the first is still running.
 //!
-//! The check runs before the claim (nothing is written) and again after it,
+//! The in-flight guard runs before the claim (nothing is written) and again after it,
 //! so a sender that slips in between is still caught; the refused op id's
 //! claim is withdrawn, so it stays unused either way.
 
@@ -154,7 +154,7 @@ fn the_same_op_id_again_is_a_replay_not_a_duplicate() {
 }
 
 /// A store that lets another sender claim the same send just before this
-/// one's claim: after the check that runs before the claim, as a racer in
+/// one's claim: after validation before the claim, as a racer in
 /// another process could.
 struct SlipIn<'a> {
     inner: FileStore,

@@ -38,7 +38,7 @@ fn staged() -> Vec<StagedAttachment> {
 /// The request id of the spawn forms below.
 const RID: &str = "ow1-0123456789abcdef0123456789abcdef01234567";
 
-/// The allowlist as approved in the implementation, written out by hand.
+/// The allowlist as approved in written out by hand.
 const ALLOWED: &[&[&str]] = &[
     &["--version"],
     &["thread", "list", "--json"],
@@ -62,7 +62,7 @@ const ALLOWED: &[&[&str]] = &[
     &["machine", "list", "--json"],
     &["thread", "show", "thr_syn_0001", "--json"],
     &["thread", "output", "thr_syn_0001", "--json"],
-    // The one write (OpenWiz 0.0.3, the implementation). Documented, not observed.
+    // The one write (OpenWiz 0.0.3). Documented, not observed.
     &[
         "thread",
         "tell",
@@ -103,7 +103,7 @@ const ALLOWED: &[&[&str]] = &[
         "--prompt",
         "Synthetic",
     ],
-    // B2 (the implementation, sheet the check): each write with attachments, staged
+    // B2: each write with attachments, staged
     // absolute paths only, the tail before the text's placement.
     &[
         "thread",
@@ -372,7 +372,7 @@ fn product_sources() -> Vec<(PathBuf, String)> {
 }
 
 /// The store's attachment module: the one source outside the adapter that
-/// may start a process, `/bin/df` only .
+/// may start a process, `/bin/df` only.
 const FREE_SPACE_MEASURE: &str = "../crates/store/src/attachments.rs";
 
 #[test]
@@ -419,7 +419,7 @@ fn only_the_adapter_can_start_a_process_and_only_from_the_allowlist() {
     assert!(measured, "{FREE_SPACE_MEASURE} was not checked");
 }
 
-/// the check's one exception, and nothing more: one process, of `/bin/df`, with
+/// The process allowlist’s one exception, and nothing more: one process, of `/bin/df`, with
 /// `-P -k`, the directory, a cleared environment and `LC_ALL=C`, in exactly
 /// that call. No other program, argument or variable can be given.
 fn the_free_space_measure_runs_only_bin_df(text: &str) {

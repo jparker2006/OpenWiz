@@ -1,5 +1,5 @@
-// AW7 : safe previews. An SVG with a script, an HTML page, a polyglot
-// (a PNG with markup after it) and a PNG named .svg never render as markup;
+// AW7: safe previews. An SVG with a script, an HTML page, a polyglot
+// (a PNG with markup after it) and a PNG named.svg never render as markup;
 // thumbnails appear only for PNG, JPEG, GIF and WebP, from the browser's own
 // copy (an object URL), and are revoked on removal. The page loads under its
 // CSP with no violation, and nothing in a file ever runs. AW8: one tray, in
@@ -22,7 +22,7 @@ after(() => browser.close());
 
 test('AW7: thumbnails only for the four image types, from an object URL; markup never renders', async () => {
   const { fx } = await composerSite();
-  // The core refuses a PNG named .svg (the check: the name and the bytes disagree); everything else is staged.
+  // The core refuses a PNG named.svg (the name and the bytes disagree); everything else is staged.
   fx.api.setUpload((name, bytes) => (name === 'png-as.svg' ? at.failed(name, 'extension_mismatch', 'its name says .svg but its bytes are a PNG') : at.ready(fx.api.staged, name, bytes)));
   const p = await openThread(browser, fx, 1);
   try {

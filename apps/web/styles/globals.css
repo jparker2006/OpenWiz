@@ -1,5 +1,4 @@
-/* OpenWiz web · visual style v1, adapted from the UI owner's handoff
- * (reference/styles.css; rules in docs/design-rules.md). Styling only.
+/* OpenWiz web · visual style v1. Styling only.
  * Dark first. Colour has one job each and never carries status alone:
  * gold = you're needed, wiz purple = live / now / focus, Lakers purple =
  * brand only, greys for everything else. No red or green.
@@ -332,7 +331,7 @@ code {
   text-decoration: underline dotted var(--ink-3);
   text-underline-offset: 4px;
 }
-/* A state's shape: its border is a shape colour . */
+/* A state's shape: its border is a shape colour. */
 .tag {
   display: inline-block;
   padding: 0 4px;
@@ -625,7 +624,7 @@ main {
   color: var(--ink);
 }
 
-/* ── the composer : under the final output, in the panel and the sheet ── */
+/* ── the composer: under the final output, in the panel and the sheet ── */
 .composer {
   margin: 24px 0 0;
   padding: 16px 0 0;
@@ -773,7 +772,7 @@ main {
   font-weight: 700;
 }
 
-/* ── the launcher : a project's New thread, in the same panel and sheet ── */
+/* ── the launcher: a project's New thread, in the same panel and sheet ── */
 /* The project heading and its New thread: the name keeps its line, the action sits at its end. */
 .group-head {
   display: flex;
@@ -939,7 +938,7 @@ main {
   }
 }
 
-/* ── the attachment tray : in the one prompt body, for the composer and the launcher ── */
+/* ── the attachment tray: in the one prompt body, for the composer and the launcher ── */
 .prompt {
   min-width: 0;
 }

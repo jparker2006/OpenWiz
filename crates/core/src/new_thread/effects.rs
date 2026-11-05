@@ -1,9 +1,9 @@
 //! What a create does, worked out before creating, in the core's words,
-//! and the project rules it starts from (sheet the check: `standard` projects with
+//! and the project rules it starts from (`standard` projects with
 //! a GitHub remote).
 //!
-//! These are the documented effects of a Cloud create (the implementation), not
-//! observations: the live check  observes them, or records them as
+//! These are the documented effects of a Cloud create, not
+//! observations: the live check observes them, or records them as
 //! unobserved.
 
 use serde::Serialize;
@@ -115,7 +115,7 @@ fn display_names(candidate: &ProjectCandidate) -> Vec<String> {
 ///
 /// A name matches every project that answers to it, by its literal name or
 /// its qualified one, and more than one project is ambiguous: a literal
-/// name never hides another project's qualified name .
+/// name never hides another project's qualified name.
 pub fn resolve_project(
     reference: &ProjectRef,
     projects: &[ProjectCandidate],

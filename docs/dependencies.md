@@ -60,10 +60,10 @@ The licences are as each package declares them in the lockfile. The repository i
 | --- | --- | --- |
 | Rust (`rustc`, `cargo`) | 1.99.1, the `rust-version` in `Cargo.toml` | Required to build. Older versions are not supported |
 | `rustfmt`, `clippy` | as shipped with Rust 1.99.1 | Needed only for the formatting and lint checks |
-| `room-cli` | v127 tested; any version runs | Needed at run time. Other versions run and are shown as untested. See [what was tested](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/evidence/0.0.1-live-check.md) |
+| `room-cli` | *Updated for 0.0.5:* historical inventory check: v127; 0.0.3 PC run: 0.43.1 and v141; 0.0.4 PC run: v141 and v142 | Needed at runtime; version is reported, never a gate. These are bounded observations, not universal compatibility; see [testing and gaps](testing.md) |
 | Node.js, npm | 24.22.1 (the `engines` in `apps/web/package.json`), with npm 11.19.1 | *New in 0.0.2.* Needed only to build and test the web page; the server does not run Node.js |
 | Chromium | 156 | *New in 0.0.2.* Needed only for the page's browser tests (`/usr/bin/chromium`, or `OPENWIZ_CHROMIUM`) |
-| `cloudflared` | any current version | *New in 0.0.2.* Needed only to reach the page from outside your Mac ([setup](web-access.md)). Cloudflare Zero Trust, with Access, is needed for the same |
+| `cloudflared` | any current version | *New in 0.0.2.* Needed only to reach the page from outside your Mac ([setup](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/web-access.md)). Cloudflare Zero Trust, with Access, is needed for the same |
 
 ## Systems and protocols
 
@@ -72,5 +72,5 @@ The licences are as each package declares them in the lockfile. The repository i
 | macOS | Built natively and live-checked once (Apple Silicon). *Updated for 0.0.2:* the server too, behind Cloudflare Tunnel and Access ([evidence](https://github.com/jparker2006/OpenWiz/blob/54a96ddddddc80b41ce129485fa31fc2b67da5bf/docs/evidence/0.0.2-live-check.md)) |
 | Linux | Fixture tests pass, the web page's included |
 | Windows | Untested |
-| Browsers | *New in 0.0.2.* Chromium, in the automated tests. The owner has opened the page on their own phone (an observation, no browser details recorded). No Safari test is recorded; other browsers are untested |
+| Browsers | *Updated for 0.0.5:* fixture/browser checks used Chromium. The 0.0.3 run recorded one real iPhone Safari send over cellular; other phone/device steps used headless Chrome emulation. Safari/WebKit beyond that send, real devices/radios and the 0.0.4 device-step Access path remain gaps; see [testing and gaps](testing.md) |
 | PACP | None: 0.0.2 implements no PACP version |

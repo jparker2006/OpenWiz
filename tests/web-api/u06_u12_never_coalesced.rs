@@ -1,12 +1,12 @@
-//! U6 and U12 , the server's half: creates are never coalesced,
+//! U6 and U12, the server's half: creates are never coalesced,
 //! and a repeat never creates twice.
 //!
 //! - **U6:** two creates with different op ids are two calls, even when
-//!   identical; the same op id from two tabs at once is one call; a
-//!   conflicting reuse is none. The read routes' single-flight is not on
-//!   the create path.
+//! identical; the same op id from two tabs at once is one call; a
+//! conflicting reuse is none. The read routes' single-flight is not on
+//! the create path.
 //! - **U12:** double presses, repeats, client retries and reloads all send
-//!   the same op id, and make one provider call: the core replays.
+//! the same op id, and make one provider call: the core replays.
 //!
 //! The page's half (one op id per draft attempt, stored first) is U12's
 //! browser proof (`apps/web/test/browser/u12-no-double.test.mjs`).
@@ -73,7 +73,7 @@ fn u6_identical_creates_with_different_op_ids_are_two_calls() {
 
 #[test]
 fn u6_identical_creates_at_once_are_never_shared() {
-    // One create at a time (the check): the second waits for the slot, then runs
+    // One create at a time: the second waits for the slot, then runs
     // its own call. Nothing is shared between them.
     let fake = slow_spawn("web_u6_at_once");
     let s = serve_new(&fake);

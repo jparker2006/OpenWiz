@@ -1,4 +1,4 @@
-//! AW3 : uploads are bounded (sheet the check). A body over 25 MiB is
+//! AW3: uploads are bounded. A body over 25 MiB is
 //! refused before a byte of it is read; a missing, repeated or lying
 //! `Content-Length`, a body slower than the upload deadline, a third upload
 //! while two run, low disk and a bad name are each refused. **None of them

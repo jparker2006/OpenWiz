@@ -46,17 +46,17 @@ pub struct InvalidSpawn(pub String);
 /// an [`Invocation::ThreadSpawn`] can only carry safe ones:
 /// - the project id: a [`ThreadId`]-shaped id;
 /// - the provider: one of the verified `spawn --provider` ids
-///   ([`HARNESS_PROVIDERS`]);
+/// ([`HARNESS_PROVIDERS`]);
 /// - the model: 1 to 128 printable ASCII characters, no space, not
-///   starting with `-`;
+/// starting with `-`;
 /// - the effort: one of the levels `thread spawn --help` lists
-///   ([`CLI_REASONING_LEVELS`]);
+/// ([`CLI_REASONING_LEVELS`]);
 /// - the request id: `ow1-` and 40 lowercase hex digits, as OpenWiz derives
-///   it;
+/// it;
 /// - the prompt: `send`'s text rules (not empty or only whitespace, no NUL,
-///   at most 16 KiB);
+/// at most 16 KiB);
 /// - the attachments (B2): staged attachments only, in the order passed
-///   (the core's dispatch order), through [`attachment_args`].
+/// (the core's dispatch order), through [`attachment_args`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SpawnArgs {
     project: ThreadId,
@@ -192,10 +192,10 @@ pub enum Invocation {
     /// `--` as the end of options is undocumented, and is the first item of
     /// the pre-live recheck.
     ///
-    /// **With attachments (B2, sheet the check):** `room-cli thread tell <id>
+    /// **With attachments:** `room-cli thread tell <id>
     /// --mode queue --json [--file|--image <staged path>]… -- <text>`, the
     /// tail from [`attachment_args`] before the `--`. Never with steer: the
-    /// core refuses Steer with attachments before anything (the check).
+    /// core refuses Steer with attachments before anything.
     ThreadTell {
         id: ThreadId,
         mode: Mode,

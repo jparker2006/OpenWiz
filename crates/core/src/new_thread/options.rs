@@ -3,12 +3,12 @@
 //!
 //! The adapter reads `cloud status --json` once and hands the core a
 //! [`Catalogue`]: only the catalogue keys, with the account and every other
-//! field discarded at its boundary (sheet the check). [`cloud_options`] then
+//! field discarded at its boundary. [`cloud_options`] then
 //! offers:
 //! - a harness only if the adapter's verified id table maps it to a `spawn`
-//!   provider, and the catalogue lists its models;
+//! provider, and the catalogue lists its models;
 //! - for each model, only the efforts in both its catalogue list and the
-//!   CLI's verified levels;
+//! CLI's verified levels;
 //! - **no default**: nothing is marked default or preselected.
 //!
 //! When `ready` is false, `harnesses` is null, the read fails or its shape

@@ -112,7 +112,7 @@ fn run_new(args: &[OsString]) -> i32 {
 }
 
 /// `openwiz attachment`: the attachment store in the owner's state
-/// directory, its free space measured by `/bin/df` (sheet the check). Paths are
+/// directory, its free space measured by `/bin/df`. Paths are
 /// passed as given, UTF-8 or not; nothing calls `room-cli`. Each
 /// attachment's claim is read from its operation's record (B2): one a send
 /// or a new thread may still use is never removed or expired.

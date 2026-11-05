@@ -1,4 +1,4 @@
-//! AW4 : the same operations. For every B1 and B2 fixture case,
+//! AW4: the same operations. For every B1 and B2 fixture case,
 //! each attachment route's answer is what `openwiz attachment add`, `ls` or
 //! `rm --json` prints for the same bytes, name, store and clock, and a send
 //! or a create with attachments answers what `openwiz send` or `openwiz new`
@@ -24,7 +24,7 @@ use crate::staging::{png, text};
 const MIB: usize = 1024 * 1024;
 
 /// Every B1 kind and refusal, as `(name, bytes)`: B1's AP1, AP2, AP3 and
-/// the check, the check cases, made here (synthetic).
+/// the related cases cases, made here (synthetic).
 fn cases() -> Vec<(String, Vec<u8>)> {
     vec![
         ("aw4.png".into(), png(2000)),
@@ -41,7 +41,7 @@ fn cases() -> Vec<(String, Vec<u8>)> {
         ("no-extension".into(), text("Synthetic AW4\n")),
         // HEIC is refused, never converted.
         ("aw4.heic".into(), heic(2000)),
-        // The name and the bytes disagree (the check).
+        // The name and the bytes disagree.
         ("png-as.jpg".into(), png(2000)),
         ("text-as.png".into(), text("Synthetic AW4 not an image\n")),
         ("svg-as.png".into(), SVG_WITH_SCRIPT.as_bytes().to_vec()),
@@ -485,7 +485,7 @@ fn no_attachment_rule_is_worked_out_in_the_server_or_the_web() {
             }
         }
         // The server's one use of a limit: its upload cap is the core's
-        // per-file limit (the check), named once in lib.rs, never a number of its
+        // per-file limit, named once in lib.rs, never a number of its
         // own.
         let caps = text.matches("FILE_MAX_BYTES").count();
         let allowed = usize::from(path.ends_with("server/src/lib.rs"));

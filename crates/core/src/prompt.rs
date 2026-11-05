@@ -6,7 +6,7 @@
 //! ([`validate_text`]: not empty, no NUL, at most
 //! [`MAX_TEXT_BYTES`](crate::messaging::MAX_TEXT_BYTES)). `attachments` is
 //! an ordered list of opaque [`AttachmentId`]s, each at most once: B1's
-//! staged attachments (the implementation). No count cap, no total.
+//! staged attachments. No count cap, no total.
 //!
 //! **One gate** ([`gate`]): before the op id is claimed, every attachment
 //! must be ready, its copy read again whole and matching its record, not
@@ -17,7 +17,7 @@
 //! **The binding**: an op id binds the text's SHA-256 and
 //! [`attachments_digest`], over the owner's ordered list. **The dispatch
 //! order** is files first, then images ([`ReadyPrompt::dispatch_order`]),
-//! the order the agent receives them . See
+//! the order the agent receives them. See
 //! `contracts/prompt.v1.schema.json`.
 
 use std::fmt;
@@ -33,7 +33,7 @@ use crate::messaging::record::StoreError;
 use crate::messaging::{InvalidRequest, OpId, sha256_hex, validate_text};
 use crate::model::Timestamp;
 
-/// B1's attachment id (the implementation), reused, never copied: the one opaque,
+/// B1's attachment id, reused, never copied: the one opaque,
 /// path-safe handle on a staged attachment.
 pub use crate::attachment::AttachmentId;
 
@@ -179,9 +179,8 @@ impl ReadyPrompt {
 /// [`READ_TIMEOUT`](crate::limits::READ_TIMEOUT), and its operation beyond
 /// its budget: one second per started MiB of attachments, a deliberately
 /// slow floor of 1 MiB/s for `room-cli`'s upload to the local CloudRoom
-/// server . **Proposed by B2, not approved; measured only against
-/// the fake** : rechecked at the live
-/// check. A call that still runs out of time is uncertain, never retried.
+/// server. Measured against the fake process; this is not a measured live
+/// throughput guarantee. A timed-out call is uncertain, never retried.
 pub fn attachment_allowance(total_bytes: u64) -> Duration {
     Duration::from_secs(total_bytes.div_ceil(ALLOWANCE_BYTES_PER_SECOND))
 }
@@ -242,7 +241,7 @@ pub enum Problem {
     NotFound,
     /// Its copy is broken, or isn't what was recorded (changed bytes).
     Failed(FailReason),
-    /// Unclaimed (or its operation failed), past its time-to-live (the check).
+    /// Unclaimed (or its operation failed), past its time-to-live.
     Expired,
     /// Another operation claims it, and may still use it, or has.
     InUse { op: OpRef, claim: Claim },
@@ -323,9 +322,9 @@ pub enum ClaimOutcome {
 ///
 /// Required of an implementation:
 /// - [`look_up`](Self::look_up) reads the copy again whole, and writes
-///   nothing;
+/// nothing;
 /// - [`claim`](Self::claim) is atomic across processes and all or nothing,
-///   and judges each attachment by [`claimable`];
+/// and judges each attachment by [`claimable`];
 /// - nothing deletes an attachment whose claim [`retention`] keeps.
 pub trait StagedAttachments: Send + Sync {
     /// One attachment, its copy read again whole. Never writes.
@@ -401,9 +400,9 @@ impl StagedAttachments for NoAttachments {
 ///
 /// - claimed by `op` itself: yes (the same operation, again);
 /// - unclaimed, or claimed by an operation that failed: yes, unless past
-///   its time-to-live (the check), when it is expired;
+/// its time-to-live, when it is expired;
 /// - claimed by another operation that is being sent, was accepted, or is
-///   uncertain: no, it is in use (the check keeps it for that operation).
+/// uncertain: no, it is in use (kept for that operation).
 pub fn claimable(
     op: &OpRef,
     current: Option<&(OpRef, Claim)>,
@@ -483,7 +482,7 @@ pub fn gate(
 /// The attachments `ids` stand for, for comparing a request with its op
 /// id's record (the binding): each one as the record holds it when the
 /// record has that id (its copy may be gone: an accepted operation's copies
-/// are deleted, the check), otherwise as its staged copy is now, read again whole.
+/// are deleted), otherwise as its staged copy is now, read again whole.
 /// `None` when an id is neither in the record nor a ready copy: then it
 /// can't be shown to be the recorded payload. Claims nothing, sends nothing.
 pub fn recorded(
@@ -509,7 +508,7 @@ pub fn recorded(
 }
 
 /// The words a queued, sent or created outcome adds when it carried
-/// attachments : never a stronger claim.
+/// attachments: never a stronger claim.
 pub fn handed_over(count: usize) -> String {
     let noun = if count == 1 {
         "attachment"

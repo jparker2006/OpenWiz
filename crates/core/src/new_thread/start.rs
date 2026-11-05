@@ -1,5 +1,5 @@
 //! After creation: the start stage and the reported configuration, from one
-//! `thread show` read (sheet the check: no `thread log`).
+//! `thread show` read (no `thread log`).
 //!
 //! | `thread.status` (and `lastError`) | Start stage |
 //! | --- | --- |
@@ -26,10 +26,10 @@ use crate::source::SourceError;
 use super::operation::NewThreadClient;
 use super::outcome::Gap;
 
-/// The CLI follows the start for at most this many reads (sheet the check).
+/// The CLI follows the start for at most this many reads.
 pub const FOLLOW_MAX_READS: u32 = 10;
 
-/// ... and for at most this long.
+///... and for at most this long.
 pub const FOLLOW_WINDOW: Duration = Duration::from_secs(60);
 
 /// The wait between two follow reads.
@@ -236,7 +236,7 @@ pub fn follow_next(reads: u32, elapsed: Duration, stage: &StartStage) -> Option<
     Some(FOLLOW_INTERVAL)
 }
 
-/// Follows the start of the created thread `thread_id` (sheet the check): one
+/// Follows the start of the created thread `thread_id`: one
 /// `thread show` read, then one every [`FOLLOW_INTERVAL`] until the stage
 /// settles, [`FOLLOW_MAX_READS`] reads were made or [`FOLLOW_WINDOW`] has
 /// passed. Returns the last read's view and the number of reads. `wait`

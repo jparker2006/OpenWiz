@@ -4,7 +4,7 @@
 //! A read is stopped at the earlier of the run's deadline and
 //! [`READ_TIMEOUT`]; a stopped child is killed and reaped. Nothing is retried.
 //!
-//! **The environment scrub** (sheet the check): every call runs without the
+//! **The environment scrub**: every call runs without the
 //! CloudRoom thread-context variables, [`is_scrubbed`], so a `room-cli`
 //! started from inside a CloudRoom thread can't act for that thread or
 //! rewrite the model asked for. `ROOM_SERVER_URL` is always kept. Everything
@@ -12,7 +12,7 @@
 //!
 //! Only the child itself is killed. A process it started that keeps the
 //! pipes open is not; the read then times out without waiting longer.
-//! Whether `room-cli` starts such processes is unobserved .
+//! Whether `room-cli` starts such processes is unobserved.
 
 use std::io::Read as _;
 use std::path::Path;
@@ -220,7 +220,7 @@ pub const NOT_FOUND_LINE: &str = "Error: HTTP 404: Thread not found";
 /// withheld)`, or nothing of it. No digit beyond the status, punctuation,
 /// control or non-ASCII character from `room-cli` is shown, so no path,
 /// address, `KEY=value` or terminal control; a word of letters still can
-/// be. Provisional; see the source-diagnostics fix's evidence README.
+/// be.
 fn diagnostic(stderr: &[u8]) -> String {
     let text = String::from_utf8_lossy(stderr);
     let Some(line) = text.lines().map(str::trim).find(|l| !l.is_empty()) else {

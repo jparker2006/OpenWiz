@@ -348,7 +348,7 @@ def where($s): if $s == null then "approved on its own" else "spec #\($s.number)
 # A ticket.
 def labels: [.labels.nodes[].name];
 def has_role($role): $W.labels[$role] as $l | any(labels[]; . == $l);
-# The fleet contract'"'"'s (contracts/fleet.v1.md) "held" label: a held ticket never starts.
+# A ticket with the held label never starts.
 def labelled_held: any(labels[]; . == "held");
 def verified_merge: any(.closedByPullRequestsReferences.nodes[]?; .merged == true and .baseRefName == $W.default);
 def merged_ok: .state == "CLOSED" and verified_merge;

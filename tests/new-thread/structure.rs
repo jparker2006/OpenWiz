@@ -1,4 +1,4 @@
-//! Structure: no reachable behaviour yet (sheet the check), every label the core
+//! Structure: no reachable behaviour yet, every label the core
 //! can serialize is in the schema, and the runner scrubs every call.
 
 use std::fs;
@@ -28,7 +28,7 @@ fn rust_text(dir: &str) -> String {
 }
 
 /// A1 phase 2 reaches new threads from the CLI, the store and the
-/// allowlist; since A2  also from the server's routes, through the
+/// allowlist; since A2 also from the server's routes, through the
 /// core's operations only, never an allowlist invocation of its own. The
 /// fake allows `spawn` only in its one shape (N16). A tripwire, not a proof.
 /// Updated for A2, with that reason.

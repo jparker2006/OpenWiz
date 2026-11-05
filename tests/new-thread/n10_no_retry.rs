@@ -1,4 +1,4 @@
-//! N10, the refusal half only (sheet the check: no retry in 0.0.4). There is no
+//! N10, the refusal half only (no retry in 0.0.4). There is no
 //! `--retry` and no retry operation: asking for one is a usage error that
 //! reads and calls nothing. An uncertain create stays uncertain whatever
 //! runs next, and the owner resolves it in CloudRoom. With the fake's

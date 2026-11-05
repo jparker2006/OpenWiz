@@ -5,7 +5,7 @@
 //! reads the Cloud catalogue with `cloud status`.
 //!
 //! Every call runs with the CloudRoom thread-context variables removed from
-//! its environment ([`is_scrubbed`], sheet the check).
+//! its environment ([`is_scrubbed`]).
 //!
 //! Every read is one [`allowlist::Invocation`], run by `process` with a
 //! 15-second timeout inside the run's deadline and no retry; [`source`]
@@ -24,5 +24,5 @@ pub use process::{KEPT_ENV, SCRUBBED_ENV, SCRUBBED_ENV_PREFIX, is_scrubbed};
 pub const PROGRAM: &str = "room-cli";
 
 /// The `room-cli` version the live check ran against (0.0.1, 2026-10-29).
-/// Reported, never a gate : any other version is marked untested.
+/// Reported, never a gate: any other version is marked untested.
 pub const TESTED_VERSION: &str = "v127";

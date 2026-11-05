@@ -35,7 +35,7 @@ const SLOW_MS = Number(process.env.OPENWIZ_FAKE_API_SLOW_MS ?? 0) || 0;
 /** Only these route kinds (comma-separated, for example `detail,list`); every kind when unset. */
 const SLOW_KINDS = process.env.OPENWIZ_FAKE_API_SLOW_KINDS ? process.env.OPENWIZ_FAKE_API_SLOW_KINDS.split(',') : null;
 
-/** The contract's send body cap (the check). */
+/** The contract's send body cap. */
 export const SEND_BODY_CAP = 99_328;
 const SEND_KEYS = new Set(['op_id', 'mode', 'text', 'resume_paused_queue', 'accept_possible_duplicate', 'attachments']);
 const OP_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
@@ -147,7 +147,7 @@ export function fakeApi() {
   const records = new Map();
   /** One entry per provider call (the core's `tell`). */
   const calls = [];
-  // The new-thread routes .
+  // The new-thread routes.
   let optionsFn = () => json(200, nt.options());
   let createPreviewFn = (project, body) => json(200, nt.preview(project, body));
   // The provider's answer to a new create: a report; { after: DROP | HANG | DROP_HELD, report } when the call
@@ -160,7 +160,7 @@ export function fakeApi() {
   const threadRecords = new Map();
   /** One entry per provider call (the core's `spawn`). */
   const creates = [];
-  // The attachment routes : the staged copies, by id, and every upload body received.
+  // The attachment routes: the staged copies, by id, and every upload body received.
   const staged = new Map();
   const uploads = [];
   // The core's answer to one upload: by default ready, its kind from its first bytes (the core's
@@ -451,7 +451,7 @@ export function fakeApi() {
     /** The provider's creates, one per new op id that passed every check. */
     creates,
     threadRecords,
-    /** The staged copies , by id, and every upload body the fake received. */
+    /** The staged copies, by id, and every upload body the fake received. */
     staged,
     uploads,
     /** `fn(name, bytes, entry)`: the core's answer to one upload (a reply), or DROP, HANG, LOST. */

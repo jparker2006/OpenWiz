@@ -1,5 +1,5 @@
 //! N8: start stages for every status row, separate from creation, within
-//! the follow bound (sheet the check). Unknowns stay unknown.
+//! the follow bound. Unknowns stay unknown.
 
 use std::time::Duration;
 

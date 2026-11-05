@@ -386,7 +386,7 @@ fn ad06_across_processes_and_restarts_no_request_id_carries_two_payloads() {
         let known = seen.entry(rid).or_insert_with(|| hashes.clone());
         assert_eq!(*known, hashes, "one request id, two payloads");
     }
-    // There is no retry (sheet the check): no form of `new` re-sends.
+    // There is no retry: no form of `new` re-sends.
     let (code, _, err) = fake.cli(&["new", "--retry", "op-ad06"], "");
     assert_eq!(code, 2, "{err}");
 }

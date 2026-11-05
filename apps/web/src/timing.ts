@@ -1,6 +1,4 @@
-// PROVISIONAL engineering choices, for fixture work only. They are not
-// targets: ticket 1's real baseline (A9) has not run, and the maintainer approves the
-// numbers .
+// Conservative fixture-tested timing choices, not measured performance targets.
 
 export type Timing = {
   /** From the end of one list read to the start of the next. */
@@ -15,7 +13,7 @@ export type Timing = {
    * margin for the network. The read is given up at this point.
    */
   laneHoldMs: number;
-  /** Delays after 1, 2, 3, ... failures in a row. The last is the cap. */
+  /** Delays after 1, 2, 3,... failures in a row. The last is the cap. */
   backoffMs: readonly number[];
   /** The last good snapshot is stale this long after its response arrived. */
   staleAfterMs: number;
@@ -29,7 +27,7 @@ export const TIMING: Timing = {
   // (above the core's 30 s run budget plus the 5 s slot wait), then 10 s to
   // write the response: 60 s from the request's arrival. Plus 10 s for transit.
   // The contract does not bound transit, or a run that ignores the core's
-  // budget ("A run past it keeps its slot"): the evidence README's gap.
+  // budget ("A run past it keeps its slot"); these cases can exceed this estimate.
   laneHoldMs: 70_000,
   backoffMs: [2_000, 4_000, 8_000, 16_000, 30_000],
   staleAfterMs: 30_000,

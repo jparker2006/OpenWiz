@@ -1,14 +1,14 @@
-// U11 to U13 : what a refusal, an uncertain create and the page's
+// U11 to U13: what a refusal, an uncertain create and the page's
 // refresh do to the launcher, on the fake API. Synthetic values only.
 //
 // - U11 failure and uncertainty keep everything: the prompt, settings and op
-//   id survive a reload; Refresh status makes no create; there is no retry
-//   (the check), only the owner's explicit Start over, which says it may make a
-//   second thread. "Not offered" reads the options again, visibly.
+// id survive a reload; Refresh status makes no create; there is no retry
+//, only the owner's explicit Start over, which says it may make a
+// second thread. "Not offered" reads the options again, visibly.
 // - U12 no double create: double clicks, a held Ctrl+Enter, Try again after no
-//   answer, a reload and a copied tab all send one op id: one provider call.
+// answer, a reload and a copied tab all send one op id: one provider call.
 // - U13 refreshes never clear the draft or settings, move focus, change a
-//   shown outcome or create anything.
+// shown outcome or create anything.
 
 import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';

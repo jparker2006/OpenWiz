@@ -54,7 +54,7 @@ pub const RETRY_AFTER_SECS: u64 = 5;
 pub const MAX_SENDS: usize = 2;
 
 /// Creates (the core's `new_thread`) at once, apart from the sends and the
-/// core runs: one (sheet the check).
+/// core runs: one.
 pub const MAX_CREATES: usize = 1;
 
 /// The largest send body: the core's text cap fully JSON-escaped (6 bytes
@@ -62,16 +62,16 @@ pub const MAX_CREATES: usize = 1;
 pub const MAX_SEND_BODY_BYTES: usize = 6 * openwiz_core::messaging::MAX_TEXT_BYTES + 1024;
 
 /// Uploads (staging one file) at once, apart from the sends, creates and
-/// core runs (sheet the check).
+/// core runs.
 pub const MAX_UPLOADS: usize = 2;
 
 /// The largest upload body: the core's per-file limit, the largest
-/// provider limit (sheet the check). The store still checks the core's rules.
+/// provider limit. The store still checks the core's rules.
 pub const MAX_UPLOAD_BYTES: u64 = openwiz_core::attachment::FILE_MAX_BYTES;
 
 /// From the end of an upload's head to its answer, for the whole body and
 /// its verification: under Cloudflare's 125-second proxy read timeout
-/// (sheet the check; documented, not observed).
+/// (documented, not observed).
 pub const UPLOAD_DEADLINE: Duration = Duration::from_secs(110);
 
 /// The header that carries an upload's file name, percent-encoded UTF-8.
@@ -112,8 +112,7 @@ pub struct Route {
 /// Every route the server answers. Anything else is `404` or `405`. Of the
 /// four `POST`s, the send and the create are the only writes to CloudRoom;
 /// the new-thread preview only reads; the upload, like the `DELETE`,
-/// changes only the attachment store . There is no retry route (sheet
-/// the check), and no route returns an attachment's bytes.
+/// changes only the attachment store. There is no retry route, and no route returns an attachment's bytes.
 pub const ROUTES: &[Route] = &[
     Route {
         method: "GET",
@@ -232,8 +231,8 @@ pub type OpenStore = Arc<dyn Fn() -> Result<Box<dyn SendStore>, StoreError> + Se
 pub type OpenStoreReadOnly =
     Arc<dyn Fn() -> Result<Option<Box<dyn SendStore>>, StoreError> + Send + Sync>;
 
-/// The one public host name a send may come to (the check). It can never be a
-/// loopback name or an IP address : [`SendHost::new`]
+/// The one public host name a send may come to. It can never be a
+/// loopback name or an IP address: [`SendHost::new`]
 /// is the only way to make one, so no configuration can serve a send to a
 /// loopback `Host`, whatever the allowed host is.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -300,7 +299,7 @@ pub type OpenNewThreadStore =
 pub type OpenNewThreadStoreReadOnly =
     Arc<dyn Fn() -> Result<Option<Box<dyn NewThreadStore>>, StoreError> + Send + Sync>;
 
-/// What the new-thread routes need : the provider's reads and its one
+/// What the new-thread routes need: the provider's reads and its one
 /// create, and the new-thread record, opened as `openwiz new` opens it,
 /// when each request needs it.
 #[derive(Clone)]
@@ -328,9 +327,9 @@ pub type OpenAttachmentStore = Arc<dyn Fn() -> Result<AttachmentStore, StoreErro
 pub type OpenAttachmentStoreReadOnly =
     Arc<dyn Fn() -> Result<Option<AttachmentStore>, StoreError> + Send + Sync>;
 
-/// What the attachment routes need : the attachment store, opened as
+/// What the attachment routes need: the attachment store, opened as
 /// `openwiz attachment` opens it, when each request needs it, and the
-/// free-space measure staging checks the floor with (sheet the check).
+/// free-space measure staging checks the floor with.
 #[derive(Clone)]
 pub struct Attaching {
     pub open_store: OpenAttachmentStore,
@@ -364,7 +363,7 @@ pub struct Config {
     /// The new-thread routes' provider and record. `openwiz-server` always
     /// sets it; without it, the four new-thread routes are `404`.
     pub creating: Option<Creating>,
-    /// The attachment routes' store . `openwiz-server` always sets it;
+    /// The attachment routes' store. `openwiz-server` always sets it;
     /// without it, the three attachment routes are `404`, and a send or a
     /// create with attachments is refused by the core's gate.
     pub attaching: Option<Attaching>,
@@ -383,7 +382,7 @@ pub struct Stats {
     pub core_runs: usize,
     /// Requests waiting for a core run's result, their own or a shared one.
     pub attached: usize,
-    /// Uploads holding an upload slot .
+    /// Uploads holding an upload slot.
     pub uploads: usize,
 }
 
@@ -696,7 +695,7 @@ fn respond(head: &Head, stream: &mut TcpStream, shared: &Shared) -> Reply {
     let matched = Matched::of(path);
     let sending = shared.config.sending.as_ref();
     // Without a send configuration these routes do not exist, for every
-    // method .
+    // method.
     if sending.is_none()
         && matches!(
             matched,
@@ -721,7 +720,7 @@ fn respond(head: &Head, stream: &mut TcpStream, shared: &Shared) -> Reply {
         return api::error(404, "no_route", "no such route");
     }
     // The same for the attachment routes without an attachment configuration
-    // .
+    //.
     let attaching = shared.config.attaching.as_ref();
     if attaching.is_none() && matches!(matched, Some(Matched::Attachments | Matched::Attachment(_)))
     {
@@ -849,7 +848,7 @@ fn core(shared: &Shared) -> api::Core {
 
 /// `POST /api/v1/attachments` and `DELETE /api/v1/attachments/{id}`, after
 /// the `Host` and the method: the route, the write `Host` (only the
-/// configured host name, never loopback: the check, unchanged by the check), the
+/// configured host name, never loopback, shared with send), the
 /// query, then `attachments.rs`.
 fn attachment_write(
     head: &Head,
@@ -889,7 +888,7 @@ fn attachment_write(
 
 /// `POST /api/v1/projects/{id}/threads` and `…/threads/preview`, after the
 /// `Host` and the method: the route, the create `Host` (only the configured
-/// host name, never loopback: the check, unchanged by the check), the query, then
+/// host name, never loopback, shared with send), the query, then
 /// `new_thread.rs`. The preview, which only reads, is a shared core run.
 fn create_route(
     head: &Head,
@@ -949,7 +948,7 @@ fn create_route(
 
 /// `POST /api/v1/sessions/{id}/messages`, after the `Host` and the method:
 /// the route, the send `Host` (only the configured host name, never
-/// loopback: the check), the query, then `send.rs`.
+/// loopback: ), the query, then `send.rs`.
 fn send_route(
     head: &Head,
     stream: &mut TcpStream,

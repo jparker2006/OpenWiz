@@ -1,5 +1,5 @@
 //! `openwiz new`, `openwiz new --status` and `openwiz models` (OpenWiz
-//! 0.0.4, the implementation): parse the command line, call the core's
+//! 0.0.4): parse the command line, call the core's
 //! `new_thread`, `preview_new_thread`, `new_thread_status` and
 //! `cloud_options`, and print the result as text or as the
 //! `contracts/new-thread.v1.schema.json` JSON.
@@ -9,10 +9,10 @@
 //! codes are the `EXIT_*` constants here, documented in
 //! [`help`](crate::help).
 //!
-//! **`new` creates only with `--yes`** (sheet the check). Without it, it reads
+//! **`new` creates only with `--yes`**. Without it, it reads
 //! what a create would read, prints the effects and the exact command, and
 //! exits [`EXIT_NEEDS_YES`]: nothing is claimed or created. There is no
-//! retry (sheet the check): an uncertain create stays uncertain, and the owner
+//! retry: an uncertain create stays uncertain, and the owner
 //! resolves it in CloudRoom.
 
 use std::io::{Read, Write};
@@ -74,7 +74,7 @@ pub const EXIT_NO_OPTIONS: i32 = 13;
 pub const YES: &str = "--yes";
 /// Shows the record of an op id; no claim, no call.
 pub const STATUS: &str = "--status";
-/// Refuses a text whose SHA-256 is not this one .
+/// Refuses a text whose SHA-256 is not this one.
 pub const TEXT_SHA256: &str = "--text-sha256";
 
 /// What `openwiz new` needs from the program around it.

@@ -5,11 +5,11 @@
 //! The text contract for `openwiz send` (provisional, like 0.0.1's):
 //! 1. line 1: `openwiz send · op <op id> · <target id> · <title>`;
 //! 2. `effects (read <age> before sending): <effect>` and `paused queue:
-//!    <words>`, when the target was read;
+//! <words>`, when the target was read;
 //! 3. the summary line: `<Mode> requested · <reported delivery>`;
 //! 4. one `gap: <subject> · <detail>` line per gap;
 //! 5. a refusal names what to do next (the acknowledgement flag), and a
-//!    replay says `replayed`.
+//! replay says `replayed`.
 //!
 //! Unknowns print as `unknown (<reason>)`.
 
@@ -294,8 +294,8 @@ fn help_documents_send_its_flags_and_its_limits() {
         "never auto",
         "the provider accepted the message, not that the work completed",
         "can change between the read and the dispatch",
-        // B2 (the implementation), recorded reason: send attaches staged files
-        // (sheet the check), queue only, all ready or nothing; the help said "no
+        // B2, recorded reason: send attaches staged files
+        //, queue only, all ready or nothing; the help said "no
         // attachments" before.
         "--attach <path>",
         "--attachment <id>",

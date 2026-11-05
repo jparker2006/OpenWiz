@@ -309,7 +309,7 @@ fn ad04_same_op_id_and_payload_is_one_call_any_attachment_difference_is_refused(
     assert_eq!(fake.tell_count(), 1);
 
     // The same payload again: its recorded outcome, no call (its copies
-    // are gone after the accepted outcome, the check; the record binds them).
+    // are gone after the accepted outcome; the record binds them).
     let again = report_with(&fake, &base);
     assert!(matches!(
         again.result,
@@ -357,7 +357,7 @@ fn ad04_a_0_0_3_record_without_attachments_still_matches() {
     assert!(json["binding"].get("attachments_digest").is_none());
     assert!(json.get("attachments").is_none());
     json.as_object_mut().unwrap().remove("source");
-    // The state directory and sends/, owner only, whatever the umask .
+    // The state directory and sends/, owner only, whatever the umask.
     crate::dirs::private_dir_all(fake.state.join("sends")).unwrap();
     let store = fake.store();
     fs::write(
@@ -884,7 +884,7 @@ fn ad05_the_adapter_never_starts_a_steer_with_attachments() {
     assert!(fake.invocations().is_empty(), "nothing was run");
 }
 
-/// the check through the real binary: `openwiz attachment ls` and `rm` judge an
+/// The retention rules through the real binary: `openwiz attachment ls` and `rm` judge an
 /// attachment by its operation's record, as `send` and `new` do. An
 /// uncertain send's attachment is listed as kept while its operation may
 /// use it (no expiry), and can't be removed.

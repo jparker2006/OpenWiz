@@ -1,13 +1,12 @@
 //! M15 Text only: a file path in the text is sent as text, never uploaded
 //! or read.
 //!
-//! **Updated for B2 (the implementation)**, with this recorded reason: sheet the check
-//!  adds attachments, through `--attach
+//! Attachments add attachments, through `--attach
 //! <path>` (staged first) and `--attachment <id>` only, and `--file` and
 //! `--image` only with staged absolute paths, built by the allowlist. So
 //! `openwiz send` still has no `--file` or `--image` option, and a path in
 //! the text is still sent as text: "a path in the text is still sent as
-//! text" . AD1 to AD13 prove the attachments.
+//! text". AD1 to AD13 prove the attachments.
 
 use std::fs;
 

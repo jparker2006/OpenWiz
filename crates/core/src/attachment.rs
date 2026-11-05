@@ -1,4 +1,4 @@
-//! Attachments: OpenWiz 0.0.4's file model (B1 phase 1, the implementation).
+//! Attachments: OpenWiz 0.0.4's file model (B1 phase 1).
 //!
 //! One attachment is one file the owner chose, copied unchanged to the
 //! controller. This module holds the rules, with no I/O: the store (phase
@@ -6,22 +6,22 @@
 //! what may happen next.
 //!
 //! - **Kind from the bytes** ([`classify`]): PNG, JPEG, GIF and WebP are
-//!   images, by their signature. HEIC and HEIF are refused, as is an ISO
-//!   media file whose brands don't settle it. Everything else is a file,
-//!   sent unchanged and never interpreted (a ZIP is never unpacked, the check). A
-//!   declared MIME type has no way in.
-//! - **Name and content agree** (the check): CloudRoom types a file by its
-//!   extension , so an image under another image's name, or a
-//!   non-image under an image's name, is refused. Nothing is renamed.
+//! images, by their signature. HEIC and HEIF are refused, as is an ISO
+//! media file whose brands don't settle it. Everything else is a file,
+//! sent unchanged and never interpreted (a ZIP is never unpacked). A
+//! declared MIME type has no way in.
+//! - **Name and content agree**: CloudRoom types a file by its
+//! extension, so an image under another image's name, or a
+//! non-image under an image's name, is refused. Nothing is renamed.
 //! - **Safe names** ([`SafeName`]): the staged name, which CloudRoom's own
-//!   sanitizing leaves unchanged (F5). CloudRoom then stores it as
-//!   `<stem>-<time>-<random><ext>`, and that stored name is what the agent
-//!   sees; the staged limit leaves room for the suffix.
+//! sanitizing leaves unchanged (F5). CloudRoom then stores it as
+//! `<stem>-<time>-<random><ext>`, and that stored name is what the agent
+//! sees; the staged limit leaves room for the suffix.
 //! - **Provider limits only** ([`limit`]): 10 MiB per image and 25 MiB per
-//!   file (F7), and the image limit for a file CloudRoom types as an image
-//!   (F26, [`IMAGE_TYPED_EXTENSIONS`]). No count cap, no total.
+//! file (F7), and the image limit for a file CloudRoom types as an image
+//! (F26, [`IMAGE_TYPED_EXTENSIONS`]). No count cap, no total.
 //! - **Readiness, retention and the free-disk floor** ([`Readiness`],
-//!   [`retention`], [`staging_room`]): the check, the check and the check.
+//! [`retention`], [`staging_room`]): shared readiness, retention and free-disk rules.
 //!
 //! CloudRoom's limits and typing are source-read, not observed; the live
 //! check rechecks them (AL2). Nothing here dispatches anything.
@@ -49,7 +49,7 @@ pub const CLOUDROOM_NAME_MAX_BYTES: usize = 200;
 /// The longest suffix CloudRoom adds before the extension when it stores an
 /// upload: `-`, `Date.now()` (13 digits until 2286), `-`, and up to six
 /// base-36 characters (`buildStoredFilename`). Source-read at upstream
-/// `eb20d1c`, not observed .
+/// `eb20d1c`, not observed.
 pub const CLOUDROOM_SUFFIX_MAX_BYTES: usize = 21;
 
 /// The longest staged name: CloudRoom's stored name, the staged name plus
@@ -65,10 +65,10 @@ pub const ATTACHMENT_ID_MAX_LEN: usize = 64;
 /// refused as unclear.
 pub const SNIFF_BYTES: usize = 4096;
 
-/// How long a ready attachment no operation has claimed is kept (the check).
+/// How long a ready attachment no operation has claimed is kept.
 pub const UNSENT_TTL: Duration = Duration::from_secs(24 * 60 * 60);
 
-/// Staging never leaves less than this free on the state volume (the check). A
+/// Staging never leaves less than this free on the state volume. A
 /// safe-resource floor, not a product cap; rechecked at the live check.
 pub const FREE_DISK_FLOOR_BYTES: u64 = 1024 * 1024 * 1024;
 
@@ -102,7 +102,7 @@ pub enum Kind {
     File,
 }
 
-/// Why an attachment can't become ready. A fixed list . In JSON, one
+/// Why an attachment can't become ready. A fixed list. In JSON, one
 /// string from [`FailReason::labels`], nothing else.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum FailReason {
@@ -112,7 +112,7 @@ pub enum FailReason {
     /// An ISO media file whose `ftyp` box can't be read in full, or names
     /// both HEVC and AV1 brands: it might be HEIC, so it is refused.
     TypeUnclear,
-    /// The name's extension and the bytes disagree (the check).
+    /// The name's extension and the bytes disagree.
     ExtensionMismatch,
     /// An image over [`IMAGE_MAX_BYTES`].
     ImageTooLarge,
@@ -587,14 +587,14 @@ impl Format {
 /// An ISO base media file (an `ftyp` box first): HEIF, or another format,
 /// or unclear. The box header is read in both forms, a 32-bit size and the
 /// 64-bit one (size 1), and every brand counts, major and compatible
-/// .
+///.
 ///
 /// - A HEVC brand (`heic`, `heix`, `hevc`, …) is HEIC, unless an AV1 brand
-///   (`avif`, `avis`) is there too: then it is unclear.
+/// (`avif`, `avis`) is there too: then it is unclear.
 /// - An AV1 brand is AVIF: a file.
 /// - Otherwise the generic HEIF brands (`mif1`, `msf1`, `mif2`) are HEIF.
 /// - A box that doesn't fit in what was read, is too small for its
-///   brands, or ends part way through a brand, is unclear.
+/// brands, or ends part way through a brand, is unclear.
 fn iso_media(head: &[u8]) -> Format {
     let be = |bytes: &[u8]| bytes.iter().fold(0u64, |n, &b| (n << 8) | u64::from(b));
     let (header, size) = match be(&head[..4]) {
@@ -613,7 +613,7 @@ fn iso_media(head: &[u8]) -> Format {
     };
     let major = &head[header..header + 4];
     // Whole 4-byte brands only: any byte left over is a cut-off brand,
-    // which might be HEVC's .
+    // which might be HEVC's.
     let (compatible, partial) = head[header + 8..end].as_chunks::<4>();
     if !partial.is_empty() {
         return Format::Unclear;
@@ -715,7 +715,7 @@ pub fn check(name: &SafeName, head: &[u8], size_bytes: u64) -> Result<Kind, Fail
 }
 
 /// Whether `incoming_bytes` more may be staged with `free_bytes` free on
-/// the state volume: never below [`FREE_DISK_FLOOR_BYTES`] (the check).
+/// the state volume: never below [`FREE_DISK_FLOOR_BYTES`].
 pub fn staging_room(free_bytes: u64, incoming_bytes: u64) -> Result<(), FailReason> {
     match free_bytes.checked_sub(incoming_bytes) {
         Some(left) if left >= FREE_DISK_FLOOR_BYTES => Ok(()),
@@ -723,12 +723,12 @@ pub fn staging_room(free_bytes: u64, incoming_bytes: u64) -> Result<(), FailReas
     }
 }
 
-/// One attachment's readiness . `selected` and `uploading` exist only
+/// One attachment's readiness. `selected` and `uploading` exist only
 /// in clients and in an upload in flight; the store holds `ready`.
 ///
 /// In JSON, `{"state": <state>}`, or `{"state": "failed", "reason":
 /// <reason>}`: read only from a map with exactly those keys, each once,
-/// and string values from their lists .
+/// and string values from their lists.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Readiness {
     /// Chosen in a client only. Claims no upload.
@@ -855,7 +855,7 @@ impl Readiness {
     }
 }
 
-/// Where the operation that claimed a ready attachment stands (the check).
+/// Where the operation that claimed a ready attachment stands.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Claim {
     /// No send or new thread uses it yet.
@@ -897,7 +897,7 @@ pub enum DeleteReason {
     Accepted,
 }
 
-/// The retention rule (the check, the check): a partial copy goes; a ready one goes
+/// The retention rule: a partial copy goes; a ready one goes
 /// once its operation is accepted, or at [`UNSENT_TTL`] if unclaimed or
 /// failed; it is kept while dispatching or uncertain.
 pub fn retention(stored: Stored) -> Retention {
@@ -933,7 +933,7 @@ pub fn can_remove(claim: Claim) -> Result<(), RemoveRefused> {
 pub const STAGING_DIR: &str = "attachments";
 
 /// The absolute path of one staged copy, the only path `--file` and
-/// `--image` may carry (sheet the check): `<area>/<id>/<safe name>`, where `area`
+/// `--image` may carry: `<area>/<id>/<safe name>`, where `area`
 /// is the store's [`STAGING_DIR`], absolute, with no `.` or `..` component,
 /// in UTF-8 and with no control character. The id and the safe name are
 /// checked types, so neither can add a component or start an option.
@@ -1052,7 +1052,7 @@ impl<'de> Deserialize<'de> for PromptAttachment {
 }
 
 /// One ready attachment and the path of its staged copy: what the adapter
-/// passes with `--file` or `--image` (the check).
+/// passes with `--file` or `--image`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StagedAttachment {
     pub attachment: PromptAttachment,

@@ -1,18 +1,18 @@
-// U7 to U10 : the launcher's settings, labels, effects and success, on
+// U7 to U10: the launcher's settings, labels, effects and success, on
 // the fake API's new-thread routes. Synthetic values only.
 //
 // - U7 visible, individual, honest settings: three controls in order, each
-//   showing its choice in words; only offered options; an unavailable harness
-//   listed with its reason and not choosable; a harness switch empties an
-//   unsupported model or effort visibly, never substituting; nothing
-//   preselected (the check); the create carries exactly the shown settings.
+// showing its choice in words; only offered options; an unavailable harness
+// listed with its reason and not choosable; a harness switch empties an
+// unsupported model or effort visibly, never substituting; nothing
+// preselected; the create carries exactly the shown settings.
 // - U8 requested is never verified: before creating, the settings say
-//   requested; after, the reported configuration is labelled as such, beside
-//   the requested one, and a difference is shown.
+// requested; after, the reported configuration is labelled as such, beside
+// the requested one, and a difference is shown.
 // - U9 effects come before pressing, in the core's words, from its preview;
-//   Start thread waits for them; a preview never creates.
+// Start thread waits for them; a preview never creates.
 // - U10 success opens the new thread's details in the same panel or sheet,
-//   with Created and the start stage on separate lines.
+// with Created and the start stage on separate lines.
 
 import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';

@@ -1,24 +1,24 @@
-// The attachment tray's presentation state : one list per target (a
+// The attachment tray's presentation state: one list per target (a
 // thread's composer, or a project's launcher), and the one place a file is
-// uploaded or a staged copy removed. From the approval sheet's the check and the check:
+// uploaded or a staged copy removed. Using the shared upload and removal guards:
 //
 // - **Readiness in the server's words.** A file is `selected` (on this device:
-//   never "uploaded"), `uploading` (to the owner's controller), `ready` (only
-//   after the server's ready answer) or `failed`, with the core's reason, or
-//   the connection's ("connection lost", "signed out"). After a reload a ready
-//   one comes back from the server's list, without a preview; anything else is
-//   `gone`: the browser no longer has the file. Nothing here claims a file
-//   still exists in the browser.
+// never "uploaded"), `uploading` (to the owner's controller), `ready` (only
+// after the server's ready answer) or `failed`, with the core's reason, or
+// the connection's ("connection lost", "signed out"). After a reload a ready
+// one comes back from the server's list, without a preview; anything else is
+// `gone`: the browser no longer has the file. Nothing here claims a file
+// still exists in the browser.
 // - **Uploads start when a file is added, two at a time** (the server's upload
-//   slots, the check), and never again on their own: Retry is the owner's, only while
-//   the browser still has the file, and it never sends anything.
+// slots), and never again on their own: Retry is the owner's, only while
+// the browser still has the file, and it never sends anything.
 // - **Safe previews.** A thumbnail is the browser's own copy of the chosen file
-//   (an object URL), drawn only when its first bytes are PNG, JPEG, GIF or WebP
-//   and the server reported it as an image (so within the core's image limit).
-//   SVG, HTML and everything else get a glyph. Object URLs are revoked on
-//   removal, on hand-over and on unload.
+// (an object URL), drawn only when its first bytes are PNG, JPEG, GIF or WebP
+// and the server reported it as an image (so within the core's image limit).
+// SVG, HTML and everything else get a glyph. Object URLs are revoked on
+// removal, on hand-over and on unload.
 // - **Store the minimum:** each item's name, size, state, id, kind and why, in
-//   this tab's sessionStorage (from src/composer.ts). Never a file's bytes.
+// this tab's sessionStorage (from src/composer.ts). Never a file's bytes.
 //
 // It works out no kind, limit, floor, gate or retention: the core decides,
 // through the server's answers. The page's gate only mirrors the server's.
@@ -30,7 +30,7 @@ import { exact, is, isNull, list, oneOf, parseApiError, str } from './envelope.t
 import type { Check } from './envelope.ts';
 import type { Timers } from './poller.ts';
 
-/** The server's upload slots (the check): the page never asks for more at once, so it never gets its own `503`. */
+/** The server's upload slots: the page never asks for more at once, so it never gets its own `503`. */
 export const UPLOADS_AT_ONCE = 2;
 
 /** The page gives up on an upload's answer after this, beyond the server's 110-second upload deadline. */
@@ -74,7 +74,7 @@ export const ORDER_NOTE = 'the agent gets files first, then images';
 export const AFTER_RELOAD = 'preview not available after reload';
 
 /**
- * The safe-preview rule : whether the first bytes of a file are a PNG,
+ * The safe-preview rule: whether the first bytes of a file are a PNG,
  * JPEG, GIF or WebP, the only types a thumbnail is drawn for. Never the
  * attachment's kind, which is the core's: a thumbnail also needs the server to
  * have reported an image.
@@ -257,7 +257,7 @@ export class Uploads {
   /**
    * The owner's files, added at the end, in their order, shown at once as
    * selected (on this device), so the gate holds before a byte is read
-   * . Each one's first bytes are read (for the preview
+   *. Each one's first bytes are read (for the preview
    * rule) before anything else: once the selection is read, only the files
    * the browser read, and still in the tray, are queued to upload, in the
    * owner's order, two at a time. So no answer can make a file ready while
@@ -486,7 +486,7 @@ function removalFailure(a: Answer): string {
 
 /**
  * A drop anywhere but a prompt body never opens the file in the browser
- * . A
+ *. A
  * prompt body takes its own drops first.
  */
 export function guardDrops(target: { addEventListener(type: string, fn: (e: DragEvent) => void): void; removeEventListener(type: string, fn: (e: DragEvent) => void): void }): () => void {

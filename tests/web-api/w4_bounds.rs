@@ -1,7 +1,7 @@
-//! W4 : the send route is bounded (the check): one target from the path,
+//! W4: the send route is bounded: one target from the path,
 //! a capped body with `Content-Length`, strict JSON, a cap on sends at
 //! once; every answer is `no-store`; and the text, op id and target never
-//! reach the log (the check).
+//! reach the log.
 
 use std::thread;
 use std::time::Duration;

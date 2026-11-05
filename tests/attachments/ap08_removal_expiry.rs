@@ -1,8 +1,8 @@
 //! AP8 Removal and expiry. `rm` deletes the bytes and the metadata. A ready
 //! attachment no operation has claimed expires 24 hours after it became
-//! ready (sheet the check): it is deleted and reported as expired, once. Removal
+//! ready: it is deleted and reported as expired, once. Removal
 //! is refused while its operation is dispatching or uncertain, and expiry
-//! keeps it then (sheet the check), against a claim source the test sets: the
+//! keeps it then, against a claim source the test sets: the
 //! real claims are B2's. Unfinished copies go when the store opens.
 
 use std::ffi::OsString;
@@ -159,7 +159,7 @@ fn a_claimed_attachment_is_kept_while_its_operation_may_use_it() {
     assert_eq!(bench.ids().len(), 5, "nothing was deleted");
 
     // Through the CLI: exit 14. Its open also lets the accepted one go
-    // (the check: its operation's outcome is recorded).
+    // (its operation's outcome is recorded).
     let refused = run(&["rm", &ids[0], &ids[1]], T0);
     assert_eq!(refused.code, 14, "{refused:?}");
     assert!(
