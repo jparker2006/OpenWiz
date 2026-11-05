@@ -6,8 +6,8 @@ All OpenWiz versions, newest first. Versioning: [RELEASING.md](RELEASING.md). Wh
 
 **Fleets of agents build for you**
 
-- Eight skills any agent can use: grill you on an idea, plan it into tickets, then build, review and merge each one.
-- Install them once as a plugin for Claude Code or Codex.
+- Eight fleet skills for coding agents: grill you on an idea, plan it into tickets, then build, review and merge each one.
+- They ship as a Claude Code plugin, and as skill folders Codex reads from the repo.
 - Every merge needs an independent review of the exact commit and green CI.
 
 ## 0.0.4 · 2026-11-05
@@ -15,14 +15,14 @@ All OpenWiz versions, newest first. Versioning: [RELEASING.md](RELEASING.md). Wh
 **Start new threads, with files**
 
 - `openwiz new` starts a Cloud thread in one of your projects. It shows exactly what it will do, and only creates it with `--yes`.
-- Attach files and images to a new thread or a message, from the terminal or your phone.
+- Attach files and images to a new thread or a queued message, from the terminal or the web page.
 - One thread per create: if the result is unclear, it tells you instead of trying again.
 
 ## 0.0.3 · 2026-11-05
 
 **Message your threads**
 
-- `openwiz send` sends one message to a running thread: Queue waits for its turn, Steer joins the current one.
+- `openwiz send` sends one message to a thread, as Queue or Steer.
 - Or send from the web page on your phone.
 - If a send's result is unclear, OpenWiz says so instead of sending twice.
 
