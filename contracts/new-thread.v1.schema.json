@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:openwiz:schema:new-thread:v1",
   "title": "openwiz.new-thread.v1",
-  "description": "OpenWiz 0.0.4 new threads (the implementation): the report of a create (the root), and in $defs the request, the record, the preview, the status read, the start view and the Cloud options. Creation and start are reported apart, and the requested configuration apart from the reported one. Unknown values are {\"unknown\": reason}. Times are integer milliseconds since the Unix epoch. maxUtf8Bytes is OpenWiz's companion keyword for a byte cap: a standard validator ignores it, and OpenWiz enforces it. A1 phase 2: openwiz new, new --status and models print these; no route does until A2. The spawn receipt and error lines behind them are source-read, not observed. B2 : the first prompt may carry staged attachments; the report, the preview and the record name them only when there are some (absent means none, so every A1 shape is unchanged). The attachment shapes are the help's (room-cli v131), never observed.",
+  "description": "OpenWiz 0.0.4 new-thread report and, in $defs, request, record, preview, status, start view and Cloud options. Creation/start and requested/reported configuration are separate. Unknown values carry reasons; times are Unix milliseconds. maxUtf8Bytes is enforced by OpenWiz; a standard validator ignores it. Attachments are staged ids. The source-read spawn fixture lacks the runtime key observed in the PC live run; OpenWiz read those receipts as created, but observed synthetic fixture coverage remains pending. See docs/testing.md for the bounded live result and all gaps; no blanket live acceptance is claimed.",
   "$ref": "#/$defs/report",
   "$defs": {
     "op_id": {

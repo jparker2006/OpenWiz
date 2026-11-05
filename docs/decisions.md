@@ -1,6 +1,6 @@
 # Decisions
 
-*Updated for 0.0.5:* older implemented-scope notes below describe 0.0.1 or 0.0.2. The current fixture-tested interface also includes send, new-thread and attachment flows; the 0.0.3 PC test held its release-blocking claims with gaps, while LIVE-0.0.4 remains pending live test. See [live status and limits](testing.md). See [current scope](../README.md) and the [API contract](../contracts/web-api.v1.md). Proposal sections retain their original status.
+*Updated for 0.0.5:* older implemented-scope notes below describe 0.0.1 or 0.0.2. The current fixture-tested interface also includes send, new-thread and attachment flows; the 0.0.3 PC test held its release-blocking claims with gaps, while LIVE-0.0.4 records held claims and gaps, including missing observed spawn-receipt fixture coverage. See [live status and limits](testing.md). See [current scope](../README.md) and the [API contract](../contracts/web-api.v1.md). Proposal sections retain their original status.
 
 *Updated for 0.0.5:* historical public reports now link to the published public tree.
 

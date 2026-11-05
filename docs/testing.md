@@ -8,7 +8,7 @@
 | Web composer, launcher and attachment tray follow their encoded cases | Fixture test | Linux Chromium; not Safari/WebKit or physical mobile devices |
 | Sent and Cloud queued receipt parsing includes individually observed shapes | Fixture test plus limited live observation of upstream shape | Parser cases are synthetic reconstructions; receipt parsing does not establish full release acceptance |
 | 0.0.3 live delivery acceptance | **Live observation: release-blocking claims held; gaps recorded** | LIVE-0.0.3: PC sittings on earlier 0.0.3 candidates, ending on `d4b2a82`; see the bounded result below. Not a live run of the combined export |
-| 0.0.4 live create/attachment acceptance | **Pending live test** | LIVE-0.0.4: orchestrator fills in exact checked commit, environment, result, counts, gaps and a public-safe summary before claiming acceptance |
+| 0.0.4 live create/attachment checks | **Live observation: held claims and recorded gaps** | LIVE-0.0.4: agent-run on `660c169`; browser/device steps emulated. Spawn-receipt fixture coverage and other gaps remain open; not a blanket acceptance or a live run of this combined export |
 | Eight skills were used in a development run | Live observation, limited | Accepted with gaps; automatic discovery in fresh children unobserved, path-based briefs used |
 | Reviews named exact heads and merged matching heads | Live observation, limited | Eight review reports and four matching merges; no low-finding follow-up exercised |
 | Helper and structural checks exercise the skill rules | Fixture test | Historical helper results and the current export check are distinct; no claim that every helper was re-run for this export |
@@ -17,7 +17,7 @@ The skill run recorded ten starts, no duplicate builders started by the loop, an
 
 **Evidence method:** the fleet summary is a read-back of recorded approvals, start claims, review reports, merge heads and recovery/cleanup records from the 2026-10-31 development run, through 23:30 UTC. Records posted from a shared account do not identify their author unless they say so. The accepted gaps remain limits of that run. Receipt-shape observations are also bounded upstream observations, not a successful complete live check of this export.
 
-**Tested inputs:** fixtures use the historical room-cli 0.43.1 and v127 directories; catalogue shape observations were recorded with v131, and the Cloud queued receipt shape with v141. Folder names do not assert compatibility. The 0.0.3 PC test used room-cli 0.43.1 and v141 across sittings; 0.0.4's final live result/environment remains a placeholder.
+**Tested inputs:** fixtures use the historical room-cli 0.43.1 and v127 directories; catalogue shape observations were recorded with v131, and the Cloud queued receipt shape with v141. Folder names do not assert compatibility. The 0.0.3 PC test used room-cli 0.43.1 and v141 across sittings; the 0.0.4 PC run used room-cli v141 and v142, with Chrome 157 emulation for its browser/device steps.
 
 **Fresh-clone verification:** the private export record binds build, test, formatting and Clippy logs to an exact public-tree head. These checks read no real CloudRoom account. The Rust and web toolchains and locked dependency versions are listed in [dependencies](dependencies.md).
 
@@ -44,4 +44,33 @@ Remaining gaps:
 
 **Machine-neutral effects:** this export takes the corrected environment-copy and awake-until-confirmed wording from the release line. Both refer to “this computer”; effect kinds and contract shapes remain unchanged. The source-wording reconciliation is complete. This wording correction is fixture-tested and does not itself establish 0.0.4 live acceptance.
 
-**Release slots:** LIVE-0.0.3 is filled with the result and limits above; LIVE-0.0.4 remains **pending live test**. Still open: the quick read-only Mac check for this release; exact-head independent export review; maintainer approval of files, diff, date and commit email. Safari/WebKit, physical device radios and the recorded fleet gaps remain unproved. Headless Chromium device emulation must be described as emulation. No PACP conformance is claimed.
+## LIVE-0.0.4: recorded PC run
+
+**Live observation, agent-run (2026-11-05), with held claims and gaps.** The run used the 0.0.4 candidate `660c169` on the Linux PC, room-cli v141 initially and v142 after an application restart. The web export was built with Node 24.22.1 and its manifest checked on the PC. This was not a live run of the combined 0.0.5 export. Browser/device steps used headless Chrome 157; an iPhone user agent, viewport and touch were emulated where required.
+
+Held in the recorded cases:
+
+- One thread per create in the intended existing project, never two; reported settings matched the request; prompt text arrived unchanged.
+- The unoffered combination, oversized image, HEIC/HEIF image and Steer-with-attachment cases were refused with zero writes. The no-remote-project refusal was not exercised live.
+- The CLI killed during create produced one thread, within the allowed zero-or-one bound; the server killed during create made zero calls. Status stayed uncertain, and reruns/waits did not redispatch.
+- Double submit, payload-conflicting operation-id reuse, double press and reload replay obeyed the recorded operation-id checks.
+- Owner-only probes held within their tested scope; no second-identity coverage is implied.
+- Attachment SHA-256 and size were checked at the call, tray refusals held, and nothing remained in local staging. This does not establish deletion of CloudRoom's copies.
+
+**Browser steps and counts:** the emulated-phone launcher created a thread with a PNG; double press and reload replay added no writes. The desktop Chromium composer sent a 10 MiB JPEG through the file input after headless drag-and-drop failed to stage it. The four-create/two-send check allowance was exhausted; the two setup targets were separate. The intended project gained four threads. The first CLI create and the desktop attachment send have **incomplete outside-session brackets because of concurrent factory activity**; their step/landing results do not turn those brackets into passes. Later browser checks were recorded outside the kit after its third sitting stopped before a step on a cross-sitting landing baseline.
+
+**Spawn-receipt gap:** every observed spawn receipt carried an extra `runtime` key with `displayStatus` and `hostReconnectGraceExpiresAt`, absent from the source-read fixture. No recorded key was missing and no type changed; OpenWiz read each receipt as created. That outcome does not prove receipt-shape parity. An observed synthetic spawn-receipt fixture is pending, so this receipt claim remains open. The current export does not add that fixture or claim this gap is fixed.
+
+Other recorded gaps:
+
+- No standard project without a GitHub remote was available, so that refusal remains fixture-only.
+- CLI/web parity pairs span sittings; parity is incomplete.
+- The first CLI-create and desktop attachment-send brackets are incomplete because of concurrent factory activity.
+- The desktop browser refusals/glyph check used Chromium, not Safari; Safari coverage remains open.
+- CDP offline did not interrupt the in-flight upload, so the mid-upload network cut was **not produced** by emulation.
+- Drag-and-drop was not exercised successfully; the file input was used.
+- A real device, real radios, and the tunnel/Access path for the device steps were not tested. The owner-only web probes do not fill that device-path gap.
+- The owner’s acceptance of the launcher and tray was not run. Runner dogfood notes are not the owner’s UI acceptance.
+- The live-tested build still said “your Mac must stay awake”. The current export carries the separately fixture-tested machine-neutral correction; this run did not live-validate that corrected wording.
+
+**Release slots:** LIVE-0.0.3 and LIVE-0.0.4 are filled with their recorded results and limits. Still open: the spawn-receipt fixture gap and the other live limits above; the quick read-only Mac check for this combined release; exact-head independent export review; maintainer approval of files, diff, date and commit email; and the owner’s UI acceptance. The recorded fleet gaps also remain. No blanket live acceptance or PACP conformance is claimed.
