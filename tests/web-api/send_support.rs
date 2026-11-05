@@ -1,4 +1,4 @@
-//! Helpers for the send routes : an in-process server with the send
+//! Helpers for the send routes: an in-process server with the send
 //! record and the fake `room-cli` of a messaging test (`SendFake`), the
 //! fixed clock `openwiz send`'s proofs use, and a raw `POST` client.
 

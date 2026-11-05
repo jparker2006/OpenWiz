@@ -52,17 +52,17 @@ pub(crate) enum Route {
     /// `POST`: the send.
     Send(String),
     Health,
-    /// `GET`: the Cloud options .
+    /// `GET`: the Cloud options.
     CloudOptions,
-    /// `POST`: the create in a project .
+    /// `POST`: the create in a project.
     Threads(String),
-    /// `POST`, never a write: what a create in a project would do .
+    /// `POST`, never a write: what a create in a project would do.
     ThreadsPreview(String),
-    /// `GET`: the new-thread record of an op id .
+    /// `GET`: the new-thread record of an op id.
     NewThreadStatus(String),
-    /// `GET`: the staged attachments; `POST`: one upload .
+    /// `GET`: the staged attachments; `POST`: one upload.
     Attachments,
-    /// `DELETE`: the removal of one staged attachment .
+    /// `DELETE`: the removal of one staged attachment.
     Attachment(String),
 }
 
@@ -144,11 +144,11 @@ pub(crate) enum Call {
     Show(String),
     /// `send <id> --preview`, with `--steer` when `steer`.
     Preview { id: String, steer: bool },
-    /// `models` .
+    /// `models`.
     CloudOptions,
-    /// `new --project-id <id> …` without `--yes`: the new-thread preview .
+    /// `new --project-id <id> …` without `--yes`: the new-thread preview.
     NewThreadPreview(Box<Asked>),
-    /// `new --status <op_id>` .
+    /// `new --status <op_id>`.
     NewThreadStatus(String),
 }
 
@@ -349,7 +349,7 @@ fn envelope<T: Serialize>(envelope: &Envelope<T>) -> Option<String> {
 
 /// The status, kind and message for an operation error: the CLI's message,
 /// under the status for the CLI's exit code (1 → 502, 2 → 400, 3 → 404).
-/// The version is never an error .
+/// The version is never an error.
 fn failure(source: &dyn SessionSource, error_: &OpError) -> Reply {
     match error_ {
         OpError::ListFailed(e) => error(

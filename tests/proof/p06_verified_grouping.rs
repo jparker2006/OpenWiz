@@ -98,7 +98,7 @@ fn text_shows_ungrouped_sessions_with_their_reason() {
     assert!(text.contains(&reason), "the reason is shown:\n{text}");
 }
 
-/// New in ticket 1's correction round 1 . One source is read twice;
+/// One source is read twice;
 /// between the runs a project disappears, then comes back. Each run groups by
 /// its own project list only, so a mapping kept from an earlier run is caught.
 #[test]
@@ -171,7 +171,7 @@ fn grouping_uses_only_the_current_runs_project_list() {
     }
 }
 
-/// New in ticket 1's correction round 1 . : shared project
+/// Shared project
 /// names are shown as `name~<last 6 characters of the id>`; a unique name is
 /// shown as it is. JSON keeps the reported name; the suffix is display only.
 #[test]

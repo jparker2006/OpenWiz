@@ -1,4 +1,4 @@
-// Synthetic attachment reports for the browser proofs , in the shapes of
+// Synthetic attachment reports for the browser proofs, in the shapes of
 // contracts/attachment.v1.schema.json: the add report of one upload, the list
 // and the remove reports. The kind comes from the first bytes (PNG, JPEG, GIF,
 // WebP are images), as the core decides it; the fixtures never decide more.

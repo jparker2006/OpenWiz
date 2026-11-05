@@ -19,8 +19,8 @@ use super::record::{Claim, RecordState, SendRecord, SendStore, StoreError};
 use super::{Binding, BindingField, InvalidRequest, MESSAGING_SCHEMA_ID, Mode, OpId, SEND_BUDGET};
 
 /// Why Steer with attachments is refused, before anything is claimed, read
-/// or sent (, decided in planning): a Cloud steer drops them in source
-///, and Local is unverified. Steer is never turned into Queue.
+/// or sent: a Cloud steer drops them in source, and Local is unverified.
+/// Steer is never turned into Queue.
 pub const STEER_WITH_ATTACHMENTS: &str = "Steer can't carry attachments. Use Queue, or remove them";
 
 /// The adapter side of `send`: the version, the target read and the one

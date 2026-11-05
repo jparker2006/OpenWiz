@@ -256,8 +256,8 @@ export class Uploads {
 
   /**
    * The owner's files, added at the end, in their order, shown at once as
-   * selected (on this device), so the gate holds before a byte is read
-   *. Each one's first bytes are read (for the preview
+   * selected (on this device), so the gate holds before a byte is read.
+   * Each one's first bytes are read (for the preview
    * rule) before anything else: once the selection is read, only the files
    * the browser read, and still in the tray, are queued to upload, in the
    * owner's order, two at a time. So no answer can make a file ready while
@@ -485,8 +485,7 @@ function removalFailure(a: Answer): string {
 }
 
 /**
- * A drop anywhere but a prompt body never opens the file in the browser
- *. A
+ * A drop anywhere but a prompt body never opens the file in the browser. A
  * prompt body takes its own drops first.
  */
 export function guardDrops(target: { addEventListener(type: string, fn: (e: DragEvent) => void): void; removeEventListener(type: string, fn: (e: DragEvent) => void): void }): () => void {

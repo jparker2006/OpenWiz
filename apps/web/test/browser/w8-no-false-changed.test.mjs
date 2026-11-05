@@ -46,7 +46,7 @@ const marks = (page) => page.evaluate(() => window.__marks.map((m) => m.closest(
 /**
  * Waits for two later renders of the composer: any effect of a render before
  * them has run, and anything it set is drawn. The mark is set in an effect
- * after the render it judges , and React runs a render's effects before
+ * after the render it judges, and React runs a render's effects before
  * it starts the next one, so the first later render follows the effect and
  * the second draws what it set. The age line is the composer's own render
  * output; a one-second step of the page's clock always moves it.

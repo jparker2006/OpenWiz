@@ -123,7 +123,7 @@ pub fn project_list() -> Value {
     ])
 }
 
-/// A project name made of shell syntax : it must reach a
+/// A project name made of shell syntax: it must reach a
 /// printed command quoted, as free text.
 pub const SHELL_SYNTAX_NAME: &str = "Synthetic ~ ~root =ls {a,b} * $HOME `x` it's !x";
 

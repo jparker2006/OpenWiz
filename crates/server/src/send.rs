@@ -1,4 +1,4 @@
-//! The one write : `POST /api/v1/sessions/{id}/messages`, and the send
+//! The one write: `POST /api/v1/sessions/{id}/messages`, and the send
 //! lookup. See `contracts/web-api.v1.md`, "Sending".
 //!
 //! The server checks only the request's shape: the send `Host`, the
@@ -281,7 +281,7 @@ impl Slots {
 /// Everything a send needs from the server.
 pub(crate) struct Context<'a> {
     pub sending: &'a Sending,
-    /// The attachment store, for a send with attachments .
+    /// The attachment store, for a send with attachments.
     pub attaching: Option<&'a Attaching>,
     pub slots: &'a Arc<Slots>,
     pub clock: &'a Arc<dyn Clock>,

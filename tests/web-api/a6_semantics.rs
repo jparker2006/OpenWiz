@@ -199,7 +199,7 @@ fn every_timeout_case_matches_the_cli() {
 
 /// [`compare`] for a timeout case. The server and the CLI each measure
 /// their own read timeout, so "timed out after N ms" may differ by a
-/// millisecond : N is ignored on both sides, everything else is
+/// millisecond: N is ignored on both sides, everything else is
 /// compared byte for byte.
 fn compare_timeout(target: &str, argv: &[&str], r: &Response, code: i32, out: &str, err: &str) {
     let r = Response {

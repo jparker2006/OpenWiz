@@ -586,8 +586,7 @@ impl Format {
 
 /// An ISO base media file (an `ftyp` box first): HEIF, or another format,
 /// or unclear. The box header is read in both forms, a 32-bit size and the
-/// 64-bit one (size 1), and every brand counts, major and compatible
-///.
+/// 64-bit one (size 1), and every brand counts, major and compatible.
 ///
 /// - A HEVC brand (`heic`, `heix`, `hevc`, …) is HEIC, unless an AV1 brand
 /// (`avif`, `avis`) is there too: then it is unclear.

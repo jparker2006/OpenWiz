@@ -1,7 +1,7 @@
 // A test-only server for `out/`, with the headers the page needs from
-// openwiz-server once it serves static files (ticket 1's A8, S1-S9 in the
-// evidence README). It mirrors A8; it does not prove it. `/api/v1/...` goes to
-// ticket 1's real server over a fixture scenario, or to a fake API.
+// openwiz-server when it serves static files (A8). It mirrors A8; it does not
+// prove it. `/api/v1/...` goes to the real server over a fixture scenario, or
+// to a fake API.
 
 import { createReadStream, existsSync, lstatSync } from 'node:fs';
 import { createServer, request as httpRequest } from 'node:http';
@@ -52,11 +52,11 @@ function fileFor(path) {
 }
 
 /**
- * Starts the site. `api` is `{ port, allowedHost? }` (ticket 1's server) or a
+ * Starts the site. `api` is `{ port, allowedHost? }` (the real server) or a
  * function `(req, res, url) => void` (a fake). Every request is logged.
  *
  * With `allowedHost`, the proxy does what the tunnel does in front of the
- * real server : it forwards `Host: <allowedHost>`, and the page's
+ * real server: it forwards `Host: <allowedHost>`, and the page's
  * own `Origin` as `https://<allowedHost>` (the page's origin through the
  * tunnel). Any other `Origin` passes unchanged, so a foreign one is still
  * refused.

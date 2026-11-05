@@ -18,7 +18,7 @@ fn the_approved_limits_are_in_the_core() {
     assert_eq!(FINAL_OUTPUT_MAX_BYTES, 4096);
     assert_eq!(MAX_CONCURRENT_DETAIL_READS, 4);
     assert_eq!(RUN_BUDGET, Duration::from_secs(30));
-    // : "--limit defaults to 100".
+    // The default page size is 100.
     assert_eq!(DEFAULT_LIMIT, 100, "the default page size");
     assert_eq!(
         ListRequest::default().limit,

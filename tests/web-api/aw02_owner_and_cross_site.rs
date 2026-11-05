@@ -25,8 +25,7 @@ fn refusals(good: &[(String, String)], body_type: bool, port: u16) -> Vec<Refusa
     let mut case = |what: &str, headers: Vec<(String, String)>, status, kind| {
         out.push((what.to_owned(), headers, status, kind));
     };
-    // This server's own loopback name: served for reads, never for a write
-    //.
+    // This server's own loopback name: served for reads, never for a write.
     for host in [
         format!("127.0.0.1:{port}"),
         format!("localhost:{port}"),

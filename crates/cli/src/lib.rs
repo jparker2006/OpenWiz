@@ -587,7 +587,7 @@ fn header<T>(command: &str, envelope: &Envelope<T>) -> String {
 }
 
 /// `<source> <version> (tested)`, or `(untested; live-tested: <version>)`:
-/// how `ls`, `show` and `send` report the version .
+/// how `ls`, `show` and `send` report the version.
 pub(crate) fn source_text(source: &SourceInfo) -> String {
     let tested = if source.version_tested {
         "tested".to_owned()

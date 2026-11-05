@@ -62,7 +62,7 @@ pub struct NewThreadRecord {
     pub state: RecordState,
     /// The project as resolved for this create.
     pub project: Option<ProjectView>,
-    /// The provider and the version read for this create .
+    /// The provider and the version read for this create.
     pub source: Option<SourceInfo>,
     /// The effects worked out before the call.
     pub effects: Option<Effects>,

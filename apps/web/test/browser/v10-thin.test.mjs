@@ -63,7 +63,7 @@ function files(dir) {
 /**
  * Absolute URLs that appear as inert text inside React's and Next's own
  * bundles (error-message links, XML namespaces). None is ever requested: the
- * request test above proves it. Each is recorded in the evidence.
+ * request test above checks it.
  */
 export const INERT_URLS = [
   /^https:\/\/react\.dev\/errors\/$/,

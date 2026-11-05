@@ -2,7 +2,7 @@
 //! list has its fixed digest on every record.
 //!
 //! **Updated for B2 (the implementation)**, with this recorded reason: B2 relaxes
-//! the seam A1 left . So: without an
+//! the seam A1 left. So: without an
 //! attachment store (`new_thread`, as the server calls it until B3) any
 //! attachment is still refused, now by the one gate, naming it, with zero
 //! calls and no claim; an attachment reaches the argument builder only as

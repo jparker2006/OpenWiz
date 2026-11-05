@@ -387,7 +387,7 @@ fn the_request_no_longer_says_the_route_body_carries_the_target() {
     }
 }
 
-/// Fail closed : the store methods the in-flight guard, the
+/// Fail closed: the store methods the in-flight guard, the
 /// lookup and the withdrawal depend on have no default body, so every store
 /// must implement them; none can fall back to "nothing in flight".
 #[test]

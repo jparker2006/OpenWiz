@@ -1,4 +1,4 @@
-//! AW1 : exactly the planned routes. The route table is A2's plus
+//! AW1: exactly the planned routes. The route table is A2's plus
 //! the three attachment routes: the list (`GET`), the upload (`POST`) and
 //! the removal (`DELETE`). Every other method and path is refused, and
 //! stages nothing. **No route returns an attachment's bytes**, whatever is

@@ -1,4 +1,4 @@
-//! M17 Lookup : one op id's send record, for "Check again".
+//! M17 Lookup: one op id's send record, for "Check again".
 //! A known op id gives its recorded report, an in-progress one says so, an
 //! unknown one says "no record", and one bound to another target says that.
 //! **No `tell`, ever, and no claim.**

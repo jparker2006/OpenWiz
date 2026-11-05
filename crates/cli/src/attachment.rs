@@ -302,7 +302,7 @@ fn expired_lines(out: &mut String, expired: &[StagedView]) {
 }
 
 /// `openwiz attachment add`'s report (`openwiz.attachment-add.v1`): the
-/// store's , with the CLI's exit code and text.
+/// store's, with the CLI's exit code and text.
 #[derive(Clone, Debug, Serialize)]
 #[serde(transparent)]
 pub struct AddReport(pub report::AddReport);
@@ -375,7 +375,7 @@ impl AddReport {
 }
 
 /// `openwiz attachment ls`'s report (`openwiz.attachment-list.v1`): the
-/// store's , with the CLI's text.
+/// store's, with the CLI's text.
 #[derive(Clone, Debug, Serialize)]
 #[serde(transparent)]
 pub struct ListReport(pub report::ListReport);
@@ -431,7 +431,7 @@ fn result_words(result: RemoveResult) -> &'static str {
 }
 
 /// `openwiz attachment rm`'s report (`openwiz.attachment-remove.v1`): the
-/// store's , with the CLI's exit code and text.
+/// store's, with the CLI's exit code and text.
 #[derive(Clone, Debug, Serialize)]
 #[serde(transparent)]
 pub struct RemoveReport(pub report::RemoveReport);

@@ -169,7 +169,7 @@ export function statusSessions(): Session[] {
 }
 
 // ── Synthetic `send` shapes (contracts/messaging.v1.schema.json), as the
-// CLI's --json, --preview --json and --check --json print them .
+// CLI's --json, --preview --json and --check --json print them.
 // Every value is invented; the words are the core's, copied from
 // crates/core/src/messaging.
 

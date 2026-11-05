@@ -1,4 +1,4 @@
-// Synthetic new-thread answers for the launcher's proofs : the Cloud
+// Synthetic new-thread answers for the launcher's proofs: the Cloud
 // options, the preview, the report and the status, shaped exactly as
 // contracts/new-thread.v1.schema.json says (the page's own exact checks read
 // them). Every value is invented: projects are `prj_web_NNNN`, threads

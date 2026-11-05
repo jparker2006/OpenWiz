@@ -1,4 +1,4 @@
-//! W6 : sends are never coalesced. Two sends with different op ids are
+//! W6: sends are never coalesced. Two sends with different op ids are
 //! two calls, even when identical (U7's in-flight guard refuses the second
 //! while the first is running, unless the owner accepts a possible
 //! duplicate); the same op id from two tabs is one call; a conflicting

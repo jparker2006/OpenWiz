@@ -1,4 +1,4 @@
-// The launcher  through ticket 1's real openwiz-server and its new-thread
+// The launcher through the real openwiz-server and its new-thread
 // routes, with the repository's fake room-cli over the `normal` scenario plus
 // the new-thread responses (the A1 fixtures of room-cli-v127/new-thread, and a
 // project list with a synthetic GitHub remote written by this test, never

@@ -294,9 +294,7 @@ fn help_documents_send_its_flags_and_its_limits() {
         "never auto",
         "the provider accepted the message, not that the work completed",
         "can change between the read and the dispatch",
-        // B2, recorded reason: send attaches staged files
-        //, queue only, all ready or nothing; the help said "no
-        // attachments" before.
+        // Send attaches staged files in Queue mode only, all ready or nothing.
         "--attach <path>",
         "--attachment <id>",
         "Steer can't carry attachments",

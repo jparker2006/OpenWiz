@@ -480,10 +480,8 @@ pub fn list_scripted(
 
 // The text contract.
 //
-// Provisional, set in ticket 1's correction round 1  so
-// the text proofs can be checked; see "Provisional choices for the maintainer" in
-// the release checks. Text tests rely on
-// these points only, and every value they check comes from the JSON:
+// Text tests rely on these points only, and every value they check comes
+// from the JSON:
 //
 // 1. Line 1 of `ls`, `ls -l` and `show` is the header. It contains
 //    `<source> <version>`, `snapshot <UTC time>` (RFC 3339, whole seconds,

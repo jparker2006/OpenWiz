@@ -1,4 +1,4 @@
-//! W5 : the same operation. For every case of the `send` fixtures, the
+//! W5: the same operation. For every case of the `send` fixtures, the
 //! route's answer is byte for byte what `openwiz send … --json` prints for
 //! the same input, op id and clock, and the preview and lookup routes'
 //! answers are `--preview --json` and `--check --json`. A static check

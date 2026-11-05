@@ -281,7 +281,7 @@ fn used(dir: &Path) -> u64 {
 /// A free-space measure over a simulated disk of `base` bytes, whose usage
 /// is the store's own files. With a `hook`, the measure runs it after
 /// taking its snapshot and before returning: another staging's copy moves
-/// on in between .
+/// on in between.
 struct Simulated<'a> {
     base: u64,
     hook: std::sync::Mutex<Option<Box<dyn FnOnce() + Send + 'a>>>,

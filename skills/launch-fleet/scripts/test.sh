@@ -614,7 +614,7 @@ expect 'every ticket closed after the summary: close the spec' 0 check.json 'mer
 close spec #10: every ticket is closed
 EOF
 
-### Follow-ups filed outside the spec : "Follow-up of #<ticket> (spec #<spec>)"
+### Follow-ups filed outside the spec: "Follow-up of #<ticket> (spec #<spec>)"
 
 expect 'the closing summary lists follow-ups filed outside the spec, and only its own' 0 check.json 'all_closed | followup(16; "OPEN"; "Follow-up of #12 (spec #10): R3 [low] a wording nit.") | followup(17; "OPEN"; "Follow-up of #31 (spec #20): another spec'"'"'s.")' -- check <<EOF
 spec done #10: every approved ticket is closed; follow-ups to approve or drop: #16

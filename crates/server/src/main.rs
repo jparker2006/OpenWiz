@@ -2,8 +2,8 @@
 //! `PATH`, as the `openwiz` CLI builds it) and the system clock, served on
 //! 127.0.0.1; and for the send routes, the same send record as `openwiz
 //! send`: `$OPENWIZ_STATE_DIR`, else the owner's default state directory,
-//! opened when each request needs it (U9); and for the new-thread routes
-//!, the same new-thread record as `openwiz new`, beside it; and for
+//! opened when each request needs it (U9); and for the new-thread routes,
+//! the same new-thread record as `openwiz new`, beside it; and for
 //! the attachment routes, the same attachment store and free-space
 //! measure as `openwiz attachment`, beside them.
 

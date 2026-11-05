@@ -30,7 +30,7 @@ fn each_row_has_its_age_from_the_snapshot() {
     }
 }
 
-/// Changed in ticket 1's correction round 1 : the text now has to
+/// The text must
 /// show the snapshot time too (text contract 1 in `support.rs`).
 #[test]
 fn text_header_shows_the_source_version_and_snapshot_time() {
@@ -68,7 +68,7 @@ fn text_header_shows_the_source_version_and_snapshot_time() {
     }
 }
 
-/// New in ticket 1's correction round 1 : each row's age in the text
+/// Each row's age in the text
 /// (text contract 5), known or unknown, matches the JSON.
 #[test]
 fn text_rows_show_their_age() {

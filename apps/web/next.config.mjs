@@ -12,7 +12,7 @@ const nextConfig = {
     // webpack's `global` runtime falls back to Function("return this")() when
     // globalThis is missing; a CSP without 'unsafe-eval' refuses that, and every
     // browser we support has globalThis. So the runtime is just globalThis
-    // . Next's bundled webpack ignores output.environment.globalThis here.
+    // Next's bundled webpack ignores output.environment.globalThis here.
     config.plugins.push({
       apply(compiler) {
         compiler.hooks.compilation.tap('OpenWizGlobalThis', (compilation) => {

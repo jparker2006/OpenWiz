@@ -1,6 +1,5 @@
-// Ticket 1's openwiz-server, run over one of 0.0.1's fixture scenarios with
-// the repository's fake room-cli first on PATH, as ticket 1's procedure P0
-// does. Synthetic data only.
+// The real openwiz-server, run over one of the fixture scenarios with the
+// repository's fake room-cli first on PATH. Synthetic data only.
 
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
@@ -33,7 +32,7 @@ export function scenarios() {
 
 /**
  * Starts openwiz-server on a free loopback port over `scenario`. With
- * `allowedHost` , it also takes that host name, which is what lets
+ * `allowedHost`, it also takes that host name, which is what lets
  * it send; its send record is a private directory.
  */
 export async function startFixtureServer(scenario, { allowedHost = null, responses = null } = {}) {

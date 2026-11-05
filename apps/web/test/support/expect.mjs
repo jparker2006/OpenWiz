@@ -52,7 +52,7 @@ export function groups(sessions) {
     }
     g.rows.push(row(s));
   }
-  // G2 : headings that share a name on this page end with the project id's last 4 characters.
+  // G2: headings that share a name on this page end with the project id's last 4 characters.
   const projects = out.filter((g) => g.key !== 'ungrouped');
   const shared = new Set(projects.filter((g) => projects.filter((x) => x.heading === g.heading).length > 1));
   return out.map((g) => (shared.has(g) ? { ...g, heading: `${g.heading} · ${g.key.slice(-4)}` } : g));

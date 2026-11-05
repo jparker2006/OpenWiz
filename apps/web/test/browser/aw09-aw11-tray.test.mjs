@@ -1,4 +1,4 @@
-// AW9 : reloads and reconnects. Reloading mid-upload, losing the network
+// AW9: reloads and reconnects. Reloading mid-upload, losing the network
 // and signing out each keep the draft and dispatch nothing; nothing retries by
 // itself; a ready attachment comes back after a reload, without a preview.
 // AW10: drag and drop onto the prompt body adds files, a folder is refused

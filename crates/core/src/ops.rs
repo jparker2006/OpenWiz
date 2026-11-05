@@ -1,7 +1,7 @@
 //! Operations: `list` (for `ls` and `ls -l`) and `show`.
 //!
-//! Every run reads the source's version first and goes on whatever it is
-//! . Then `list` reads the session,
+//! Every run reads the source's version first and goes on whatever it is.
+//! Then `list` reads the session,
 //! project and machine lists, and `show` reads one session, the project and machine lists, and its final
 //! output. Grouping and location use only the lists read in the same run.
 //!
@@ -104,7 +104,7 @@ struct VersionRead {
 }
 
 /// A recognised version: `N.N.N` (1 to 4 digits each), as `room-cli` 0.43.1
-/// printed, or `v<N>` (1 to 6 digits), as `room-cli` v127 prints . The
+/// printed, or `v<N>` (1 to 6 digits), as `room-cli` v127 prints. The
 /// only version text ever shown: the adapter's sanitizer  and `send` use
 /// it too.
 pub fn is_version_text(text: &str) -> bool {
@@ -118,7 +118,7 @@ pub fn is_version_text(text: &str) -> bool {
     parts.len() == 3 && parts.iter().all(|p| digits(p, 4))
 }
 
-/// The version a run reports, and whether it is `tested`. Never a gate :
+/// The version a run reports, and whether it is `tested`. Never a gate:
 /// the reads and `send` both use it. `read` names the version read, such as
 /// `room-cli --version`. A recognised version is known; anything else is
 /// unknown with OpenWiz's reason, and its text is never echoed.
@@ -162,7 +162,7 @@ fn version_failure(error: &SourceError) -> String {
         } => "ended without an exit code (detail withheld)".to_owned(),
         SourceError::TimedOut { after_ms } => format!("timed out after {after_ms} ms"),
         // The one malformed detail that is shown: OpenWiz's own fixed words
-        // for a version outside the grammar . Allowlisted, so any
+        // for a version outside the grammar. Allowlisted, so any
         // other detail is withheld.
         SourceError::Malformed { detail } if detail == VERSION_NOT_RECOGNISED => detail.clone(),
         SourceError::Malformed { .. } => "returned malformed output (detail withheld)".to_owned(),
@@ -423,7 +423,7 @@ impl<'a> Run<'a> {
         format!("{} {error}", self.name(read))
     }
 
-    /// The source's version, read once. Never a gate : the run goes on
+    /// The source's version, read once. Never a gate: the run goes on
     /// whatever it is. Only a recognised version text is shown; anything else
     /// is unknown with a reason and a gap, and is never echoed.
     fn read_version(&self) -> VersionRead {

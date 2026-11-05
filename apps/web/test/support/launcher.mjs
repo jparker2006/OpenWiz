@@ -1,4 +1,4 @@
-// Shared setup for the launcher's proofs , on the fake API's
+// Shared setup for the launcher's proofs, on the fake API's
 // new-thread routes. Synthetic values only.
 
 import { DESKTOP, openPage, readDetail, readView, waitFor } from './browser.mjs';

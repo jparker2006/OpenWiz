@@ -1,10 +1,10 @@
 //! The web page: `apps/web`'s static export, from one directory given by
-//! `--web-root` . An explicit list that matches the export's layout:
+//! `--web-root`. An explicit list that matches the export's layout:
 //! `/` is `index.html`, and `/_next/static/…` and `/fonts/…` are files under
 //! the root with an extension in [`TYPES`]. Nothing else is served.
 //!
 //! **Loaded once, at start, into memory; no request touches the
-//! filesystem** . Replacing the root, an ancestor or a file
+//! filesystem**. Replacing the root, an ancestor or a file
 //! afterwards changes nothing, and a request can never open a FIFO. A new
 //! export needs a restart.
 //!
@@ -29,7 +29,7 @@ font-src 'self'; img-src 'self' blob:; connect-src 'self'; base-uri 'none'; \
 form-action 'none'; frame-ancestors 'none'";
 
 /// `Cache-Control` for `/_next/static/…` and `/fonts/…`. The builder's
-/// default : the owner's browser only, never a shared cache.
+/// default: the owner's browser only, never a shared cache.
 pub const STATIC_CACHE: &str = "private, max-age=31536000, immutable";
 
 /// `Cache-Control` for the page itself: it names one build's assets.

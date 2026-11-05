@@ -173,7 +173,7 @@ fn assert_no_body(what: &str, r: &Response, status: u16) {
     );
 }
 
-/// J26, completed : a HEAD request refused before its head
+/// J26, completed: a HEAD request refused before its head
 /// parses still has no body, since its request line already says HEAD:
 /// `414`, `431`, `505`, a malformed request line (`400`), a head that
 /// arrives too late (`408`) and the connection cap's `503`.
@@ -424,7 +424,7 @@ fn the_server_calls_only_the_cores_list_and_show() {
         ] {
             let allowed_in_main =
                 ["from_path()", "openwiz_store"].contains(&forbidden) && path.ends_with("main.rs");
-            // A8 : only web.rs reads files: the web page's, once, at
+            // A8: only web.rs reads files: the web page's, once, at
             // start (checked below: never while answering a request).
             let allowed_in_web = ["std::fs", "File::open", "read_dir"].contains(&forbidden)
                 && path.ends_with("web.rs");

@@ -106,7 +106,7 @@ const OBSERVED_KEYS: &[&str] = &[
 
 const OBSERVED_SENT_KEYS: &[&str] = &["threadId", "ok", "delivery", "mode"];
 
-/// Queued keys/labels observed by PC probe c687079 , only in send/.
+/// Queued keys/labels reconstructed from an observed receipt, only in send/.
 const OBSERVED_QUEUED_KEYS: &[&str] = &[
     "queuedMessage",
     "id",
@@ -348,7 +348,7 @@ fn is_synthetic_id(s: &str) -> bool {
 }
 
 fn is_version(s: &str) -> bool {
-    // `v<N>`: the format `room-cli` prints since v127 .
+    // `v<N>`: the format `room-cli` prints since v127.
     if let Some(n) = s.strip_prefix('v') {
         return !n.is_empty() && n.len() <= 6 && n.bytes().all(|b| b.is_ascii_digit());
     }

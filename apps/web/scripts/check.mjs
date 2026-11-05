@@ -26,7 +26,7 @@ const walk = (dir) =>
   });
 
 // The checked sources: every file under pages/ and src/, which is what ships.
-// Fail closed: a file the checks cannot read (not.ts or.tsx) is a problem.
+// Fail closed: a file the checks cannot read (not `.ts` or `.tsx`) is a problem.
 const sources = ['pages', 'src'].flatMap((d) => walk(join(WEB, d)));
 for (const f of sources) {
   if (!/\.tsx?$/.test(f)) problems.push(`${relative(WEB, f)}: a source file the checks cannot read (only .ts and .tsx are allowed)`);

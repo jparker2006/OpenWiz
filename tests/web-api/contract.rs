@@ -145,7 +145,7 @@ fn the_contract_documents_what_the_tests_check() {
     ] {
         need(value);
     }
-    // A8 : the web page.
+    // A8: the web page.
     need("`--web-root`".to_owned());
     need("`Allow: GET, HEAD`".to_owned());
     need(format!("`Content-Security-Policy: {PAGE_CSP}`"));

@@ -1,4 +1,4 @@
-// The one attachment tray , in the one prompt body's attachments
+// The one attachment tray, in the one prompt body's attachments
 // region, so the composer and the launcher show the same one (AW8: `npm run
 // check` allows <AttachmentTray> only in PromptBody.tsx, and a file input only
 // here). Each row: a thumbnail or a glyph, the name as plain text (cut in the

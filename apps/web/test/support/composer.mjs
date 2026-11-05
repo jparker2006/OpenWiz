@@ -1,4 +1,4 @@
-// Shared setup for the composer's proofs , on the fake
+// Shared setup for the composer's proofs, on the fake
 // API's send routes. Synthetic values only.
 
 import { DESKTOP, openPage, readDetail, readView, waitFor } from './browser.mjs';

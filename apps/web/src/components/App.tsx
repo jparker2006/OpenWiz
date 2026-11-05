@@ -58,7 +58,7 @@ export function App() {
     () => viewer.getState(),
     () => viewer.getState(),
   );
-  // One tray per target , shared by the composer and the launcher through the one prompt body.
+  // One tray per target, shared by the composer and the launcher through the one prompt body.
   const [uploads] = useState(
     () => new Uploads({ fetch: browserFetch, xhr: browserXhr, storage: browserStorage(), timers, urls: { create: (f) => URL.createObjectURL(f), revoke: (u) => URL.revokeObjectURL(u) } }),
   );
@@ -74,7 +74,7 @@ export function App() {
     return () => viewer.stop();
   }, [viewer]);
 
-  // A file dropped anywhere but a prompt body never opens in the browser; object URLs go with the page .
+  // A file dropped anywhere but a prompt body never opens in the browser; object URLs go with the page.
   useEffect(() => {
     const unguard = guardDrops(window);
     const leave = () => uploads.unload();

@@ -1,4 +1,4 @@
-//! Helpers for the new-thread routes : a private fake `room-cli`
+//! Helpers for the new-thread routes: a private fake `room-cli`
 //! and new-thread record per test, an in-process server with the send and
 //! new-thread configurations, the fixed clock `openwiz new`'s proofs use,
 //! `openwiz new` and `openwiz models` in-process, and raw `POST` clients.

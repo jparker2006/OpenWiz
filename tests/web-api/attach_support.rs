@@ -1,4 +1,4 @@
-//! Helpers for the attachment routes : an in-process server with
+//! Helpers for the attachment routes: an in-process server with
 //! the send, new-thread and attachment configurations over one private
 //! state directory, a free-space measure the test sets, raw upload, list
 //! and removal clients, and `openwiz attachment` in-process with the same

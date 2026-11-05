@@ -719,8 +719,7 @@ fn respond(head: &Head, stream: &mut TcpStream, shared: &Shared) -> Reply {
     {
         return api::error(404, "no_route", "no such route");
     }
-    // The same for the attachment routes without an attachment configuration
-    //.
+    // The same for the attachment routes without an attachment configuration.
     let attaching = shared.config.attaching.as_ref();
     if attaching.is_none() && matches!(matched, Some(Matched::Attachments | Matched::Attachment(_)))
     {

@@ -448,8 +448,8 @@ impl Store<Attachments> {
         // a copy is written, and a sweep takes it only after letting go of
         // the staging lock, so the two never wait on each other.
         let _claims = self.claims_lock()?;
-        // What the other stagings still need, first; the free space after
-        //. Copies run without this lock, so one
+        // What the other stagings still need, first; the free space after.
+        // Copies run without this lock, so one
         // can move on, or finish, between the two looks: then its bytes are
         // counted twice (still needed, and already used), never not at all.
         // Measured the other way round, a copy moving on in between would be

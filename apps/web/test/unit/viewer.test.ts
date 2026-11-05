@@ -56,7 +56,7 @@ test('a failure keeps the last good snapshot, and the next success clears it (V6
   assert.deepEqual(list.last?.envelope, page);
   assert.deepEqual(list.failure, { kind: 'disconnected', cause: 'network', status: null });
   assert.equal(connection(list, at(h.clock.now), TIMING.staleAfterMs), 'disconnected');
-  // A network failure is not the server's answer: the retry waits out its bound since the read was sent .
+  // A network failure is not the server's answer: the retry waits out its bound since the read was sent.
   await h.clock.advance(TIMING.laneHoldMs);
   h.f.reply(json(200, page));
   await settle();

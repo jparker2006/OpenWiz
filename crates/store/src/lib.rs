@@ -304,7 +304,7 @@ impl<K: Area> Store<K> {
     /// kind's directory. With `sync`, missing directories are made and the
     /// chain is synced. Without it nothing is made or synced, and a missing
     /// directory gives `None`. Named for the send record, the store's first
-    /// kind ; it checks every area's directory the same way.
+    /// kind; it checks every area's directory the same way.
     fn checked_sends(
         state_dir: &Path,
         sync: Option<&SyncDir<'_>>,

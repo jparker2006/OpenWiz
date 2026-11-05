@@ -11,13 +11,12 @@
 //! **Fixtures only.** The synthetic files are written at test time into a
 //! private directory outside the repository (never committed); nothing
 //! calls `room-cli`, and fixture tests never prove CloudRoom's behaviour:
-//! its limits and typing rules are source-read ,
+//! its limits and typing rules are source-read,
 //! rechecked at the live check (AL2). `bench` runs the store and the CLI on
 //! a private state directory, with a faked free-space measure and claim
 //! source; `child` is this test binary run again as its own process (AP4
 //! stops it at each staging step, AP6 measures its memory). `program` runs
-//! the release `openwiz attachment` with the real free-space measure
-//! .
+//! the release `openwiz attachment` with the real free-space measure.
 
 mod bench;
 mod child;
@@ -31,7 +30,7 @@ mod schema;
 #[path = "../support/dirs.rs"]
 mod dirs;
 
-// `pattern`, for the attachment schema only .
+// `pattern`, for the attachment schema only.
 mod pattern;
 
 mod ap01_kind;

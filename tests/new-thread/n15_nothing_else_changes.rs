@@ -55,7 +55,7 @@ fn no_read_command_reaches_a_write() {
     assert_eq!(catalogue_reads, 3, "models twice and the preview once");
 }
 
-/// Updated for A2 , with this reason: A2 adds the server's new-thread
+/// Updated for A2, with this reason: A2 adds the server's new-thread
 /// routes, which call the core's `new_thread`, `preview_new_thread`,
 /// `new_thread_status` and `cloud_options` as the CLI does
 /// (`tests/web-api/u05_same_operation.rs` finds no new-thread logic of the

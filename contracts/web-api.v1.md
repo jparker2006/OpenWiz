@@ -210,7 +210,7 @@ The four routes call only the core, as `openwiz new` and `openwiz models` do, an
 | `model` | A string, the same rule | `--model` |
 | `effort` | A string, the same rule | `--effort` |
 | `text` | A string: the prompt, passed as it is. The core's text rule (not empty, not only whitespace, no NUL, at most 16 384 bytes of UTF-8) | the text after `--` |
-| `attachments` | A JSON array of strings: staged attachment ids, in the owner's order, through the core's one gate (; [Attachments in a send and a create](#attachments-in-a-send-and-a-create)). `[]` is a text-only prompt | `--attachment <id>`, once per id |
+| `attachments` | A JSON array of strings: staged attachment ids, in the owner's order, through the core's one gate ([Attachments in a send and a create](#attachments-in-a-send-and-a-create)). `[]` is a text-only prompt | `--attachment <id>`, once per id |
 
 All six keys are required, each exactly once, each of its own JSON type; keys may come in any order. Any other key, a missing or repeated key, a value of the wrong JSON type (an `attachments` element included), a root that is not an object, invalid JSON or UTF-8, or anything after the object but whitespace is `400` (`invalid_request`), and nothing is read, claimed or created. The message names the rule, never the value.
 

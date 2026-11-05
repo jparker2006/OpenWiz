@@ -45,7 +45,7 @@ function Row({ session, selected, onSelect }: { session: Session; selected: bool
   );
 }
 
-/** A project heading's New thread : opens the launcher for that project. It creates nothing. */
+/** A project heading's New thread: opens the launcher for that project. It creates nothing. */
 function NewThread({ project, open, onNewThread }: { project: LaunchProject; open: boolean; onNewThread: (project: LaunchProject) => void }) {
   const name = `${factText(project.name)}${project.suffix === null ? '' : ` · ${project.suffix}`}`;
   return (
@@ -127,7 +127,7 @@ export function Inventory({
   fresh: boolean;
   now: Date;
   onSelect: (id: string) => void;
-  /** A project heading's New thread : opens the launcher in the panel or sheet. */
+  /** A project heading's New thread: opens the launcher in the panel or sheet. */
   onNewThread: (project: LaunchProject) => void;
   onPage: (offset: number) => void;
 }) {

@@ -460,7 +460,7 @@ pub fn strings(value: &Value, out: &mut Vec<String>) {
     }
 }
 
-// Sends in flight .
+// Sends in flight.
 
 /// A send of `op_id` claimed by another live sender: a second store, in
 /// this process, that holds the op id's lock until it is dropped or

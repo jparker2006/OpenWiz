@@ -2,8 +2,8 @@
 // refresh do to the launcher, on the fake API. Synthetic values only.
 //
 // - U11 failure and uncertainty keep everything: the prompt, settings and op
-// id survive a reload; Refresh status makes no create; there is no retry
-//, only the owner's explicit Start over, which says it may make a
+// id survive a reload; Refresh status makes no create; there is no retry;
+// only the owner's explicit Start over, which says it may make a
 // second thread. "Not offered" reads the options again, visibly.
 // - U12 no double create: double clicks, a held Ctrl+Enter, Try again after no
 // answer, a reload and a copied tab all send one op id: one provider call.

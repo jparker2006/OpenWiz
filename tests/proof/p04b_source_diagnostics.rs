@@ -338,7 +338,7 @@ fn fake_with(test: &str, scenario: &str, edit: impl FnOnce(&mut Value)) -> Fake 
 }
 
 /// What the failing response prints on stdout; a failed read's stdout is
-/// never used .
+/// never used.
 const FAILED_STDOUT: &str =
     "Synthetic stdout of a failed read at /Users/synthetic-owner/failed-read-stdout";
 const FAILED_STDOUT_MARKER: &str = "failed-read-stdout";

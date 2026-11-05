@@ -101,7 +101,7 @@ function SendControl({
   changed?: boolean;
   onPress: (p: Press) => void;
 }) {
-  // One activation, one press . A held key never presses again: its
+  // One activation, one press. A held key never presses again: its
   // auto-repeat is ignored, and after a press this control stays latched until a fresh activation:
   // a new key press or release, a new pointer down, or a click with no key held (assistive
   // technology clicks without keys).
@@ -361,7 +361,7 @@ export function Composer({
   const out = inFlight(s);
   const empty = s.draft.trim() === '';
   // What stops every send button alike; each adds its own preview's reason. An attachment not
-  // ready stops them too .
+  // ready stops them too.
   const off = !listed ? 'this thread is no longer listed on this page' : (composers.blocked(id) ?? composers.attachmentsOff(id));
   const gate = (label: string, mode: Mode) => gateOf(label, mode, previews, off);
   const idle = !empty && !out;

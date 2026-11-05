@@ -20,7 +20,7 @@ pub struct Envelope<T> {
 }
 
 /// Which source answered, and whether its version is the tested one. Also
-/// recorded and reported by `send` .
+/// recorded and reported by `send`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SourceInfo {
     /// Such as `room-cli`.
@@ -96,7 +96,7 @@ pub struct Gap {
 pub enum GapKind {
     /// The source's version could not be read, or is not a recognised
     /// version text. A known but untested version is not a gap: it is shown
-    /// by `version_tested` .
+    /// by `version_tested`.
     UntestedVersion,
     /// A read exited non-zero.
     CommandFailed,

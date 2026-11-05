@@ -1,4 +1,4 @@
-//! Foundation checks that pass in ticket 1: dependency direction, the
+//! Foundation checks: dependency direction, the
 //! fixture scan, the approved limits, schema conformance and the pending list.
 //! OpenWiz 0.0.5 adds the skills folder's static check, and
 //! the rule that no test leaves a directory's mode to the umask.

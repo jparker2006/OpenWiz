@@ -1,6 +1,6 @@
 //! N17: drift. An unexpected receipt shape gives uncertain with a gap; an
 //! unexpected catalogue shape gives no options. The version is reported,
-//! never a gate : the draft's "an untested version means nothing is
+//! never a gate: the draft's "an untested version means nothing is
 //! created" is dropped (sheet, "Already decided").
 
 use openwiz_adapter_cloudroom::new_thread::{parse_catalogue, spawn_receipt};

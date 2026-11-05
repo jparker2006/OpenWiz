@@ -2,7 +2,7 @@
 // hours of refreshes with changing rows, then failures (backoff is capped),
 // then a hidden hour (no reads; one on return). The JS heap must not grow.
 //
-// The retry gaps are measured exactly : the page's clock
+// The retry gaps are measured exactly: the page's clock
 // is paused, so it moves only by `runFor`, and each list read is stamped by
 // the page's own clock when it calls `fetch`. Before, a read was dated by the
 // 1-second step in which the fake API happened to see it, so a read that was
@@ -107,7 +107,7 @@ test(`soak: ${HOURS} simulated hours, then failures, then a hidden hour`, { time
     assert.ok(fx.api.reads('list').length - failStart <= (30 * 60_000) / cap + 10);
 
     // Phase 2b: 20 simulated minutes of the network's error page. The server is not
-    // known to be done with those reads, so each holds the lane for its bound .
+    // known to be done with those reads, so each holds the lane for its bound.
     failing = 'network';
     const netFrom = await listCount();
     for (let t = 0; t < 20 * 60_000; t += 1_000) {

@@ -1,4 +1,4 @@
-// Shared setup for the attachment tray's proofs , on the fake
+// Shared setup for the attachment tray's proofs, on the fake
 // API's attachment routes. Synthetic files only, made here at test time.
 
 import { deflateSync } from 'node:zlib';

@@ -1,4 +1,4 @@
-//! Schema parity : `contracts/prompt.v1.schema.json`
+//! Schema parity: `contracts/prompt.v1.schema.json`
 //! and `contracts/new-thread.v1.schema.json` accept exactly what the Rust
 //! core accepts, for the prompt text, the op id, the attachment id, the
 //! three settings and the project reference. The schemas use `pattern` and

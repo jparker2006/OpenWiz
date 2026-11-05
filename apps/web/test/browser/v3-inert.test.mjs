@@ -199,6 +199,6 @@ test('the emitted JavaScript has no eval or Function(...), except the recorded n
     if (/\beval\s*\(|\bFunction\s*\(/.test(text)) found.push(f.slice(OUT_DIR.length));
   }
   // The only allowed file is the polyfills chunk that pages load with `noModule`:
-  // no browser that runs ES modules (every supported one) loads it .
+  // no browser that runs ES modules (every supported one) loads it.
   assert.deepEqual(found.filter((f) => !noModule.includes(f)), [], 'eval or Function(...) in a chunk the page runs');
 });

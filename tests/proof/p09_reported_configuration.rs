@@ -47,7 +47,7 @@ fn json_keeps_model_and_effort_under_reported_configuration() {
     }
 }
 
-/// Changed in ticket 1's correction round 1 : the label must be the
+/// The label must be the
 /// configuration's own, tied to both values (text contract 6 in
 /// `support.rs`), in `ls -l` and `show`, not just "reported" somewhere.
 #[test]

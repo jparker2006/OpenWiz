@@ -153,7 +153,7 @@ fn there_is_no_count_cap() {
 
 /// Every constant in the attachment model is one of these, and nothing else
 /// in the core names an attachment cap. Adding a count or size cap fails
-/// here (the negative check in the evidence).
+/// here.
 #[test]
 fn no_other_size_or_count_constant() {
     const ALLOWED: &[&str] = &[

@@ -1,4 +1,4 @@
-// The design pass : presentation proofs at 390 and 1440 px. The selected
+// The design pass: presentation proofs at 390 and 1440 px. The selected
 // row has a shape, not only a tint; the core's words are shown whole and as
 // reported; desktop rows are one line; labels sit on one line; every marker's
 // glyph lines up with the text above it (its box hangs outside).

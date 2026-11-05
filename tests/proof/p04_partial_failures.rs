@@ -295,7 +295,7 @@ fn final_output_read_timeout_gives_a_partial_show_within_the_budget() {
     );
 }
 
-/// New in ticket 2. : each read has a 15-second timeout, and there
+/// Each read has a 15-second timeout, and there
 /// are no retries; a timeout becomes a gap. With the default 30-second
 /// budget, a read that never answers is stopped after 15 seconds, once.
 #[test]
@@ -415,7 +415,7 @@ fn exit_codes_are_documented_and_errors_go_to_stderr() {
     }
 }
 
-/// New in ticket 2. `openwiz --help` documents the commands, the sort key
+/// `openwiz --help` documents the commands, the sort key
 /// and the exit codes, and reads nothing.
 #[test]
 fn help_documents_the_commands_the_order_and_the_exit_codes() {

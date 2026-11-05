@@ -4,7 +4,7 @@
 //!
 //! Every case runs against the repository's fake `room-cli`. **Nothing is
 //! sent live**, and fixture tests never prove live behaviour: the `thread
-//! tell` shapes are documented, not observed, until ticket 3.
+//! tell` shapes are documented; their fixture cases do not establish live behaviour.
 //!
 //! `structure` holds the checks that are not one M case: dependency
 //! direction for the new store crate, and a core without I/O.

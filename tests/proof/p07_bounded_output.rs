@@ -149,7 +149,7 @@ fn rows_are_capped() {
     }
 }
 
-/// Changed in ticket 1's correction round 1 : the cut must be shown
+/// The cut must be shown
 /// (text contract 7 in `support.rs`), for the final output and the purpose.
 #[test]
 fn printed_final_output_and_purpose_show_their_cut() {
@@ -327,8 +327,7 @@ fn assert_every_string_is_capped(label: &str, json: &Value) {
     }
 }
 
-/// Changed in ticket 1's correction round 1 , from a title-only
-/// check. Every string field in the result is capped; plain text fields keep
+/// Every string field in the result is capped; plain text fields keep
 /// their first `FIELD_MAX_CHARS - 1` characters and end with `…`, and
 /// bounded texts set `truncated`.
 #[test]
@@ -506,7 +505,7 @@ fn printed_output_shows_every_cut() {
     let wanted = format!("unknown ({})", capped(&o.reasons[0]));
     assert!(text.contains(&wanted), "show shows {wanted:?}:\n{text}");
 
-    // An oversized version : not a recognised version, so
+    // An oversized version: not a recognised version, so
     // it is unknown with a reason and never echoed; the run goes on.
     let version = oversized("version");
     let source = ScriptedSource::new(1).with_version(&version);

@@ -119,8 +119,7 @@ fn json_output_matches_the_schema() {
 }
 
 /// The header, counts, gaps, freshness, location, grouping and parent in the
-/// text say what the JSON says (text contract in `support.rs`). New in
-/// ticket 1's correction round 1 .
+/// text say what the JSON says (text contract in `support.rs`).
 fn assert_envelope_text_matches(label: &str, json: &Value, text: &str) {
     let header = text.lines().next().unwrap_or_default();
     let source = format!(
@@ -266,7 +265,7 @@ fn show_text_matches_the_json_envelope() {
     }
 }
 
-/// New in ticket 2. : `cargo build --release` produces `openwiz`,
+/// `cargo build --release` produces `openwiz`,
 /// and its `--json` output passes the schema check. The test builds the
 /// release binary into this workspace's target directory, runs it with the
 /// fake `room-cli` first on `PATH`, and checks every envelope against the

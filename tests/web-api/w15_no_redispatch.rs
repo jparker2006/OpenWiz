@@ -1,4 +1,4 @@
-//! W15 : the built `openwiz-server` dispatches nothing when it starts,
+//! W15: the built `openwiz-server` dispatches nothing when it starts,
 //! and a server killed during a send's call leaves that op id uncertain:
 //! a replay after the restart is recovered as uncertain, never sent again.
 //! And U9: the server and `openwiz send` share one send record, so an op id
@@ -80,7 +80,7 @@ impl Binary {
 
     /// Waits, up to 10 s, until stderr holds `n` lines starting with each
     /// `prefix`: a line is written after its response is sent, so a response
-    /// does not prove its line is there yet .
+    /// does not prove its line is there yet.
     fn wait_for_lines(&self, expected: &[(&str, usize)]) {
         let until = Instant::now() + Duration::from_secs(10);
         loop {

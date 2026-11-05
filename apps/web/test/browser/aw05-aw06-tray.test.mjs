@@ -1,4 +1,4 @@
-// AW5 , the page's half: the action button is disabled while any
+// AW5, the page's half: the action button is disabled while any
 // attachment is selected, uploading or failed, and says why ("2 attachments
 // not ready"); Steer is not offered with attachments. The server's gate is the
 // real one (tests/web-api, AW5). AW6: honest states. Selected never says

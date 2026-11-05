@@ -1,4 +1,4 @@
-//! Project names : a name resolves to one project
+//! Project names: a name resolves to one project
 //! only when no other project answers to it, whether by its literal name or
 //! by the inventory's qualified `name~<last 6 of the id>`. Otherwise it is
 //! refused as ambiguous, so a create can never land in another project.

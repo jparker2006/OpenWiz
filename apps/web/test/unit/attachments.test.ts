@@ -1,4 +1,4 @@
-// The attachment tray's state : AW5's gate (mirrored), AW6's honest
+// The attachment tray's state: AW5's gate (mirrored), AW6's honest
 // states, AW7's safe previews, AW9's reloads and lost connections, and the
 // tray's one upload path: two at a time, never retried by itself, a retry
 // only while the browser has the file, a removal of a ready copy through the

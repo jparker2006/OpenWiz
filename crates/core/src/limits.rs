@@ -21,10 +21,10 @@ pub const MAX_CONCURRENT_DETAIL_READS: usize = 4;
 pub const RUN_BUDGET: Duration = Duration::from_secs(30);
 
 /// Each single read gives up after this long, inside the run budget, and is
-/// never retried. Decided in ; the adapter applies it to every read.
+/// never retried; the adapter applies it to every read.
 pub const READ_TIMEOUT: Duration = Duration::from_secs(15);
 
-/// Rows per page when `--limit` is not given. Decided in .
+/// Rows per page when `--limit` is not given.
 pub const DEFAULT_LIMIT: usize = 100;
 
 /// The largest page `--limit` may ask for. Provisional.

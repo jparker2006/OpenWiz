@@ -1,4 +1,4 @@
-//! U9 and U11 , the server's half.
+//! U9 and U11, the server's half.
 //!
 //! - **U9 effects come before pressing,** in the core's words: the
 //!   new-thread preview carries the core's effect lines (or why a create

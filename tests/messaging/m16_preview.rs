@@ -1,4 +1,4 @@
-//! M16 Preview : what a send to one target in one mode would
+//! M16 Preview: what a send to one target in one mode would
 //! do, before any text is written. It reads the target and returns `send`'s
 //! effects and the read's time, with **no claim and no `tell`**. Its effects
 //! equal `send`'s for every target in the send fixtures, because `send`

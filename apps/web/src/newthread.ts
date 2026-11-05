@@ -1,4 +1,4 @@
-// The new-thread shapes the launcher reads , as
+// The new-thread shapes the launcher reads, as
 // `contracts/new-thread.v1.schema.json` defines them: the Cloud options
 // (`openwiz models --json`), the preview (`openwiz new … --json`), the report
 // (`openwiz new … --yes --json`) and the status (`openwiz new --status`). One
