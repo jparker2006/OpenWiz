@@ -1,6 +1,6 @@
 # Private access to OpenWiz
 
-*Updated for 0.0.5.* **Current interface; fixture-tested boundaries.** The current server can send messages, create Cloud threads and stage or remove local attachments. Full 0.0.3/0.0.4 live acceptance is **pending live test**. The old read-only 0.0.2 access check does not validate this update's writes.
+*Updated for 0.0.5.* **Current interface; fixture-tested boundaries.** The current server can send messages, create Cloud threads and stage or remove local attachments. The 0.0.3 PC test held its release-blocking claims with recorded gaps; LIVE-0.0.4 remains **pending live test**. See [testing and gaps](testing.md). The old read-only 0.0.2 access check does not validate this update's writes.
 
 ## How it is protected
 

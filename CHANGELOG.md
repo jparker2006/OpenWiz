@@ -8,11 +8,11 @@ All OpenWiz versions and revisions, newest first. Versioning is explained in [RE
 
 **Message, create and coordinate threads.**
 
-1. **Fixture test — 0.0.3:** Queue and Steer messages from the CLI and web, with operation records and explicit uncertain outcomes. Full delivery acceptance: **pending live test**.
+1. **Fixture test — 0.0.3:** Queue and Steer messages from the CLI and web, with operation records and explicit uncertain outcomes. **Live observation — LIVE-0.0.3:** the PC test held the release-blocking claims, with recorded gaps; the combined export was not that test candidate.
 2. **Fixture test — 0.0.4:** preview and create a Cloud thread in an existing project; stage files and images locally, then attach them to Queue sends or creates. Full creation and attachment acceptance: **pending live test**.
 3. **Live observation, limited — 0.0.5:** eight fleet skills used in a development run, accepted with recorded gaps: fresh-child discovery and contract holds unobserved; five-ready-ticket launches and cross-version timing unproved; some running and cleanup required intervention. Exact-head reviews and matching merges were observed; helper checks are fixture tests.
 
-Export validation: Rust 1.99.1, Node.js 24.22.1, Linux and Chromium on synthetic tests, with the locked crates and packages in [dependencies](docs/dependencies.md). The fresh-clone log and its result belong to the private export record. Live result placeholders for 0.0.3 and 0.0.4, a quick Mac check, Safari/WebKit, real device radios and unattended fleet operation remain open; see [testing and gaps](docs/testing.md). No PACP conformance is claimed.
+Export validation: Rust 1.99.1, Node.js 24.22.1, Linux and Chromium on synthetic tests, with the locked crates and packages in [dependencies](docs/dependencies.md). The fresh-clone log and its result belong to the private export record. LIVE-0.0.3 is filled with the bounded PC result and gaps; LIVE-0.0.4 remains pending live test. A quick Mac check, Safari/WebKit beyond the one recorded phone send, real-radio fault coverage and unattended fleet operation remain open; see [testing and gaps](docs/testing.md). No PACP conformance is claimed.
 
 ## 0.0.2 · 2026-10-30
 

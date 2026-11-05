@@ -62,7 +62,7 @@ pub fn effects_for(project: &ProjectView, read_at: Timestamp) -> Effects {
             ),
             effect(
                 EffectKind::CopiesEnvFiles,
-                "copies the project's .env files from your Mac".to_owned(),
+                "copies the project's .env files from this computer".to_owned(),
             ),
             effect(
                 EffectKind::FullPermissions,
@@ -74,7 +74,7 @@ pub fn effects_for(project: &ProjectView, read_at: Timestamp) -> Effects {
             ),
             effect(
                 EffectKind::MacStaysAwake,
-                "your Mac must stay awake until the start is confirmed".to_owned(),
+                "this computer must stay awake until the start is confirmed".to_owned(),
             ),
             effect(
                 EffectKind::CloudRoomNamesIt,

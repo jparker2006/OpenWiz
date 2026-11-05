@@ -61,10 +61,10 @@ export function effects(project: string, name = PROJECT_NAME, readAt = T0): Effe
     effects: [
       e('creates_and_starts', `creates one Cloud thread in ${name} and starts its first turn`),
       e('starts_from_github', "starts from the project's default branch on GitHub"),
-      e('copies_env_files', "copies the project's .env files from your Mac"),
+      e('copies_env_files', "copies the project's .env files from this computer"),
       e('full_permissions', 'runs with full permissions in its own sandbox'),
       e('uses_cloud_agent', 'uses one Cloud agent from your plan'),
-      e('mac_stays_awake', 'your Mac must stay awake until the start is confirmed'),
+      e('mac_stays_awake', 'this computer must stay awake until the start is confirmed'),
       e('cloud_room_names_it', 'CloudRoom names it'),
     ],
   };

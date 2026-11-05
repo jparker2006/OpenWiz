@@ -1,6 +1,6 @@
 # Releasing
 
-*Updated for 0.0.5:* this staged update combines 0.0.3–0.0.5. The workspace and web package version are 0.0.5. Full 0.0.3 and 0.0.4 live acceptance is pending live test; 0.0.5 was accepted with recorded gaps. Publication still requires exact-head review and maintainer approval.
+*Updated for 0.0.5:* this staged update combines 0.0.3–0.0.5. The workspace and web package version are 0.0.5. The 0.0.3 PC test held its release-blocking claims with recorded gaps; full 0.0.4 live acceptance is pending live test; 0.0.5 was accepted with recorded gaps. Publication still requires exact-head review and maintainer approval.
 
 *Updated for 0.0.5:* historical public reports now link to the published public tree.
 

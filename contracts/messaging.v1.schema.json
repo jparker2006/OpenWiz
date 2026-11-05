@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:openwiz:schema:messaging:v1",
   "title": "openwiz.messaging.v1",
-  "description": "OpenWiz send reports, requests, previews, lookups and records. Unknown values carry reasons. Attachments are staged ids, Queue only. Fixture-tested; full live acceptance pending live test. Receipt parsers cover documented shapes and synthetic copies of individually observed sent and Cloud queued receipts; those observations do not establish complete delivery acceptance.",
+  "description": "OpenWiz send reports, requests, previews, lookups and records. Unknown values carry reasons. Attachments are staged ids, Queue only. Fixture-tested; the separately recorded 0.0.3 PC test held its release-blocking claims with gaps; this combined export has not itself been live-tested. Receipt parsers cover documented shapes and synthetic copies of individually observed sent and Cloud queued receipts; those observations do not establish complete delivery acceptance.",
   "$ref": "#/$defs/report",
   "$defs": {
     "report": {

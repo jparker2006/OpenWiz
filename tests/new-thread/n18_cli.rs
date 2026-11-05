@@ -49,10 +49,10 @@ fn without_yes_the_effects_and_the_exact_command_are_printed_and_nothing_is_crea
     for effect in [
         "creates one Cloud thread in Synthetic project one and starts its first turn",
         "starts from the project's default branch on GitHub",
-        "copies the project's .env files from your Mac",
+        "copies the project's .env files from this computer",
         "runs with full permissions in its own sandbox",
         "uses one Cloud agent from your plan",
-        "your Mac must stay awake until the start is confirmed",
+        "this computer must stay awake until the start is confirmed",
         "CloudRoom names it",
     ] {
         assert!(out.contains(effect), "{effect:?} not shown:\n{out}");

@@ -10,7 +10,7 @@ The HTTP API of `openwiz-server` (`crates/server`), for OpenWiz 0.0.2, 0.0.3 and
 
 **Revision 0.0.4: attachments.** This revision adds the attachment routes: `POST /api/v1/attachments`, which stages one file the owner chose in the browser, as `openwiz attachment add <file> --json` stages one file; `GET /api/v1/attachments`, as `openwiz attachment ls --json`; and `DELETE /api/v1/attachments/{id}`, as `openwiz attachment rm <id> --json`. Their bodies are the CLI's `openwiz.attachment-add.v1`, `openwiz.attachment-list.v1` and `openwiz.attachment-remove.v1` JSON ([`contracts/attachment.v1.schema.json`](attachment.v1.schema.json)), reused unchanged. The send body gains the optional `attachments` (absent means none), and the create's and the new-thread preview's `attachments` now carry staged ids: the CLI's `--attachment <id>`, in order. **No route returns an attachment's bytes.** The upload and the removal change only the controller's attachment store, never CloudRoom. See [Attachments](#attachments-revision-004), and the [attachment limits](../docs/attachment-types.md).
 
-**Status: Current interface; fixture test.** The current send, create and attachment routes are covered by synthetic tests. Full 0.0.3 and 0.0.4 acceptance is **pending live test**; see [testing and gaps](../docs/testing.md).
+**Status: Current interface; fixture test.** The current send, create and attachment routes are covered by synthetic tests. The 0.0.3 PC test held its release-blocking claims with gaps; full 0.0.4 acceptance is **pending live test**; see [testing and gaps](../docs/testing.md).
 
 ## Transport
 

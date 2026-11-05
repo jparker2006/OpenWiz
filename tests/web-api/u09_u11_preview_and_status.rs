@@ -45,6 +45,17 @@ fn u9_the_preview_carries_the_cores_effects_and_creates_nothing() {
         effects[2]["text"].as_str().unwrap().contains(".env"),
         "{preview}"
     );
+    assert_eq!(
+        [
+            effects[2]["text"].as_str().unwrap(),
+            effects[5]["text"].as_str().unwrap(),
+        ],
+        [
+            "copies the project's .env files from this computer",
+            "this computer must stay awake until the start is confirmed",
+        ],
+        "{preview}"
+    );
     // A project a create would refuse: the core's reason, and no effects.
     let r = preview_json(&s, NO_REMOTE, &body("u9-op-2", TEXT));
     assert_eq!(r.status, 200, "{}", r.text());
