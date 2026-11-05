@@ -10,7 +10,7 @@ The server binds to `127.0.0.1` only and has no account login of its own. It use
 
 ## Build and run
 
-Use the [README build steps](../README.md#install), then keep the complete `apps/web/out` together with the corresponding server build. The server loads that directory at startup; restart after replacing it.
+Use the [build steps](../AGENTS.md#build-and-run), then keep the complete `apps/web/out` together with the corresponding server build. The server loads that directory at startup; restart after replacing it.
 
 ```sh
 target/release/openwiz-server --port <port> --allowed-host <openwiz-hostname> --web-root <web-dir>

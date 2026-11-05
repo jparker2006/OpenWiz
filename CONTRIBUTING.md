@@ -46,7 +46,7 @@ A new npm package needs the maintainer's approval too.
 
 1. **Synthetic examples only.** Use reserved names such as `example.com`, `example.org`, `urn:example:…` and `did:example:…`, and invented people such as "User A".
 2. **No personal data, secrets or private material.** That includes real names, contact details, transcripts, chat logs, memory exports, tokens, keys, credentials, private links, and session or account identifiers.
-3. **Label status honestly.** Use **Released**, **Current**, **Unverified**, **Proposed** or **Future** as defined in the [README](README.md#status-words) (*Released* is new in 0.0.1). Do not describe anything as working, supported, compatible or secure without evidence anyone can check.
+3. **Label status honestly.** Use **Released**, **Current**, **Unverified**, **Proposed** or **Future** as defined in the [agent and contributor guide](AGENTS.md#status-words) (*Released* is new in 0.0.1). Do not describe anything as working, supported, compatible or secure without evidence anyone can check.
 4. **Do not imply access that does not exist.** Many personal agents have no public interface for this kind of integration. Say "requires a supported interface", not "integrates with".
 5. **Attribute sources.** Link public sources, pinned to an exact version or commit where possible. Quote briefly rather than copying. Only submit material you have the right to license under Apache 2.0.
 
